@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 
 # GitHub raw URLs
-url_etf = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/us_snapshot_etf_price.csv"
-url_rs  = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/us_snapshot_rs_sparkline.csv"
+url_etf = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv"
+url_rs  = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
 
 # Load data
 df_etf = pd.read_csv(url_etf)
