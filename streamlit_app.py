@@ -10,11 +10,10 @@ df_price = pd.read_csv(price_url)
 df_rs = pd.read_csv(rs_url)
 
 st.title("📊 US Market Daily Snapshot")
-st.caption("Refreshed daily via Databricks & Tiingo")
 
 # 1. Relative Strength
 st.header("1️⃣ Relative Strength vs SPY")
-st.dataframe(df_rs[["ticker","group","rs_rank_52w","rs_rank_20d"]])
+st.dataframe(df_rs[["ticker","rs_to_spy"]])
 # Example sparkline chart
 sparkline = alt.Chart(df_rs).mark_line().encode(
     x="day", y="rs_ratio", color="ticker"
