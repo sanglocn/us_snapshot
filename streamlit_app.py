@@ -1,44 +1,37 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 
-# Load GitHub CSVs
-price_url = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv"
-rs_url = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
+# GitHub raw URLs
+url_etf = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/us_snapshot_etf_price.csv"
+url_rs  = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/us_snapshot_rs_sparkline.csv"
 
-df_price = pd.read_csv(price_url)
-df_rs = pd.read_csv(rs_url)
+# Load data
+df_etf = pd.read_csv(url_etf)
+df_rs  = pd.read_csv(url_rs)
 
-st.title("📊 US Market Daily Snapshot")
+st.title("US ETF Snapshot Dashboard")
 
-# 1. Relative Strength
-st.header("1️⃣ Relative Strength vs SPY")
-st.dataframe(df_rs[["ticker","rs_to_spy"]])
-# Example sparkline chart
-sparkline = alt.Chart(df_rs).mark_line().encode(
-    x="day", y="rs_ratio", color="ticker"
-).properties(width=150, height=60)
-st.altair_chart(sparkline, use_container_width=True)
-
-# 2. Price Performance
-st.header("2️⃣ Price Performance Snapshot")
-cols_perf = ["ticker","1D","1W","1M","3M","6M","1Y","YTD","intraday","pct_from_52w_high","pct_from_52w_low"]
-st.dataframe(df_price[cols_perf])
-
-# 3. Trend Check
-st.header("3️⃣ Trend Check vs SMAs")
-cols_sma = ["ticker","sma5_check","sma10_check","sma20_check","sma50_check","sma100_check"]
-st.dataframe(df_price[cols_sma])
-
-# 4. Volume Alerts
-st.header("4️⃣ Volume Alerts")
-alerts = df_price[df_price["volume_alert"] != "-"]
-st.dataframe(alerts[["ticker","volume_alert"]])
-
-# 5. Group Strength Rotation
-st.header("5️⃣ Group Strength Rotation")
-# Example bar chart by group
-bar = alt.Chart(df_rs).mark_bar().encode(
-    x="rs_rank_change_1d", y="ticker", color="group", tooltip=["ticker","group","rs_rank_change_1d"]
+# --- Section 1: ETF Price Table ---
+st.header("ETF Prices & Metrics")
+st.dataframe(
+    df_etf[[
+        "date","ticker","adj_close","ret_1d","ret_1w","ret_1m",
+        "ret_3m","ret_6m","ret_1y","ret_ytd",
+        "rs_to_spy","rs_rank_21d","rs_rank_252d","volume_alert"
+    ]]
 )
-st.altair_chart(bar, use_container_width=True)
+
+# --- Section 2: Sparkline Relative Strength ---
+st.header("Relative Strength vs SPY (Sparklines)")
+
+tickers = df_rs["ticker"].unique().tolist()
+selected = st.multiselect("Select tickers", tickers, default=tickers[:3])
+
+for t in selected:
+    df_sub = df_rs[df_rs["ticker"] == t]
+    st.line_chart(df_sub.set_index("date")["rs_to_spy"], height=120)
+
+# --- Section 3: Filters and Drilldown ---
+st.header("Drilldown")
+ticker_choice = st.selectbox("Choose a ticker", df_etf["ticker"].unique())
+st.write(df_etf[df_etf["ticker"] == ticker_choice])
