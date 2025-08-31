@@ -219,7 +219,10 @@ for group_name, tickers in group_iter:
     for c in perf_cols:
         disp[c] = numeric_for_style[c].map(lambda x: f"{x*100:.1f}%" if pd.notnull(x) else "")
 
-    rs_cols = [c for c in ["RS Rank (21D)", "RS Rank (252D)"]]
+    # format RS ranks as integer percentages (no decimals)
+    for col in ["RS Rank (21D)", "RS Rank (252D)"]:
+        if col in disp.columns:
+            disp[col] = disp[col].map(lambda x: f"{int(round(x))}%" if pd.notnull(x) else "")
 
     styler = (
         disp.style
