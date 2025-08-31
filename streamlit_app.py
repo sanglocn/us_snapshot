@@ -56,9 +56,9 @@ def format_perf(value):
 
 def tick_icon(value):
     v = str(value).strip().lower()
-    if v == "Yes":
+    if v == "yes":
         return '<span style="color:green;">✅</span>'
-    elif v == "No":
+    elif v == "no":
         return '<span style="color:red;">❌</span>'
     else:
         return "-"
