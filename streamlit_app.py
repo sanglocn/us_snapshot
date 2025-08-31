@@ -39,7 +39,6 @@ def create_sparkline(series_vals, width=120, height=36):
     # Set y-axis limits based on the series' own min and max
     if series_vals:
         y_min, y_max = min(series_vals), max(series_vals)
-        # Add small padding to avoid clipping
         padding = (y_max - y_min) * 0.05 or 0.01
         ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
@@ -90,7 +89,18 @@ def render_dashboard(df_etf, df_rs):
                 "Above SMA10": tick_icon(row.get("above_sma10")),
                 "Above SMA20": tick_icon(row.get("above_sma20")),
             })
-        st.write(pd.DataFrame(rows).to_html(escape=False, index=False), unsafe_allow_html=True)
+        table_html = pd.DataFrame(rows).to_html(escape=False, index=False)
+        st.markdown(
+            f"""
+            <style>
+            table th {{
+                text-align: center !important;
+            }}
+            </style>
+            {table_html}
+            """,
+            unsafe_allow_html=True,
+        )
 
 # Run app
 if __name__ == "__main__":
