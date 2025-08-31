@@ -77,18 +77,18 @@ def render_dashboard(df_etf, df_rs):
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
                 "Ticker": ticker,
-                "RS Sparkline": create_sparkline(spark_series),
-                "RS Rank (21D)": format_rank(row.get("rs_rank_21d")),
-                "RS Rank (252D)": format_rank(row.get("rs_rank_252d")),
+                "Relative Strength": create_sparkline(spark_series),
+                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
+                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
                 "Volume Alert": row.get("volume_alert", "-"),
                 " ": "",
-                "1D": format_perf(row.get("ret_1d")),
-                "1W": format_perf(row.get("ret_1w")),
-                "1M": format_perf(row.get("ret_1m")),
+                "1D Return": format_perf(row.get("ret_1d")),
+                "1W Return": format_perf(row.get("ret_1w")),
+                "1M Return": format_perf(row.get("ret_1m")),
                 "  ": "",
-                "SMA5": tick_icon(row.get("above_sma5")),
-                "SMA10": tick_icon(row.get("above_sma10")),
-                "SMA20": tick_icon(row.get("above_sma20")),
+                "Above SMA5": tick_icon(row.get("above_sma5")),
+                "Above SMA10": tick_icon(row.get("above_sma10")),
+                "Above SMA20": tick_icon(row.get("above_sma20")),
             })
         st.write(pd.DataFrame(rows).to_html(escape=False, index=False), unsafe_allow_html=True)
 
