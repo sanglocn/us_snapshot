@@ -1,18 +1,16 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 import base64
+import io
+import matplotlib.pyplot as plt  # used as fallback for sparkline export
 
 st.set_page_config(page_title="US Market Daily Snapshot", layout="wide")
 
 # -------------------------------------------------------------------
-# Data locations (your confirmed GitHub raw CSVs)
+# Data locations (GitHub raw CSVs)
 # -------------------------------------------------------------------
 URL_ETF = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv"
 URL_RS  = "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
-
-# Optional: hide chart toolbar
-alt.renderers.set_embed_options(actions=False)
 
 # -------------------------------------------------------------------
 # Data loading (cached)
@@ -22,8 +20,8 @@ def load_data():
     df_etf = pd.read_csv(URL_ETF)
     df_rs  = pd.read_csv(URL_RS)
     # dtypes
-    df_etf["date"] = pd.to_datetime(df_etf["date"])
-    df_rs["date"]  = pd.to_datetime(df_rs["date"])
+    df_etf["date"] = pd.to_datetime(df_etf["date"], errors="coerce")
+    df_rs["date"]  = pd.to_datetime(df_rs["date"], errors="coerce")
     # normalize group/ticker text (defensive)
     if "group" in df_etf.columns:
         df_etf["group"] = df_etf["group"].fillna("Ungrouped")
@@ -75,36 +73,62 @@ else:
 # -------------------------------------------------------------------
 def sparkbar_img(series_vals, width=120, height=36, y_domain=None):
     """
-    Return a base64 <img> tag of a mini bar sparkline (Altair v5 + vl-convert).
-    - Last bar dark green; earlier bars light green
-    - y_domain=(min,max) keeps absolute scale across tickers
+    Return a base64 <img> tag for a mini bar sparkline.
+    Tries Altair PNG export (requires vl-convert-python). If that fails,
+    falls back to Matplotlib (no extra backend needed).
     """
     if not isinstance(series_vals, (list, tuple)) or len(series_vals) == 0:
         return ""
 
-    df_tmp = pd.DataFrame({"x": range(len(series_vals)), "y": series_vals})
-    df_tmp["is_current"] = df_tmp["x"] == df_tmp["x"].max()
+    # ---------- Try Altair first ----------
+    try:
+        import altair as alt
+        # Optional: hide toolbar
+        alt.renderers.set_embed_options(actions=False)
 
-    y_scale = alt.Scale(zero=False)
-    if y_domain and len(y_domain) == 2:
-        y_scale = alt.Scale(zero=False, domain=list(y_domain))
+        df_tmp = pd.DataFrame({"x": range(len(series_vals)), "y": series_vals})
+        df_tmp["is_current"] = df_tmp["x"] == df_tmp["x"].max()
 
-    chart = (
-        alt.Chart(df_tmp)
-        .mark_bar()
-        .encode(
-            x=alt.X("x:Q", axis=None, scale=alt.Scale(domain=[0, max(0, len(series_vals)-1)])),
-            y=alt.Y("y:Q", axis=None, scale=y_scale),
-            color=alt.condition(alt.datum.is_current, alt.value("darkgreen"), alt.value("lightgreen")),
-            tooltip=[alt.Tooltip("y:Q", title="RS to SPY", format=".4f")],
+        y_scale = alt.Scale(zero=False)
+        if y_domain and len(y_domain) == 2:
+            y_scale = alt.Scale(zero=False, domain=list(y_domain))
+
+        chart = (
+            alt.Chart(df_tmp)
+            .mark_bar()
+            .encode(
+                x=alt.X("x:Q", axis=None, scale=alt.Scale(domain=[0, max(0, len(series_vals)-1)])),
+                y=alt.Y("y:Q", axis=None, scale=y_scale),
+                color=alt.condition(alt.datum.is_current, alt.value("darkgreen"), alt.value("lightgreen")),
+                tooltip=[alt.Tooltip("y:Q", title="RS to SPY", format=".4f")],
+            )
+            .properties(width=width, height=height)
         )
-        .properties(width=width, height=height)
-    )
 
-    # requires: vl-convert-python
-    png_bytes = chart.save(format="png")
-    b64 = base64.b64encode(png_bytes).decode("utf-8")
-    return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
+        # Altair v5 + vl-convert backend; may raise if backend missing
+        png_bytes = chart.save(format="png")
+        b64 = base64.b64encode(png_bytes).decode("utf-8")
+        return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
+
+    except Exception:
+        # ---------- Fallback: Matplotlib ----------
+        fig = plt.figure(figsize=(width/96, height/96), dpi=96)
+        ax = fig.add_axes([0, 0, 1, 1])
+
+        colors = ["lightgreen"] * len(series_vals)
+        colors[-1] = "darkgreen"
+
+        ax.bar(range(len(series_vals)), series_vals, color=colors)
+        ax.axis("off")
+        if y_domain and len(y_domain) == 2:
+            ax.set_ylim(y_domain[0], y_domain[1])
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
+        plt.close(fig)
+
+        b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
 
 def highlight_rs_cell(val):
     """Full-cell background for RS Rank thresholds."""
@@ -172,7 +196,7 @@ for group_name, tickers in group_iter:
     for ticker in tickers:
         row = latest.loc[ticker]
 
-        # 21/63/252-day RS sparkline for this ticker
+        # RS sparkline series for this ticker (last N)
         series = rs_lastN.loc[rs_lastN["ticker"] == ticker, "rs_to_spy"].tolist()
         spark_img = sparkbar_img(series, y_domain=(RS_MIN, RS_MAX)) if series else ""
 
