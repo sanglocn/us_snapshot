@@ -164,6 +164,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
                 "Volume Alert": volume_alert_format(row.get("volume_alert", "-")),
                 " ": "",
+                "Intraday": format_perf(row.get("ret_intraday")),
                 "1D Return": format_perf(row.get("ret_1d")),
                 "1W Return": format_perf(row.get("ret_1w")),
                 "1M Return": format_perf(row.get("ret_1m")),
