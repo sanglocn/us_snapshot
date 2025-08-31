@@ -37,6 +37,7 @@ def create_sparkline(series_vals, width=120, height=36):
     ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
+    # Set y-axis limits based on the series' own min and max
     y_min, y_max = min(series_vals), max(series_vals)
     padding = (y_max - y_min) * 0.05 or 0.01
     ax.set_ylim(y_min - padding, y_max + padding)
@@ -64,12 +65,11 @@ def tick_icon(value):
 def _slug(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
-# Render a single group's table with scoped CSS
+# Render a single group's table with SCOPED CSS
 def render_group_table(group_name: str, rows: list[dict]):
-    df = pd.DataFrame(rows)
-    html = df.to_html(escape=False, index=False)
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
     table_id = f"tbl-{_slug(group_name)}"
-
+    # Scoped CSS for header centering + relative strength width
     st.markdown(
         f"""
 <div id="{table_id}">
@@ -79,22 +79,12 @@ def render_group_table(group_name: str, rows: list[dict]):
   border-collapse: collapse;
   table-layout: fixed;
 }}
-/* headers always centered */
-#{table_id} th {{
-  text-align: center !important;
+#{table_id} table th {{
+  text-align: center !important;   /* center ONLY the headers */
 }}
-/* center ticker column (first col) */
-#{table_id} td:nth-child(1), #{table_id} th:nth-child(1) {{
-  text-align: center !important;
-  width: 90px;
-}}
-/* widen relative strength (2nd col) */
+/* widen Relative Strength column (2nd col) */
 #{table_id} td:nth-child(2), #{table_id} th:nth-child(2) {{
   width: 200px;
-}}
-/* all other cells right-aligned */
-#{table_id} td {{
-  text-align: right;
 }}
 </style>
 {html}
