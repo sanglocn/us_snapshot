@@ -114,18 +114,19 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(5),
-        #{table_id} table td:nth-child(6),
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(10) {{
+        #{table_id} table td:nth-child(11),
+        #{table_id} table td:nth-child(12),
+        #{table_id} table td:nth-child(13) {{
             text-align: center !important;
         }}
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
-        #{table_id} table td:nth-child(6),
         #{table_id} table td:nth-child(7),
-        #{table_id} table td:nth-child(8) {{
+        #{table_id} table td:nth-child(8),
+        #{table_id} table td:nth-child(9) {{
             text-align: right !important;
         }}
         </style>
@@ -162,9 +163,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
                 "Volume Alert": volume_alert_format(row.get("volume_alert", "-")),
+                " ": "",
                 "1D Return": format_perf(row.get("ret_1d")),
                 "1W Return": format_perf(row.get("ret_1w")),
                 "1M Return": format_perf(row.get("ret_1m")),
+                "  ": "",
                 "Above SMA5": tick_icon(row.get("above_sma5")),
                 "Above SMA10": tick_icon(row.get("above_sma10")),
                 "Above SMA20": tick_icon(row.get("above_sma20")),
