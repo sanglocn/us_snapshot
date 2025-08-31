@@ -69,7 +69,7 @@ def _slug(text: str) -> str:
 def render_group_table(group_name: str, rows: list[dict]):
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
     table_id = f"tbl-{_slug(group_name)}"
-    # Scoped CSS for header centering + relative strength width
+    # wrap table with a container that has an id and scope CSS to that id only
     st.markdown(
         f"""
 <div id="{table_id}">
@@ -77,14 +77,9 @@ def render_group_table(group_name: str, rows: list[dict]):
 #{table_id} table {{
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }}
 #{table_id} table th {{
-  text-align: center !important;   /* center ONLY the headers */
-}}
-/* widen Relative Strength column (2nd col) */
-#{table_id} td:nth-child(2), #{table_id} th:nth-child(2) {{
-  width: 200px;
+  text-align: center !important;   /* center ONLY the headers in this table */
 }}
 </style>
 {html}
