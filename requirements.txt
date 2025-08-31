@@ -1,4 +1,4 @@
 streamlit
 pandas
-altair
-vl-convert-python
+altair>=5
+vl-convert-python>=1.6
