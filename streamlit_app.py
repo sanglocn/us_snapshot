@@ -31,31 +31,21 @@ GROUP_ORDER = [
 # ---------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Load and preprocess ETF and RS data from CSV files."""
     df_etf = pd.read_csv(DATA_URLS["etf"])
     df_rs = pd.read_csv(DATA_URLS["rs"])
     df_etf["date"] = pd.to_datetime(df_etf["date"])
     df_rs["date"] = pd.to_datetime(df_rs["date"])
     return df_etf, df_rs
 
-
 # ---------------------------
 # Data Processing
 # ---------------------------
 def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Process ETF and RS data for dashboard display."""
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
     rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK_DAYS)
     return latest, rs_last_n
 
-
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
-    """
-    Compute per-day counts:
-      - count_over_85: number of tickers with rs_rank_21d >= 0.85
-      - count_under_50: number of tickers with rs_rank_21d < 0.50
-    Keep only the last 21 trading days present in the data.
-    """
     if "rs_rank_21d" not in df_etf.columns:
         return pd.DataFrame(columns=["date", "count_over_85", "count_under_50", "date_str"])
 
@@ -69,55 +59,40 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
                 count_under_50=("under_50", "sum"))
            .sort_values("date")
     )
-
-    # Only keep rows with actual data (both counts not NA)
     daily = daily.dropna(subset=["count_over_85", "count_under_50"])
 
-    # Limit to last 21 trading days available
     last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
 
-    # Create a categorical label to remove weekend/holiday gaps on axis
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
-
 
 # ---------------------------
 # Visualization Helpers
 # ---------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
-    """Generate a sparkline image from a series of values."""
     if not values:
         return ""
-
     fig = plt.figure(figsize=(width / 96, height / 96), dpi=96)
     ax = fig.add_axes([0, 0, 1, 1])
     ax.plot(range(len(values)), values, linewidth=1.5, color="green")
     ax.plot(len(values) - 1, values[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
-
     y_min, y_max = min(values), max(values)
     padding = (y_max - y_min) * 0.05 or 0.01
     ax.set_ylim(y_min - padding, y_max + padding)
-
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-
 def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Chart:
-    """
-    Altair column chart helper for breadth counts.
-    - Uses a categorical x-axis (date_str) so only trading days shown; no gaps for weekends/holidays.
-    - Removes x-axis title and y-axis title.
-    """
     return (
         alt.Chart(df)
         .mark_bar()
         .encode(
-            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),  # categorical, no title
-            y=alt.Y(f"{value_col}:Q", title=None),                                # remove y-axis label
+            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),
+            y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip(f"{value_col}:Q", title=title)
@@ -125,7 +100,6 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
         )
         .properties(height=320, title=title)
     )
-
 
 # ---------------------------
 # Formatting Helpers
@@ -135,12 +109,10 @@ def format_rank(value: float) -> str:
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{int(round(value * 100))}%</span>'
 
-
 def format_performance(value: float) -> str:
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
-
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
@@ -150,15 +122,12 @@ def format_indicator(value: str) -> str:
         return '<span style="color:red; display:block; text-align:center;">❌</span>'
     return '<span style="display:block; text-align:center;">-</span>'
 
-
 def format_volume_alert(value: str) -> str:
     value = str(value).strip()
     return f'<span style="display:block; text-align:center;">{value}</span>'
 
-
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
-
 
 # ---------------------------
 # Table Rendering
@@ -166,7 +135,6 @@ def slugify(text: str) -> str:
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
-
     css = f"""
         #{table_id} table {{
             width: 100%;
@@ -196,36 +164,12 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
-
 # ---------------------------
 # Dashboard Rendering
 # ---------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
 
-    # Top breadth charts (last 21 trading days)
-    counts_21 = compute_threshold_counts(df_etf)
-    if not counts_21.empty:
-        start_date = counts_21["date"].min().date()
-        end_date = counts_21["date"].max().date()
-        st.subheader("Breadth: RS Threshold Counts (Last 21 Trading Days)")
-        st.caption(f"From {start_date} to {end_date}")
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.altair_chart(
-                breadth_column_chart(counts_21, "count_over_85", "Count ≥ 0.85"),
-                use_container_width=True
-            )
-        with c2:
-            st.altair_chart(
-                breadth_column_chart(counts_21, "count_under_50", "Count < 0.50"),
-                use_container_width=True
-            )
-    else:
-        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
-
-    # Rest of dashboard
     latest, rs_last_n = process_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
 
@@ -256,9 +200,28 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
             })
-
         render_group_table(group_name, rows)
 
+    # ---- Breadth charts moved to bottom ----
+    counts_21 = compute_threshold_counts(df_etf)
+    if not counts_21.empty:
+        start_date = counts_21["date"].min().date()
+        end_date = counts_21["date"].max().date()
+        st.subheader("Breadth: RS Counts (Last 21 Trading Days)")
+        st.caption(f"From {start_date} to {end_date}")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.altair_chart(
+                breadth_column_chart(counts_21, "count_over_85", "Count ≥ 0.85"),
+                use_container_width=True
+            )
+        with c2:
+            st.altair_chart(
+                breadth_column_chart(counts_21, "count_under_50", "Count < 0.50"),
+                use_container_width=True
+            )
+    else:
+        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
 
 # ---------------------------
 # Main
