@@ -57,7 +57,7 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
     Keep only the last 21 trading days present in the data.
     """
     if "rs_rank_21d" not in df_etf.columns:
-        return pd.DataFrame(columns=["date", "count_over_85", "count_under_50"])
+        return pd.DataFrame(columns=["date", "count_over_85", "count_under_50", "date_str"])
 
     tmp = df_etf.copy()
     tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
@@ -70,9 +70,15 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
            .sort_values("date")
     )
 
+    # Only keep rows with actual data (both counts not NA)
+    daily = daily.dropna(subset=["count_over_85", "count_under_50"])
+
     # Limit to last 21 trading days available
     last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
+
+    # Create a categorical label to remove weekend/holiday gaps on axis
+    daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
 
 
@@ -101,13 +107,17 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
 
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Chart:
-    """Altair column chart helper for breadth counts."""
+    """
+    Altair column chart helper for breadth counts.
+    - Uses a categorical x-axis (date_str) so only trading days shown; no gaps for weekends/holidays.
+    - Removes x-axis title and y-axis title.
+    """
     return (
         alt.Chart(df)
         .mark_bar()
         .encode(
-            x=alt.X("date:T", title="Trading Day"),     # show trading days
-            y=alt.Y(f"{value_col}:Q", title=None),      # remove y-axis label
+            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),  # categorical, no title
+            y=alt.Y(f"{value_col}:Q", title=None),                                # remove y-axis label
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip(f"{value_col}:Q", title=title)
