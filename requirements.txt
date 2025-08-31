@@ -2,3 +2,4 @@ streamlit
 pandas
 altair>=5
 vl-convert-python>=1.6
+matplotlib
