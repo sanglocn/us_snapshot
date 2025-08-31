@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import base64
 import io
-import matplotlib.pyplot as plt  # used as fallback for sparkline export
+import matplotlib.pyplot as plt  # fallback for sparkline export
 
 st.set_page_config(page_title="US Market Daily Snapshot", layout="wide")
 
@@ -32,21 +32,10 @@ def load_data():
 df_etf, df_rs = load_data()
 
 # -------------------------------------------------------------------
-# Sidebar controls
+# Prep: latest snapshot & sparkline slice (fixed 21 days)
 # -------------------------------------------------------------------
-st.sidebar.header("Controls")
+LOOKBACK = 21  # fixed (last 21 trading days for sparkline)
 
-groups = sorted(df_etf["group"].dropna().unique().tolist()) if "group" in df_etf.columns else ["All"]
-selected_groups = st.sidebar.multiselect("Groups", groups, default=groups)
-
-lookback = st.sidebar.selectbox("Sparkline lookback (trading days)", [21, 63, 252], index=0)
-
-show_rs21  = st.sidebar.checkbox("Show RS Rank (21D)", value=True)
-show_rs252 = st.sidebar.checkbox("Show RS Rank (252D)", value=True)
-
-# -------------------------------------------------------------------
-# Prep: latest snapshot and sparkline slice
-# -------------------------------------------------------------------
 # latest row per ticker for table metrics
 latest = (
     df_etf.sort_values("date")
@@ -55,12 +44,9 @@ latest = (
           .set_index("ticker")
 )
 
-if "group" in latest.columns and selected_groups:
-    latest = latest[latest["group"].isin(selected_groups)]
-
-# sparkline data: last N per ticker, global absolute Y scale
+# sparkline data: last 21 per ticker, global absolute Y scale
 df_rs = df_rs.sort_values(["ticker", "date"])
-rs_lastN = df_rs.groupby("ticker").tail(lookback)
+rs_lastN = df_rs.groupby("ticker").tail(LOOKBACK)
 
 if not rs_lastN.empty:
     RS_MIN = float(rs_lastN["rs_to_spy"].min())
@@ -83,7 +69,6 @@ def sparkbar_img(series_vals, width=120, height=36, y_domain=None):
     # ---------- Try Altair first ----------
     try:
         import altair as alt
-        # Optional: hide toolbar
         alt.renderers.set_embed_options(actions=False)
 
         df_tmp = pd.DataFrame({"x": range(len(series_vals)), "y": series_vals})
@@ -179,10 +164,10 @@ def color_sma_text(val):
 # -------------------------------------------------------------------
 st.title("US Market Daily Snapshot")
 if not latest.empty:
-    st.caption(f"Latest data date: {latest['date'].max().date()} • Sparkline lookback: {lookback} trading days")
+    st.caption(f"Latest data date: {latest['date'].max().date()} • Sparkline lookback fixed at {LOOKBACK} trading days")
 
 # -------------------------------------------------------------------
-# Render by group
+# Render by group (all groups, no controls)
 # -------------------------------------------------------------------
 if "group" in latest.columns:
     group_iter = latest.groupby("group").groups.items()
@@ -196,19 +181,15 @@ for group_name, tickers in group_iter:
     for ticker in tickers:
         row = latest.loc[ticker]
 
-        # RS sparkline series for this ticker (last N)
+        # RS sparkline series for this ticker (last 21)
         series = rs_lastN.loc[rs_lastN["ticker"] == ticker, "rs_to_spy"].tolist()
         spark_img = sparkbar_img(series, y_domain=(RS_MIN, RS_MAX)) if series else ""
 
         record = {
             "Ticker": ticker,
             "RS Sparkline": spark_img,
-        }
-        if show_rs21:
-            record["RS Rank (21D)"] = row.get("rs_rank_21d", None)
-        if show_rs252:
-            record["RS Rank (252D)"] = row.get("rs_rank_252d", None)
-        record.update({
+            "RS Rank (21D)": row.get("rs_rank_21d", None),
+            "RS Rank (252D)": row.get("rs_rank_252d", None),
             "": "",  # spacer
             "Volume Alert": row.get("volume_alert", "-"),
             "  ": "",  # spacer
@@ -238,7 +219,7 @@ for group_name, tickers in group_iter:
     for c in perf_cols:
         disp[c] = numeric_for_style[c].map(lambda x: f"{x*100:.1f}%" if pd.notnull(x) else "")
 
-    rs_cols = [c for c in ["RS Rank (21D)", "RS Rank (252D)"] if c in disp.columns]
+    rs_cols = [c for c in ["RS Rank (21D)", "RS Rank (252D)"]]
 
     styler = (
         disp.style
