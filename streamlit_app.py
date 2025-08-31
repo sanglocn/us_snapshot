@@ -69,9 +69,15 @@ for group_name, tickers in latest.groupby("group").groups.items():
             "RS Sparkline": spark,
             "RS Rank (21D)": f"{int(round(row['rs_rank_21d']))}%" if pd.notnull(row['rs_rank_21d']) else "",
             "RS Rank (252D)": f"{int(round(row['rs_rank_252d']))}%" if pd.notnull(row['rs_rank_252d']) else "",
+            
+            " ": "",
+            
             "1D": f"{row['ret_1d']*100:.1f}%" if pd.notnull(row['ret_1d']) else "",
             "1W": f"{row['ret_1w']*100:.1f}%" if pd.notnull(row['ret_1w']) else "",
             "1M": f"{row['ret_1m']*100:.1f}%" if pd.notnull(row['ret_1m']) else "",
+
+            "  ": "",
+
             "SMA10": "✅" if row.get("above_sma10") else "❌",
             "SMA20": "✅" if row.get("above_sma20") else "❌",
             "SMA50": "✅" if row.get("above_sma50") else "❌",
