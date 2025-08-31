@@ -208,7 +208,7 @@ for group_name, tickers in group_iter:
             "SMA20": sma_icon(row.get("above_sma20", 0)),
             "SMA50": sma_icon(row.get("above_sma50", 0)),
             "SMA100":sma_icon(row.get("above_sma100", 0)),
-        })
+        }
         rows.append(record)
 
     disp = pd.DataFrame(rows)
