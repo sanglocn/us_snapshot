@@ -55,14 +55,20 @@ def format_perf(value):
     return f"{float(value):.1f}%" if pd.notna(value) else ""
 
 def tick_icon(value):
-    return "✅" if bool(value) else "❌"
+    v = str(value).strip().lower()
+    if v == "Yes":
+        return '<span style="color:green;">✅</span>'
+    elif v == "No":
+        return '<span style="color:red;">❌</span>'
+    else:
+        return "-"
 
 # Render dashboard
 def render_dashboard(df_etf, df_rs):
     st.title("US Market Daily Snapshot")
     latest, rs_last_n = get_processed_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
-    
+
     for group_name, tickers in latest.groupby("group").groups.items():
         st.header(f"📌 {group_name}")
         rows = []
