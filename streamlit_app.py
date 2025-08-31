@@ -83,6 +83,11 @@ def tick_icon(value: str) -> str:
         return '<span style="color:red; display:block; text-align:center;">❌</span>'
     return '<span style="display:block; text-align:center;">-</span>'
 
+def volume_alert_format(value: str) -> str:
+    """Format volume alert value with centered styling."""
+    value = str(value).strip()
+    return f'<span style="display:block; text-align:center;">{value}</span>'
+
 def slugify(text: str) -> str:
     """Convert text to a URL-safe slug."""
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
@@ -104,6 +109,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table th {{
             text-align: center !important;
         }}
+        #{table_id} table td:nth-child(5),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
         #{table_id} table td:nth-child(13) {{
@@ -142,7 +148,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
-                "Volume Alert": row.get("volume_alert", "-"),
+                "Volume Alert": volume_alert_format(row.get("volume_alert", "-")),
                 " ": "",
                 "1D Return": format_perf(row.get("ret_1d")),
                 "1W Return": format_perf(row.get("ret_1w")),
