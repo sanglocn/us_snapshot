@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import altair as alt
 import io
 import base64
 import re
@@ -25,8 +26,9 @@ GROUP_ORDER = [
     "Leader"
 ]
 
-
+# ---------------------------
 # Data Loading
+# ---------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load and preprocess ETF and RS data from CSV files."""
@@ -37,7 +39,9 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     return df_etf, df_rs
 
 
+# ---------------------------
 # Data Processing
+# ---------------------------
 def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Process ETF and RS data for dashboard display."""
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
@@ -45,7 +49,37 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFram
     return latest, rs_last_n
 
 
-# Visualization
+def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute per-day counts:
+      - count_over_85: number of tickers with rs_rank_21d >= 0.85
+      - count_under_50: number of tickers with rs_rank_21d < 0.50
+    Keep only the last 21 trading days present in the data.
+    """
+    if "rs_rank_21d" not in df_etf.columns:
+        return pd.DataFrame(columns=["date", "count_over_85", "count_under_50"])
+
+    tmp = df_etf.copy()
+    # Comparisons with NaN yield False, which is fine for counting
+    tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
+    tmp["under_50"] = tmp["rs_rank_21d"] < 0.50
+
+    daily = (
+        tmp.groupby("date", as_index=False)
+           .agg(count_over_85=("over_85", "sum"),
+                count_under_50=("under_50", "sum"))
+           .sort_values("date")
+    )
+
+    # Limit to last 21 trading days available
+    last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
+    daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
+    return daily_21
+
+
+# ---------------------------
+# Visualization Helpers
+# ---------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
     """Generate a sparkline image from a series of values."""
     if not values:
@@ -67,7 +101,24 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 
+def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Chart:
+    """Altair column chart helper for breadth counts."""
+    return (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("date:T", title="Date"),
+            y=alt.Y(f"{value_col}:Q", title=title),
+            tooltip=[alt.Tooltip("date:T", title="Date"),
+                     alt.Tooltip(f"{value_col}:Q", title=title)]
+        )
+        .properties(height=320, title=title)
+    )
+
+
+# ---------------------------
 # Formatting Helpers
+# ---------------------------
 def format_rank(value: float) -> str:
     """Format rank value as percentage with right-aligned styling."""
     if pd.isna(value):
@@ -103,7 +154,9 @@ def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 
+# ---------------------------
 # Table Rendering
+# ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a styled table for a group of tickers."""
     table_id = f"tbl-{slugify(group_name)}"
@@ -139,23 +192,48 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
 
+# ---------------------------
 # Dashboard Rendering
+# ---------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the complete US Market Snapshot dashboard."""
     st.title("US Market Daily Snapshot")
 
+    # Top breadth charts (last 21 trading days)
+    counts_21 = compute_threshold_counts(df_etf)
+    if not counts_21.empty:
+        start_date = counts_21["date"].min().date()
+        end_date = counts_21["date"].max().date()
+        st.subheader("Breadth: RS Threshold Counts (Last 21 Trading Days)")
+        st.caption(f"From {start_date} to {end_date}")
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.altair_chart(
+                breadth_column_chart(counts_21, "count_over_85", "Count ≥ 0.85"),
+                use_container_width=True
+            )
+        with c2:
+            st.altair_chart(
+                breadth_column_chart(counts_21, "count_under_50", "Count < 0.50"),
+                use_container_width=True
+            )
+    else:
+        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
+
+    # Rest of dashboard
     latest, rs_last_n = process_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
 
     group_tickers = latest.groupby("group").groups
-
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
         st.header(f"📌 {group_name}")
         rows = []
+        tickers_in_group = group_tickers[group_name]
 
-        for ticker in group_tickers[group_name]:
+        for ticker in tickers_in_group:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
@@ -178,7 +256,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         render_group_table(group_name, rows)
 
 
-# Main Execution
+# ---------------------------
+# Main
+# ---------------------------
 if __name__ == "__main__":
     df_etf, df_rs = load_data()
     render_dashboard(df_etf, df_rs)
