@@ -25,11 +25,10 @@ def load_data():
 def get_processed_data(df_etf, df_rs):
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
     rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK)
-    y_min, y_max = float(rs_last_n["rs_to_spy"].min()), float(rs_last_n["rs_to_spy"].max()) if not rs_last_n.empty else (0.9, 1.1)
-    return latest, rs_last_n, (y_min, y_max)
+    return latest, rs_last_n
 
 # Sparkline generation
-def create_sparkline(series_vals, y_domain=None, width=120, height=36):
+def create_sparkline(series_vals, width=120, height=36):
     if not series_vals:
         return ""
     fig = plt.figure(figsize=(width/96, height/96), dpi=96)
@@ -37,8 +36,12 @@ def create_sparkline(series_vals, y_domain=None, width=120, height=36):
     ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
-    if y_domain:
-        ax.set_ylim(y_domain)
+    # Set y-axis limits based on the series' own min and max
+    if series_vals:
+        y_min, y_max = min(series_vals), max(series_vals)
+        # Add small padding to avoid clipping
+        padding = (y_max - y_min) * 0.05 or 0.01
+        ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
@@ -57,7 +60,7 @@ def tick_icon(value):
 # Render dashboard
 def render_dashboard(df_etf, df_rs):
     st.title("US Market Daily Snapshot")
-    latest, rs_last_n, y_domain = get_processed_data(df_etf, df_rs)
+    latest, rs_last_n = get_processed_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
     
     for group_name, tickers in latest.groupby("group").groups.items():
@@ -68,7 +71,7 @@ def render_dashboard(df_etf, df_rs):
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
                 "Ticker": ticker,
-                "RS Sparkline": create_sparkline(spark_series, y_domain),
+                "RS Sparkline": create_sparkline(spark_series),
                 "RS Rank (21D)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (252D)": format_rank(row.get("rs_rank_252d")),
                 "Volume Alert": row.get("volume_alert", "-"),
