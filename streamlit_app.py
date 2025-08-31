@@ -34,7 +34,7 @@ rs_lastN = df_rs.groupby("ticker").tail(LOOKBACK)
 
 RS_MIN, RS_MAX = rs_lastN["rs_to_spy"].min(), rs_lastN["rs_to_spy"].max()
 
-# --- Sparkline helper (Matplotlib) ---
+# --- Sparkline helper ---
 def sparkbar_img(series_vals, width=120, height=30):
     if not series_vals:
         return ""
@@ -51,35 +51,36 @@ def sparkbar_img(series_vals, width=120, height=30):
     b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
     return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
 
-# --- Build table ---
-rows = []
-for ticker, row in latest.iterrows():
-    series = rs_lastN.loc[rs_lastN["ticker"]==ticker, "rs_to_spy"].tolist()
-    spark = sparkbar_img(series)
-
-    rows.append({
-        "Ticker": ticker,
-        "RS Sparkline": spark,
-        "RS Rank (21D)": f"{int(round(row['rs_rank_21d']))}%" if pd.notnull(row['rs_rank_21d']) else "",
-        "RS Rank (252D)": f"{int(round(row['rs_rank_252d']))}%" if pd.notnull(row['rs_rank_252d']) else "",
-        "1D": f"{row['ret_1d']*100:.1f}%" if pd.notnull(row['ret_1d']) else "",
-        "1W": f"{row['ret_1w']*100:.1f}%" if pd.notnull(row['ret_1w']) else "",
-        "1M": f"{row['ret_1m']*100:.1f}%" if pd.notnull(row['ret_1m']) else "",
-        "3M": f"{row['ret_3m']*100:.1f}%" if pd.notnull(row['ret_3m']) else "",
-        "6M": f"{row['ret_6m']*100:.1f}%" if pd.notnull(row['ret_6m']) else "",
-        "1Y": f"{row['ret_1y']*100:.1f}%" if pd.notnull(row['ret_1y']) else "",
-        "YTD": f"{row['ret_ytd']*100:.1f}%" if pd.notnull(row['ret_ytd']) else "",
-        "SMA5": "✅" if row.get("above_sma5") else "❌",
-        "SMA10": "✅" if row.get("above_sma10") else "❌",
-        "SMA20": "✅" if row.get("above_sma20") else "❌",
-        "SMA50": "✅" if row.get("above_sma50") else "❌",
-        "SMA100": "✅" if row.get("above_sma100") else "❌",
-    })
-
-disp = pd.DataFrame(rows)
-
-# --- Render ---
+# --- Page ---
 st.title("US Market Daily Snapshot")
 st.caption(f"Latest data date: {latest['date'].max().date()}")
 
-st.write(disp.to_html(escape=False, index=False), unsafe_allow_html=True)
+# --- Render by group (no Ungrouped handling needed) ---
+for group_name, tickers in latest.groupby("group").groups.items():
+    st.header(f"📌 {group_name}")
+    rows = []
+    for ticker in tickers:
+        row = latest.loc[ticker]
+        series = rs_lastN.loc[rs_lastN["ticker"]==ticker, "rs_to_spy"].tolist()
+        spark = sparkbar_img(series)
+
+        rows.append({
+            "Ticker": ticker,
+            "RS Sparkline": spark,
+            "RS Rank (21D)": f"{int(round(row['rs_rank_21d']))}%" if pd.notnull(row['rs_rank_21d']) else "",
+            "RS Rank (252D)": f"{int(round(row['rs_rank_252d']))}%" if pd.notnull(row['rs_rank_252d']) else "",
+            "1D": f"{row['ret_1d']*100:.1f}%" if pd.notnull(row['ret_1d']) else "",
+            "1W": f"{row['ret_1w']*100:.1f}%" if pd.notnull(row['ret_1w']) else "",
+            "1M": f"{row['ret_1m']*100:.1f}%" if pd.notnull(row['ret_1m']) else "",
+            "3M": f"{row['ret_3m']*100:.1f}%" if pd.notnull(row['ret_3m']) else "",
+            "6M": f"{row['ret_6m']*100:.1f}%" if pd.notnull(row['ret_6m']) else "",
+            "1Y": f"{row['ret_1y']*100:.1f}%" if pd.notnull(row['ret_1y']) else "",
+            "YTD": f"{row['ret_ytd']*100:.1f}%" if pd.notnull(row['ret_ytd']) else "",
+            "SMA5": "✅" if row.get("above_sma5") else "❌",
+            "SMA10": "✅" if row.get("above_sma10") else "❌",
+            "SMA20": "✅" if row.get("above_sma20") else "❌",
+            "SMA50": "✅" if row.get("above_sma50") else "❌",
+            "SMA100": "✅" if row.get("above_sma100") else "❌",
+        })
+    disp = pd.DataFrame(rows)
+    st.write(disp.to_html(escape=False, index=False), unsafe_allow_html=True)
