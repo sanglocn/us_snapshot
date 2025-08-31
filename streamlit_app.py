@@ -60,7 +60,6 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["date", "count_over_85", "count_under_50"])
 
     tmp = df_etf.copy()
-    # Comparisons with NaN yield False, which is fine for counting
     tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
     tmp["under_50"] = tmp["rs_rank_21d"] < 0.50
 
@@ -107,10 +106,12 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
         alt.Chart(df)
         .mark_bar()
         .encode(
-            x=alt.X("date:T", title="Date"),
-            y=alt.Y(f"{value_col}:Q", title=title),
-            tooltip=[alt.Tooltip("date:T", title="Date"),
-                     alt.Tooltip(f"{value_col}:Q", title=title)]
+            x=alt.X("date:T", title="Trading Day"),     # show trading days
+            y=alt.Y(f"{value_col}:Q", title=None),      # remove y-axis label
+            tooltip=[
+                alt.Tooltip("date:T", title="Date"),
+                alt.Tooltip(f"{value_col}:Q", title=title)
+            ]
         )
         .properties(height=320, title=title)
     )
@@ -120,21 +121,18 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """Format rank value as percentage with right-aligned styling."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{int(round(value * 100))}%</span>'
 
 
 def format_performance(value: float) -> str:
-    """Format performance value as percentage with right-aligned styling."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
 
 
 def format_indicator(value: str) -> str:
-    """Return checkmark or cross icon with centered styling based on input."""
     value = str(value).strip().lower()
     if value == "yes":
         return '<span style="color:green; display:block; text-align:center;">✅</span>'
@@ -144,13 +142,11 @@ def format_indicator(value: str) -> str:
 
 
 def format_volume_alert(value: str) -> str:
-    """Format volume alert value with centered styling."""
     value = str(value).strip()
     return f'<span style="display:block; text-align:center;">{value}</span>'
 
 
 def slugify(text: str) -> str:
-    """Convert text to a URL-safe slug."""
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 
@@ -158,7 +154,6 @@ def slugify(text: str) -> str:
 # Table Rendering
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    """Render a styled table for a group of tickers."""
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
@@ -196,7 +191,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # Dashboard Rendering
 # ---------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
-    """Render the complete US Market Snapshot dashboard."""
     st.title("US Market Daily Snapshot")
 
     # Top breadth charts (last 21 trading days)
