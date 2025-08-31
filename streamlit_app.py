@@ -75,13 +75,13 @@ def format_perf(value: float) -> str:
     return f"{float(value):.1f}%" if pd.notna(value) else ""
 
 def tick_icon(value: str) -> str:
-    """Return checkmark or cross icon based on value."""
+    """Return checkmark or cross icon with centered styling."""
     value = str(value).strip().lower()
     if value == "yes":
-        return '<span style="color:green;">✅</span>'
+        return '<span style="color:green; display:block; text-align:center;">✅</span>'
     elif value == "no":
-        return '<span style="color:red;">❌</span>'
-    return "-"
+        return '<span style="color:red; display:block; text-align:center;">❌</span>'
+    return '<span style="display:block; text-align:center;">-</span>'
 
 def slugify(text: str) -> str:
     """Convert text to a URL-safe slug."""
@@ -102,6 +102,11 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-collapse: collapse;
         }}
         #{table_id} table th {{
+            text-align: center !important;
+        }}
+        #{table_id} table td:nth-child(11),
+        #{table_id} table td:nth-child(12),
+        #{table_id} table td:nth-child(13) {{
             text-align: center !important;
         }}
         </style>
