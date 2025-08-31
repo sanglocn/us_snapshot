@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import io, base64
+import re
 
 st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
@@ -37,10 +38,9 @@ def create_sparkline(series_vals, width=120, height=36):
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
     # Set y-axis limits based on the series' own min and max
-    if series_vals:
-        y_min, y_max = min(series_vals), max(series_vals)
-        padding = (y_max - y_min) * 0.05 or 0.01
-        ax.set_ylim(y_min - padding, y_max + padding)
+    y_min, y_max = min(series_vals), max(series_vals)
+    padding = (y_max - y_min) * 0.05 or 0.01
+    ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
@@ -61,6 +61,32 @@ def tick_icon(value):
         return '<span style="color:red;">❌</span>'
     else:
         return "-"
+
+def _slug(text: str) -> str:
+    return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
+
+# Render a single group's table with SCOPED CSS
+def render_group_table(group_name: str, rows: list[dict]):
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
+    table_id = f"tbl-{_slug(group_name)}"
+    # wrap table with a container that has an id and scope CSS to that id only
+    st.markdown(
+        f"""
+<div id="{table_id}">
+<style>
+#{table_id} table {{
+  width: 100%;
+  border-collapse: collapse;
+}}
+#{table_id} table th {{
+  text-align: center !important;   /* center ONLY the headers in this table */
+}}
+</style>
+{html}
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 # Render dashboard
 def render_dashboard(df_etf, df_rs):
@@ -89,18 +115,7 @@ def render_dashboard(df_etf, df_rs):
                 "Above SMA10": tick_icon(row.get("above_sma10")),
                 "Above SMA20": tick_icon(row.get("above_sma20")),
             })
-        table_html = pd.DataFrame(rows).to_html(escape=False, index=False)
-        st.markdown(
-            f"""
-            <style>
-            table th {{
-                text-align: center !important;
-            }}
-            </style>
-            {table_html}
-            """,
-            unsafe_allow_html=True,
-        )
+        render_group_table(group_name, rows)
 
 # Run app
 if __name__ == "__main__":
