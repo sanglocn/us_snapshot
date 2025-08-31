@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import io, base64
+import io
+import base64
 import re
+from typing import List, Dict
 
+# Configuration
 st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
 # Constants
@@ -11,92 +14,104 @@ DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
 }
-LOOKBACK = 21
+LOOKBACK_DAYS = 21
 
-# Load and preprocess data
+# Data Loading
 @st.cache_data(ttl=900)
-def load_data():
+def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Load and preprocess ETF and RS data from CSV files."""
     df_etf = pd.read_csv(DATA_URLS["etf"])
     df_rs = pd.read_csv(DATA_URLS["rs"])
     df_etf["date"] = pd.to_datetime(df_etf["date"])
     df_rs["date"] = pd.to_datetime(df_rs["date"])
     return df_etf, df_rs
 
-# Data processing
-def get_processed_data(df_etf, df_rs):
+# Data Processing
+def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Process ETF and RS data for dashboard display."""
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
-    rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK)
+    rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK_DAYS)
     return latest, rs_last_n
 
-# Sparkline generation
-def create_sparkline(series_vals, width=120, height=36):
+# Visualization
+def create_sparkline(series_vals: List[float], width: int = 120, height: int = 36) -> str:
+    """Generate a sparkline image from a series of values."""
     if not series_vals:
         return ""
+    
     fig = plt.figure(figsize=(width/96, height/96), dpi=96)
     ax = fig.add_axes([0, 0, 1, 1])
     ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
-    # Set y-axis limits based on the series' own min and max
+    
     y_min, y_max = min(series_vals), max(series_vals)
     padding = (y_max - y_min) * 0.05 or 0.01
     ax.set_ylim(y_min - padding, y_max + padding)
+    
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-# Formatting helpers
-def format_rank(value):
+# Formatting Helpers
+def format_rank(value: float) -> str:
+    """Format rank value as percentage."""
     return f"{int(round(float(value) * 100))}%" if pd.notna(value) else ""
 
-def format_perf(value):
+def format_perf(value: float) -> str:
+    """Format performance value as percentage."""
     return f"{float(value):.1f}%" if pd.notna(value) else ""
 
-def tick_icon(value):
-    v = str(value).strip().lower()
-    if v == "yes":
+def tick_icon(value: str) -> str:
+    """Return checkmark or cross icon based on value."""
+    value = str(value).strip().lower()
+    if value == "yes":
         return '<span style="color:green;">✅</span>'
-    elif v == "no":
+    elif value == "no":
         return '<span style="color:red;">❌</span>'
-    else:
-        return "-"
+    return "-"
 
-def _slug(text: str) -> str:
+def slugify(text: str) -> str:
+    """Convert text to a URL-safe slug."""
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
-# Render a single group's table with SCOPED CSS
-def render_group_table(group_name: str, rows: list[dict]):
+# Table Rendering
+def render_group_table(group_name: str, rows: List[Dict]) -> None:
+    """Render a styled table for a group of tickers."""
+    table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
-    table_id = f"tbl-{_slug(group_name)}"
-    # wrap table with a container that has an id and scope CSS to that id only
+    
     st.markdown(
         f"""
-<div id="{table_id}">
-<style>
-#{table_id} table {{
-  width: 100%;
-  border-collapse: collapse;
-}}
-#{table_id} table th {{
-  text-align: center !important;   /* center ONLY the headers in this table */
-}}
-</style>
-{html}
-</div>
-""",
+        <div id="{table_id}">
+        <style>
+        #{table_id} table {{
+            width: 100%;
+            border-collapse: collapse;
+        }}
+        #{table_id} table th {{
+            text-align: center !important;
+        }}
+        </style>
+        {html}
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
-# Render dashboard
-def render_dashboard(df_etf, df_rs):
+# Dashboard Rendering
+def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
+    """Render the complete US Market Snapshot dashboard."""
     st.title("US Market Daily Snapshot")
-    latest, rs_last_n = get_processed_data(df_etf, df_rs)
+    
+    latest, rs_last_n = process_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
-
+    
     for group_name, tickers in latest.groupby("group").groups.items():
         st.header(f"📌 {group_name}")
         rows = []
+        
         for ticker in tickers:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
@@ -115,9 +130,10 @@ def render_dashboard(df_etf, df_rs):
                 "Above SMA10": tick_icon(row.get("above_sma10")),
                 "Above SMA20": tick_icon(row.get("above_sma20")),
             })
+        
         render_group_table(group_name, rows)
 
-# Run app
+# Main Execution
 if __name__ == "__main__":
     df_etf, df_rs = load_data()
     render_dashboard(df_etf, df_rs)
