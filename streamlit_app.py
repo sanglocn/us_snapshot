@@ -36,14 +36,14 @@ rs_lastN = df_rs.groupby("ticker").tail(LOOKBACK)
 RS_MIN = float(rs_lastN["rs_to_spy"].min()) if not rs_lastN.empty else 0.9
 RS_MAX = float(rs_lastN["rs_to_spy"].max()) if not rs_lastN.empty else 1.1
 
-# --- Sparkline helper: Altair line (fallback to Matplotlib line) ---
+# --- Helpers ---
 def sparkline_img(series_vals, width=120, height=36, y_domain=None):
+    """Altair line sparkline (with last point) -> PNG; fallback to Matplotlib if Altair backend missing."""
     if not series_vals:
         return ""
     # Try Altair first
     try:
         import altair as alt
-        import pandas as pd
         alt.renderers.set_embed_options(actions=False)
 
         df_tmp = pd.DataFrame({"x": list(range(len(series_vals))), "y": series_vals})
@@ -76,7 +76,7 @@ def sparkline_img(series_vals, width=120, height=36, y_domain=None):
         return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
 
     except Exception:
-        # Matplotlib fallback (line)
+        # Fallback: Matplotlib line
         fig = plt.figure(figsize=(width/96, height/96), dpi=96)
         ax = fig.add_axes([0,0,1,1])
         ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
@@ -89,6 +89,18 @@ def sparkline_img(series_vals, width=120, height=36, y_domain=None):
         plt.close(fig)
         b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
         return f'<img src="data:image/png;base64,{b64}" alt="sparkline" />'
+
+def fmt_rank_percent(val):
+    """RS rank stored as 0–1 → show as integer % (e.g., 0.87 -> 87%)."""
+    if pd.isnull(val):
+        return ""
+    try:
+        return f"{int(round(float(val) * 100))}%"
+    except Exception:
+        return ""
+
+def tick_icon(v):
+    return "✅" if bool(v) else "❌"
 
 # --- Page ---
 st.title("US Market Daily Snapshot")
@@ -109,8 +121,8 @@ for group_name, tickers in groups.items():
         rows.append({
             "Ticker": ticker,
             "RS Sparkline": spark,
-            "RS Rank (21D)": f"{int(round(row['rs_rank_21d']))}%" if pd.notnull(row['rs_rank_21d']) else "",
-            "RS Rank (252D)": f"{int(round(row['rs_rank_252d']))}%" if pd.notnull(row['rs_rank_252d']) else "",
+            "RS Rank (21D)": fmt_rank_percent(row.get("rs_rank_21d")),
+            "RS Rank (252D)": fmt_rank_percent(row.get("rs_rank_252d")),
             "Volume Alert": row.get("volume_alert", "-"),
 
             " ": "",  # spacer between ranks and performance
