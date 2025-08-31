@@ -1,3 +1,4 @@
+use this version going forward
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -37,13 +38,14 @@ def create_sparkline(series_vals, width=120, height=36):
     ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
+    # Set y-axis limits based on the series' own min and max
     y_min, y_max = min(series_vals), max(series_vals)
     padding = (y_max - y_min) * 0.05 or 0.01
     ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
-    return f'<img style="display:block;margin:0 auto;" src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
+    return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 # Formatting helpers
 def format_rank(value):
@@ -66,10 +68,9 @@ def _slug(text: str) -> str:
 
 # Render a single group's table with SCOPED CSS
 def render_group_table(group_name: str, rows: list[dict]):
-    df = pd.DataFrame(rows)
-    html = df.to_html(escape=False, index=False)
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
     table_id = f"tbl-{_slug(group_name)}"
-
+    # wrap table with a container that has an id and scope CSS to that id only
     st.markdown(
         f"""
 <div id="{table_id}">
@@ -77,31 +78,9 @@ def render_group_table(group_name: str, rows: list[dict]):
 #{table_id} table {{
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }}
-/* headers centered */
-#{table_id} th {{
-  text-align: center !important;
-}}
-/* center ticker column */
-#{table_id} td:nth-child(1), #{table_id} th:nth-child(1) {{
-  text-align: center !important;
-  width: 90px;
-}}
-/* center relative strength (2nd column) */
-#{table_id} td:nth-child(2), #{table_id} th:nth-child(2) {{
-  text-align: center !important;
-  width: 200px;
-}}
-/* center tick columns (last 3 SMA cols) */
-#{table_id} td:nth-child(12), #{table_id} th:nth-child(12),
-#{table_id} td:nth-child(13), #{table_id} th:nth-child(13),
-#{table_id} td:nth-child(14), #{table_id} th:nth-child(14) {{
-  text-align: center !important;
-}}
-/* everything else (numbers, words) right aligned */
-#{table_id} td {{
-  text-align: right;
+#{table_id} table th {{
+  text-align: center !important;   /* center ONLY the headers in this table */
 }}
 </style>
 {html}
@@ -123,19 +102,19 @@ def render_dashboard(df_etf, df_rs):
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
-                "Ticker": ticker,                                     # centered
-                "Relative Strength": create_sparkline(spark_series),  # centered
-                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),  # right
-                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")), # right
-                "Volume Alert": row.get("volume_alert", "-"),         # text → right
-                " ": "",                                              # spacer
-                "1D Return": format_perf(row.get("ret_1d")),          # right
-                "1W Return": format_perf(row.get("ret_1w")),          # right
-                "1M Return": format_perf(row.get("ret_1m")),          # right
-                "  ": "",                                             # spacer
-                "Above SMA5": tick_icon(row.get("above_sma5")),       # centered
-                "Above SMA10": tick_icon(row.get("above_sma10")),     # centered
-                "Above SMA20": tick_icon(row.get("above_sma20")),     # centered
+                "Ticker": ticker,
+                "Relative Strength": create_sparkline(spark_series),
+                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
+                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
+                "Volume Alert": row.get("volume_alert", "-"),
+                " ": "",
+                "1D Return": format_perf(row.get("ret_1d")),
+                "1W Return": format_perf(row.get("ret_1w")),
+                "1M Return": format_perf(row.get("ret_1m")),
+                "  ": "",
+                "Above SMA5": tick_icon(row.get("above_sma5")),
+                "Above SMA10": tick_icon(row.get("above_sma10")),
+                "Above SMA20": tick_icon(row.get("above_sma20")),
             })
         render_group_table(group_name, rows)
 
