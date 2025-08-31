@@ -72,15 +72,9 @@ for group_name, tickers in latest.groupby("group").groups.items():
             "1D": f"{row['ret_1d']*100:.1f}%" if pd.notnull(row['ret_1d']) else "",
             "1W": f"{row['ret_1w']*100:.1f}%" if pd.notnull(row['ret_1w']) else "",
             "1M": f"{row['ret_1m']*100:.1f}%" if pd.notnull(row['ret_1m']) else "",
-            "3M": f"{row['ret_3m']*100:.1f}%" if pd.notnull(row['ret_3m']) else "",
-            "6M": f"{row['ret_6m']*100:.1f}%" if pd.notnull(row['ret_6m']) else "",
-            "1Y": f"{row['ret_1y']*100:.1f}%" if pd.notnull(row['ret_1y']) else "",
-            "YTD": f"{row['ret_ytd']*100:.1f}%" if pd.notnull(row['ret_ytd']) else "",
-            "SMA5": "✅" if row.get("above_sma5") else "❌",
             "SMA10": "✅" if row.get("above_sma10") else "❌",
             "SMA20": "✅" if row.get("above_sma20") else "❌",
             "SMA50": "✅" if row.get("above_sma50") else "❌",
-            "SMA100": "✅" if row.get("above_sma100") else "❌",
         })
     disp = pd.DataFrame(rows)
     st.write(disp.to_html(escape=False, index=False), unsafe_allow_html=True)
