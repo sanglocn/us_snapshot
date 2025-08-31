@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import io, base64
-import re
 
 st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
@@ -38,16 +37,15 @@ def create_sparkline(series_vals, width=120, height=36):
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
     # Set y-axis limits based on the series' own min and max
-    y_min, y_max = min(series_vals), max(series_vals)
-    padding = (y_max - y_min) * 0.05 or 0.01
-    ax.set_ylim(y_min - padding, y_max + padding)
-
+    if series_vals:
+        y_min, y_max = min(series_vals), max(series_vals)
+        # Add small padding to avoid clipping
+        padding = (y_max - y_min) * 0.05 or 0.01
+        ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
-    b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    # make the image center nicely inside the cell and scale within width
-    return f'<img style="display:block;margin:0 auto;max-width:100%;" src="data:image/png;base64,{b64}" alt="sparkline" />'
+    return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 # Formatting helpers
 def format_rank(value):
@@ -65,71 +63,12 @@ def tick_icon(value):
     else:
         return "-"
 
-def slugify(text: str) -> str:
-    return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
-
-def render_group_table(group_name, rows):
-    df = pd.DataFrame(rows)
-
-    # Build a unique table id so CSS applies per table without collisions
-    tbl_id = f"tbl-{slugify(group_name)}"
-
-    # Global CSS for this table: fixed layout, header centered, cell padding
-    st.markdown(
-        f"""
-        <style>
-        /* fixed layout keeps column widths consistent */
-        #{tbl_id} {{
-          table-layout: fixed;
-          width: 100%;
-          border-collapse: collapse;
-        }}
-        #{tbl_id} th {{
-          text-align: center !important;
-          vertical-align: middle;
-        }}
-        #{tbl_id} td, #{tbl_id} th {{
-          padding: 6px 8px;
-          vertical-align: middle;
-          font-size: 0.95rem;
-          line-height: 1.25rem;
-        }}
-        /* widen Relative Strength (2nd column) */
-        #{tbl_id} td:nth-child(2), #{tbl_id} th:nth-child(2) {{
-          width: 180px;
-        }}
-        /* narrow Ticker (1st column) a bit for compactness */
-        #{tbl_id} td:nth-child(1), #{tbl_id} th:nth-child(1) {{
-          width: 90px;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Use Styler to control alignment:
-    # - default: right-align everything
-    # - center: Ticker, Relative Strength, and the three SMA tick columns
-    center_cols = ["Ticker", "Relative Strength", "Above SMA5", "Above SMA10", "Above SMA20"]
-    styler = (
-        df.style
-          .hide_index()
-          .set_table_attributes(f'id="{tbl_id}"')
-          .set_properties(subset=df.columns, **{"text-align": "right"})
-          .set_properties(subset=center_cols, **{"text-align": "center"})
-    )
-
-    # Render with HTML allowed (sparklines + tick icons)
-    html = styler.to_html(escape=False)
-    st.markdown(html, unsafe_allow_html=True)
-
 # Render dashboard
 def render_dashboard(df_etf, df_rs):
     st.title("US Market Daily Snapshot")
     latest, rs_last_n = get_processed_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
 
-    # Loop groups (stacked vertically as in your original)
     for group_name, tickers in latest.groupby("group").groups.items():
         st.header(f"📌 {group_name}")
         rows = []
@@ -137,21 +76,21 @@ def render_dashboard(df_etf, df_rs):
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
-                "Ticker": ticker,                                # centered
-                "Relative Strength": create_sparkline(spark_series),  # centered + wider column
-                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),  # right
-                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")), # right
-                "Volume Alert": row.get("volume_alert", "-"),         # right (words/numbers)
-                " ": "",                                              # spacer
-                "1D Return": format_perf(row.get("ret_1d")),          # right
-                "1W Return": format_perf(row.get("ret_1w")),          # right
-                "1M Return": format_perf(row.get("ret_1m")),          # right
-                "  ": "",                                             # spacer
-                "Above SMA5": tick_icon(row.get("above_sma5")),       # centered
-                "Above SMA10": tick_icon(row.get("above_sma10")),     # centered
-                "Above SMA20": tick_icon(row.get("above_sma20")),     # centered
+                "Ticker": ticker,
+                "Relative Strength": create_sparkline(spark_series),
+                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
+                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
+                "Volume Alert": row.get("volume_alert", "-"),
+                " ": "",
+                "1D Return": format_perf(row.get("ret_1d")),
+                "1W Return": format_perf(row.get("ret_1w")),
+                "1M Return": format_perf(row.get("ret_1m")),
+                "  ": "",
+                "Above SMA5": tick_icon(row.get("above_sma5")),
+                "Above SMA10": tick_icon(row.get("above_sma10")),
+                "Above SMA20": tick_icon(row.get("above_sma20")),
             })
-        render_group_table(group_name, rows)
+        st.write(pd.DataFrame(rows).to_html(escape=False, index=False), unsafe_allow_html=True)
 
 # Run app
 if __name__ == "__main__":
