@@ -17,12 +17,12 @@ DATA_URLS = {
 LOOKBACK_DAYS = 21
 GROUP_ORDER = [
     "Market",
-    "Market Weight Sector",
-    "Crypto",
+    "Sector",
     "Commodity",
-    "Foreign Market",
+    "Crypto",
+    "Country",
     "Theme",
-    "Stock"
+    "Leader"
 ]
 
 
