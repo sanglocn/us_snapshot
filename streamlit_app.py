@@ -16,6 +16,17 @@ DATA_URLS = {
 }
 LOOKBACK_DAYS = 21
 
+# Custom group order for visualization
+GROUP_ORDER = [
+    "Market",
+    "Market Weight Sector",
+    "Crypto",
+    "Commodity",
+    "Foreign Market",
+    "Theme",
+    "Stock"
+]
+
 # Data Loading
 @st.cache_data(ttl=900)
 def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -108,11 +119,17 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest, rs_last_n = process_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
     
-    for group_name, tickers in latest.groupby("group").groups.items():
+    # Get all groups and their tickers
+    group_tickers = latest.groupby("group").groups
+    
+    # Iterate through groups in the specified order
+    for group_name in GROUP_ORDER:
+        if group_name not in group_tickers:
+            continue  # Skip if group is not in the data
         st.header(f"📌 {group_name}")
         rows = []
         
-        for ticker in tickers:
+        for ticker in group_tickers[group_name]:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
