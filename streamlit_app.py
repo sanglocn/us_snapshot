@@ -24,21 +24,12 @@ def load_data():
 
 # Data processing
 def get_processed_data(df_etf, df_rs):
-    latest = (
-        df_etf.sort_values("date")
-        .groupby("ticker")
-        .tail(1)
-        .set_index("ticker")
-    )
-    rs_last_n = (
-        df_rs.sort_values(["ticker", "date"])
-        .groupby("ticker")
-        .tail(LOOKBACK)
-    )
+    latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
+    rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK)
     return latest, rs_last_n
 
 # Sparkline generation
-def create_sparkline(series_vals, width=160, height=40):
+def create_sparkline(series_vals, width=120, height=36):
     if not series_vals:
         return ""
     fig = plt.figure(figsize=(width/96, height/96), dpi=96)
@@ -46,6 +37,7 @@ def create_sparkline(series_vals, width=160, height=40):
     ax.plot(range(len(series_vals)), series_vals, linewidth=1.5, color="green")
     ax.plot(len(series_vals)-1, series_vals[-1], "o", color="darkgreen", markersize=4)
     ax.axis("off")
+    # Set y-axis limits based on the series' own min and max
     y_min, y_max = min(series_vals), max(series_vals)
     padding = (y_max - y_min) * 0.05 or 0.01
     ax.set_ylim(y_min - padding, y_max + padding)
@@ -54,6 +46,7 @@ def create_sparkline(series_vals, width=160, height=40):
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
     b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+    # make the image center nicely inside the cell and scale within width
     return f'<img style="display:block;margin:0 auto;max-width:100%;" src="data:image/png;base64,{b64}" alt="sparkline" />'
 
 # Formatting helpers
@@ -75,15 +68,17 @@ def tick_icon(value):
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
 
-# Single group renderer with alignment + responsive spacer hiding
 def render_group_table(group_name, rows):
     df = pd.DataFrame(rows)
+
+    # Build a unique table id so CSS applies per table without collisions
     tbl_id = f"tbl-{slugify(group_name)}"
 
+    # Global CSS for this table: fixed layout, header centered, cell padding
     st.markdown(
         f"""
         <style>
-        /* table base */
+        /* fixed layout keeps column widths consistent */
         #{tbl_id} {{
           table-layout: fixed;
           width: 100%;
@@ -99,24 +94,22 @@ def render_group_table(group_name, rows):
           font-size: 0.95rem;
           line-height: 1.25rem;
         }}
-
-        /* widen Relative Strength (2nd column), narrow Ticker (1st) */
-        #{tbl_id} td:nth-child(1), #{tbl_id} th:nth-child(1) {{ width: 90px; }}
-        #{tbl_id} td:nth-child(2), #{tbl_id} th:nth-child(2) {{ width: 200px; }}
-
-        /* hide spacer columns (6th and 10th) on small screens */
-        @media (max-width: 768px) {{
-            #{tbl_id} td:nth-child(6), #{tbl_id} th:nth-child(6),
-            #{tbl_id} td:nth-child(10), #{tbl_id} th:nth-child(10) {{
-                display: none;
-            }}
+        /* widen Relative Strength (2nd column) */
+        #{tbl_id} td:nth-child(2), #{tbl_id} th:nth-child(2) {{
+          width: 180px;
+        }}
+        /* narrow Ticker (1st column) a bit for compactness */
+        #{tbl_id} td:nth-child(1), #{tbl_id} th:nth-child(1) {{
+          width: 90px;
         }}
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    # Alignment: right by default; center Ticker, Relative Strength, SMA ticks
+    # Use Styler to control alignment:
+    # - default: right-align everything
+    # - center: Ticker, Relative Strength, and the three SMA tick columns
     center_cols = ["Ticker", "Relative Strength", "Above SMA5", "Above SMA10", "Above SMA20"]
     styler = (
         df.style
@@ -126,7 +119,9 @@ def render_group_table(group_name, rows):
           .set_properties(subset=center_cols, **{"text-align": "center"})
     )
 
-    st.markdown(styler.to_html(escape=False), unsafe_allow_html=True)
+    # Render with HTML allowed (sparklines + tick icons)
+    html = styler.to_html(escape=False)
+    st.markdown(html, unsafe_allow_html=True)
 
 # Render dashboard
 def render_dashboard(df_etf, df_rs):
@@ -134,7 +129,7 @@ def render_dashboard(df_etf, df_rs):
     latest, rs_last_n = get_processed_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
 
-    # vertical groups (original layout)
+    # Loop groups (stacked vertically as in your original)
     for group_name, tickers in latest.groupby("group").groups.items():
         st.header(f"📌 {group_name}")
         rows = []
@@ -142,16 +137,16 @@ def render_dashboard(df_etf, df_rs):
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
-                "Ticker": ticker,                                     # centered
-                "Relative Strength": create_sparkline(spark_series),  # centered + wider
+                "Ticker": ticker,                                # centered
+                "Relative Strength": create_sparkline(spark_series),  # centered + wider column
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),  # right
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")), # right
                 "Volume Alert": row.get("volume_alert", "-"),         # right (words/numbers)
-                " ": "",                                              # spacer (hidden on small screens)
+                " ": "",                                              # spacer
                 "1D Return": format_perf(row.get("ret_1d")),          # right
                 "1W Return": format_perf(row.get("ret_1w")),          # right
                 "1M Return": format_perf(row.get("ret_1m")),          # right
-                "  ": "",                                             # spacer (hidden on small screens)
+                "  ": "",                                             # spacer
                 "Above SMA5": tick_icon(row.get("above_sma5")),       # centered
                 "Above SMA10": tick_icon(row.get("above_sma10")),     # centered
                 "Above SMA20": tick_icon(row.get("above_sma20")),     # centered
