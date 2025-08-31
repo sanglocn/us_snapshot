@@ -45,7 +45,7 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> tuple[pd.DataFram
     return latest, rs_last_n
 
 # Visualization
-def create_sparkline(series_vals: List[float], width: int = 150, height: int = 36) -> str:
+def create_sparkline(series_vals: List[float], width: int = 180, height: int = 36) -> str:
     """Generate a sparkline image from a series of values."""
     if not series_vals:
         return ""
