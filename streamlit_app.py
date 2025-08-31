@@ -67,12 +67,14 @@ def create_sparkline(series_vals: List[float], width: int = 120, height: int = 3
 
 # Formatting Helpers
 def format_rank(value: float) -> str:
-    """Format rank value as percentage."""
-    return f"{int(round(float(value) * 100))}%" if pd.notna(value) else ""
+    """Format rank value as percentage with right-aligned styling."""
+    formatted = f"{int(round(float(value) * 100))}%" if pd.notna(value) else ""
+    return f'<span style="display:block; text-align:right;">{formatted}</span>'
 
 def format_perf(value: float) -> str:
-    """Format performance value as percentage."""
-    return f"{float(value):.1f}%" if pd.notna(value) else ""
+    """Format performance value as percentage with right-aligned styling."""
+    formatted = f"{float(value):.1f}%" if pd.notna(value) else ""
+    return f'<span style="display:block; text-align:right;">{formatted}</span>'
 
 def tick_icon(value: str) -> str:
     """Return checkmark or cross icon with centered styling."""
@@ -109,11 +111,23 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table th {{
             text-align: center !important;
         }}
+        #{table_id} table td:nth-child(3),
+        #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(5),
+        #{table_id} table td:nth-child(7),
+        #{table_id} table td:nth-child(8),
+        #{table_id} table td:nth-child(9),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
         #{table_id} table td:nth-child(13) {{
             text-align: center !important;
+        }}
+        #{table_id} table td:nth-child(3),
+        #{table_id} table td:nth-child(4),
+        #{table_id} table td:nth-child(7),
+        #{table_id} table td:nth-child(8),
+        #{table_id} table td:nth-child(9) {{
+            text-align: right !important;
         }}
         </style>
         {html}
