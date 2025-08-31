@@ -5,40 +5,14 @@ import io, base64
 
 st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
-# ----------------------------------
 # Constants
-# ----------------------------------
 DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
 }
 LOOKBACK = 21
 
-# Desired group display order (lowercase keys as they appear in data)
-GROUP_ORDER = [
-    "market",
-    "market weight sector",
-    "foreign market",
-    "crypto",
-    "commodity",
-    "theme",
-    "stock",
-]
-
-# Pretty labels for headers
-GROUP_LABELS = {
-    "market": "Market",
-    "market weight sector": "Market Weight Sector",
-    "foreign market": "Foreign Market",
-    "crypto": "Crypto",
-    "commodity": "Commodity",
-    "theme": "Theme",
-    "stock": "Stock",
-}
-
-# ----------------------------------
 # Load and preprocess data
-# ----------------------------------
 @st.cache_data(ttl=900)
 def load_data():
     df_etf = pd.read_csv(DATA_URLS["etf"])
@@ -47,24 +21,13 @@ def load_data():
     df_rs["date"] = pd.to_datetime(df_rs["date"])
     return df_etf, df_rs
 
-# ----------------------------------
 # Data processing
-# ----------------------------------
 def get_processed_data(df_etf, df_rs):
-    latest = (
-        df_etf.sort_values("date")
-        .groupby("ticker").tail(1)
-        .set_index("ticker")
-    )
-    rs_last_n = (
-        df_rs.sort_values(["ticker", "date"])
-        .groupby("ticker").tail(LOOKBACK)
-    )
+    latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
+    rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK)
     return latest, rs_last_n
 
-# ----------------------------------
-# Sparkline generation (Matplotlib -> base64 <img>)
-# ----------------------------------
+# Sparkline generation
 def create_sparkline(series_vals, width=120, height=36):
     if not series_vals:
         return ""
@@ -76,57 +39,34 @@ def create_sparkline(series_vals, width=120, height=36):
     # Set y-axis limits based on the series' own min and max
     if series_vals:
         y_min, y_max = min(series_vals), max(series_vals)
-        padding = (y_max - y_min) * 0.05 or 0.01  # small padding to avoid clipping
+        # Add small padding to avoid clipping
+        padding = (y_max - y_min) * 0.05 or 0.01
         ax.set_ylim(y_min - padding, y_max + padding)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-# ----------------------------------
 # Formatting helpers
-# ----------------------------------
 def format_rank(value):
-    return f"{int(round(float(value) * 100))}%" if pd.notna(value) else "-"
+    return f"{int(round(float(value) * 100))}%" if pd.notna(value) else ""
 
 def format_perf(value):
-    return f"{float(value):.1f}%" if pd.notna(value) else "-"
+    return f"{float(value):.1f}%" if pd.notna(value) else ""
 
 def tick_icon(value):
-    if pd.isna(value):
-        return "-"
     return "✅" if bool(value) else "❌"
 
-# ----------------------------------
 # Render dashboard
-# ----------------------------------
 def render_dashboard(df_etf, df_rs):
     st.title("US Market Daily Snapshot")
     latest, rs_last_n = get_processed_data(df_etf, df_rs)
     st.caption(f"Latest data date: {latest['date'].max().date()}")
-
-    # Collect groups from data
-    groups = list(latest.groupby("group").groups.items())
-
-    # Sort groups by desired order; unknown groups go to the end
-    groups_sorted = sorted(
-        groups,
-        key=lambda x: GROUP_ORDER.index(x[0]) if x[0] in GROUP_ORDER else len(GROUP_ORDER)
-    )
-
-    # Render each group in the chosen order
-    for idx, (group_name, tickers) in enumerate(groups_sorted):
-        pretty_name = GROUP_LABELS.get(group_name, group_name.title())
-        st.header(f"📌 {pretty_name}")
-
-        # --- NEW: sort tickers within group by rs_rank_21d DESC, NaNs last
-        group_df = latest.loc[list(tickers)].copy()
-        group_df_sorted = group_df.sort_values(
-            by="rs_rank_21d", ascending=False, na_position="last"
-        )
-
+    
+    for group_name, tickers in latest.groupby("group").groups.items():
+        st.header(f"📌 {group_name}")
         rows = []
-        for ticker in group_df_sorted.index:
+        for ticker in tickers:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
             rows.append({
@@ -144,16 +84,9 @@ def render_dashboard(df_etf, df_rs):
                 "SMA10": tick_icon(row.get("above_sma10")),
                 "SMA20": tick_icon(row.get("above_sma20")),
             })
-
         st.write(pd.DataFrame(rows).to_html(escape=False, index=False), unsafe_allow_html=True)
 
-        # Divider between groups for readability (optional)
-        if idx < len(groups_sorted) - 1:
-            st.divider()
-
-# ----------------------------------
 # Run app
-# ----------------------------------
 if __name__ == "__main__":
     df_etf, df_rs = load_data()
     render_dashboard(df_etf, df_rs)
