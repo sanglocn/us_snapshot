@@ -207,43 +207,37 @@ def slugify(text: str) -> str:
 # Table Rendering
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    """Styled table (no verticals, strong header underline, dim row dividers, no outer border)."""
+    """Render a styled table:
+       - Hide vertical lines
+       - Bold header underline
+       - Dimmed divider under each data row
+    """
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Remove any outer border and all vertical lines */
-        #{table_id} table, 
-        #{table_id} table th, 
-        #{table_id} table td {{
-            border: none !important;
-        }}
-
+        /* Base table layout */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse;   /* collapse so only bottom borders show */
             border-spacing: 0;
         }}
-
-        /* Header: strong underline only */
+        /* Header: strong underline; no vertical borders */
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
+            border-left: none !important;
+            border-right: none !important;
             padding: 6px 8px;
         }}
-
-        /* Data cells: subtle bottom divider (dimmed) */
+        /* Data cells: only a subtle bottom border (dimmed), no verticals */
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.18);
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22); /* dim row line */
+            border-left: none !important;
+            border-right: none !important;
             padding: 6px 8px;
         }}
-
-        /* Remove bottom border from the last row to avoid an outside edge */
-        #{table_id} table tbody tr:last-child td {{
-            border-bottom: none !important;
-        }}
-
-        /* Alignment rules */
+        /* Alignment rules (keep your two spacer columns intact) */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
