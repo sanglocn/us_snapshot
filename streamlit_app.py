@@ -88,16 +88,13 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     """Column chart with fixed bar color, formatted x-axis for readability."""
-    # Format labels as 'Mon DD' (e.g., Aug 21)
     df = df.copy()
     df["date_label"] = df["date"].dt.strftime("%b %d")
-
     return (
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            x=alt.X("date_label:N",
-                    axis=alt.Axis(title=None, labelAngle=-45)),  # angled labels
+            x=alt.X("date_label:N", axis=alt.Axis(title=None, labelAngle=-45)),
             y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
@@ -133,6 +130,28 @@ def format_performance(value: float) -> str:
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
+
+def format_performance_intraday(value: float) -> str:
+    """Right-aligned % with soft background shading."""
+    if pd.isna(value):
+        return '<span style="display:block; text-align:right;">-</span>'
+
+    pct_text = f"{value:.1f}%"
+    if value > 0:
+        bg = "rgba(16, 185, 129, 0.22)"   # green
+        border = "rgba(16, 185, 129, 0.35)"
+    elif value < 0:
+        bg = "rgba(239, 68, 68, 0.22)"    # red
+        border = "rgba(239, 68, 68, 0.35)"
+    else:
+        return f'<span style="display:block; text-align:right;">{pct_text}</span>'
+
+    return (
+        f'<span style="display:block; text-align:right;'
+        f' padding:2px 6px; border-radius:6px;'
+        f' background-color:{bg}; border:1px solid {border};'
+        f' color:inherit;">{pct_text}</span>'
+    )
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
@@ -232,7 +251,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
                 "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
                 " ": "",
-                "Intraday": format_performance(row.get("ret_intraday")),
+                "Intraday": format_performance_intraday(row.get("ret_intraday")),
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
@@ -249,7 +268,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         st.subheader("Breadth Gauge")
-        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
+        st.caption("Green = gaining momentum (count_over_85) · Red = losing momentum (count_under_50)")
         st.caption(f"From {start_date} to {end_date}")
 
         c1, c2 = st.columns(2)
