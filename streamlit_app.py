@@ -242,17 +242,17 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
-        st.subheader("Breadth: RS Threshold Counts (Last 21 Trading Days)")
+        st.subheader("Breadth Gauge")
         st.caption(f"From {start_date} to {end_date}")
         c1, c2 = st.columns(2)
         with c1:
             st.altair_chart(
-                breadth_column_chart(counts_21, "count_over_85", "Count ≥ 0.85"),
+                breadth_column_chart(counts_21, "count_over_85", "Gain Momentum"),
                 use_container_width=True
             )
         with c2:
             st.altair_chart(
-                breadth_column_chart(counts_21, "count_under_50", "Count < 0.50"),
+                breadth_column_chart(counts_21, "count_under_50", "Lose Momentum"),
                 use_container_width=True
             )
     else:
