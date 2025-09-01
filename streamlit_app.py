@@ -108,23 +108,32 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """Format rank value as percentage with colors only:
-       - Green if >= 85%
-       - Red if < 50%
-       - Black otherwise
+    """RS Rank with shaded background (like Intraday):
+       - Green shade if >= 85%
+       - Red shade if < 50%
+       - Gray shade if between 50–84%
+       - Dash if missing
     """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct = int(round(value * 100))
     if pct >= 85:
-        color = "green"
+        bg = "rgba(16, 185, 129, 0.22)"   # green
+        border = "rgba(16, 185, 129, 0.35)"
     elif pct < 50:
-        color = "red"
+        bg = "rgba(239, 68, 68, 0.22)"    # red
+        border = "rgba(239, 68, 68, 0.35)"
     else:
-        color = "black"
+        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+        border = "rgba(156, 163, 175, 0.35)"
 
-    return f'<span style="display:block; text-align:right; color:{color};">{pct}%</span>'
+    return (
+        f'<span style="display:block; text-align:right;'
+        f' padding:2px 6px; border-radius:6px;'
+        f' background-color:{bg}; border:1px solid {border};'
+        f' color:inherit;">{pct}%</span>'
+    )
 
 def format_performance(value: float) -> str:
     if pd.isna(value):
@@ -147,7 +156,7 @@ def format_performance_intraday(value: float) -> str:
     elif value < 0:
         bg = "rgba(239, 68, 68, 0.22)"    # red
         border = "rgba(239, 68, 68, 0.35)"
-    else:  # neutral (zero)
+    else:  # neutral zero
         bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
         border = "rgba(156, 163, 175, 0.35)"
 
