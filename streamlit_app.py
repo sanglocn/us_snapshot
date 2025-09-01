@@ -207,37 +207,31 @@ def slugify(text: str) -> str:
 # Table Rendering
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    """Render a styled table:
-       - Hide vertical lines
-       - Bold header underline
-       - Dimmed divider under each data row
-    """
+    """Base styling with thicker outside border."""
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Base table layout */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;   /* collapse so only bottom borders show */
+            border-collapse: collapse;
             border-spacing: 0;
+            border: 3px solid rgba(156, 163, 175, 0.85); /* thicker outside border */
+            border-radius: 8px;
+            overflow: hidden;
         }}
-        /* Header: strong underline; no vertical borders */
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
-            border-left: none !important;
-            border-right: none !important;
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
             padding: 6px 8px;
         }}
-        /* Data cells: only a subtle bottom border (dimmed), no verticals */
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.22); /* dim row line */
-            border-left: none !important;
-            border-right: none !important;
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22);
             padding: 6px 8px;
         }}
-        /* Alignment rules (keep your two spacer columns intact) */
+        #{table_id} table tbody tr:last-child td {{
+            border-bottom: none;
+        }}
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
