@@ -105,22 +105,23 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """Format rank value as percentage with colors and 💎 emoji for >=85%."""
+    """Format rank value as percentage with colors only:
+       - Green if >= 85%
+       - Red if < 50%
+       - Black otherwise
+    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct = int(round(value * 100))
     if pct >= 85:
         color = "green"
-        emoji = " 💎"
     elif pct < 50:
         color = "red"
-        emoji = ""
     else:
         color = "black"
-        emoji = ""
 
-    return f'<span style="display:block; text-align:right; color:{color};">{pct}%{emoji}</span>'
+    return f'<span style="display:block; text-align:right; color:{color};">{pct}%</span>'
 
 def format_performance(value: float) -> str:
     if pd.isna(value):
