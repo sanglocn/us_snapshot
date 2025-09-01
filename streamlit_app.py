@@ -208,36 +208,49 @@ def slugify(text: str) -> str:
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a styled table:
-       - Hide vertical lines
-       - Bold header underline
+       - Keep outside border
+       - No vertical grid lines
+       - Strong header underline
        - Dimmed divider under each data row
+       - Hover row highlight
     """
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Base table layout */
+        /* Keep a subtle outside border around the table */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;   /* collapse so only bottom borders show */
+            border-collapse: collapse;
             border-spacing: 0;
+            border: 1px solid rgba(156, 163, 175, 0.35); /* outer border */
+            border-radius: 8px;
+            overflow: hidden; /* ensure rounded corners clip */
         }}
-        /* Header: strong underline; no vertical borders */
+
+        /* Header: strong underline, no verticals */
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
-        /* Data cells: only a subtle bottom border (dimmed), no verticals */
+
+        /* Data cells: only bottom divider, no verticals */
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.22); /* dim row line */
+            border-bottom: 1px solid rgba(156, 163, 175, 0.18);
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
-        /* Alignment rules (keep your two spacer columns intact) */
+
+        /* Hover row highlight */
+        #{table_id} table tbody tr:hover td {{
+            background-color: rgba(156, 163, 175, 0.12);
+        }}
+
+        /* Alignment rules */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
