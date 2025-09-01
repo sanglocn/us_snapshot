@@ -108,12 +108,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """RS Rank with shaded background (like Intraday):
-       - Green shade if >= 85%
-       - Red shade if < 50%
-       - Gray shade if between 50–84%
-       - Dash if missing
-    """
+    """RS Rank with shaded background (like Intraday)."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
@@ -141,23 +136,19 @@ def format_performance(value: float) -> str:
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
 
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading:
-       - Green if > 0
-       - Red if < 0
-       - Gray if == 0
-    """
+    """Right-aligned % with soft background shading (green >0, red <0, gray ==0)."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct_text = f"{value:.1f}%"
     if value > 0:
-        bg = "rgba(16, 185, 129, 0.22)"   # green
+        bg = "rgba(16, 185, 129, 0.22)"
         border = "rgba(16, 185, 129, 0.35)"
     elif value < 0:
-        bg = "rgba(239, 68, 68, 0.22)"    # red
+        bg = "rgba(239, 68, 68, 0.22)"
         border = "rgba(239, 68, 68, 0.35)"
-    else:  # neutral zero
-        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+    else:
+        bg = "rgba(156, 163, 175, 0.25)"
         border = "rgba(156, 163, 175, 0.35)"
 
     return (
@@ -209,24 +200,21 @@ def slugify(text: str) -> str:
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
+
     css = f"""
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
+            border-spacing: 0;
         }}
         #{table_id} table th {{
             text-align: center !important;
+            border-bottom: 2px solid rgba(156, 163, 175, 0.4);
+            padding: 6px;
         }}
-        #{table_id} table td:nth-child(3),
-        #{table_id} table td:nth-child(4),
-        #{table_id} table td:nth-child(5),
-        #{table_id} table td:nth-child(7),
-        #{table_id} table td:nth-child(8),
-        #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(11),
-        #{table_id} table td:nth-child(12),
-        #{table_id} table td:nth-child(13) {{
-            text-align: center !important;
+        #{table_id} table td {{
+            padding: 6px;
+            border-bottom: 1px solid rgba(156, 163, 175, 0.25);
         }}
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
@@ -234,6 +222,16 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9) {{
             text-align: right !important;
+        }}
+        #{table_id} table td:nth-child(5),
+        #{table_id} table td:nth-child(11),
+        #{table_id} table td:nth-child(12),
+        #{table_id} table td:nth-child(13) {{
+            text-align: center !important;
+        }}
+        #{table_id} table td:nth-child(6),
+        #{table_id} table td:nth-child(10) {{
+            border-left: 2px solid rgba(156, 163, 175, 0.4);
         }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
