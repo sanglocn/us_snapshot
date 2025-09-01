@@ -240,13 +240,15 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
-        #{table_id} table td:nth-child(9) {{
+        #{table_id} table td:nth-child(9),
+        #{table_id} table td:nth-child(10) {{
             text-align: right !important;
         }}
         #{table_id} table td:nth-child(5),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
-        #{table_id} table td:nth-child(13) {{
+        #{table_id} table td:nth-child(13),
+        #{table_id} table td:nth-child(14) {{
             text-align: center !important;
         }}
     """
@@ -266,9 +268,15 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         if group_name not in group_tickers:
             continue
         st.header(f"📌 {group_name}")
-        rows = []
         tickers_in_group = group_tickers[group_name]
-
+        # Sort tickers by rs_rank_21d descending if column exists
+        if "rs_rank_21d" in latest.columns:
+            tickers_in_group = sorted(
+                tickers_in_group,
+                key=lambda t: latest.loc[t, "rs_rank_21d"] if not pd.isna(latest.loc[t, "rs_rank_21d"]) else -1,
+                reverse=True
+            )
+        rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
