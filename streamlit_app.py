@@ -207,33 +207,49 @@ def slugify(text: str) -> str:
 # Table Rendering
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
+    """Render a styled table:
+       - Hide vertical lines
+       - Bold header underline
+       - Dimmed divider under each data row
+    """
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
+
     css = f"""
+        /* Base table layout */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse;   /* collapse so only bottom borders show */
+            border-spacing: 0;
         }}
-        #{table_id} table th {{
+        /* Header: strong underline; no vertical borders */
+        #{table_id} table thead th {{
             text-align: center !important;
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
+            border-left: none !important;
+            border-right: none !important;
+            padding: 6px 8px;
         }}
-        #{table_id} table td:nth-child(3),
-        #{table_id} table td:nth-child(4),
-        #{table_id} table td:nth-child(5),
-        #{table_id} table td:nth-child(7),
-        #{table_id} table td:nth-child(8),
-        #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(11),
-        #{table_id} table td:nth-child(12),
-        #{table_id} table td:nth-child(13) {{
-            text-align: center !important;
+        /* Data cells: only a subtle bottom border (dimmed), no verticals */
+        #{table_id} table tbody td {{
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22); /* dim row line */
+            border-left: none !important;
+            border-right: none !important;
+            padding: 6px 8px;
         }}
+        /* Alignment rules (keep your two spacer columns intact) */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9) {{
             text-align: right !important;
+        }}
+        #{table_id} table td:nth-child(5),
+        #{table_id} table td:nth-child(11),
+        #{table_id} table td:nth-child(12),
+        #{table_id} table td:nth-child(13) {{
+            text-align: center !important;
         }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
