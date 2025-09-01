@@ -12,8 +12,8 @@ st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
 # Constants
 DATA_URLS = {
-    "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
-    "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
+    "etf": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_etf_price.csv.gz",
+    "rs": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_rs_sparkline.csv.gz"
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = [
