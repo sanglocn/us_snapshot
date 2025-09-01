@@ -87,19 +87,24 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
-    """Column chart with fixed bar color, no axis titles, categorical trading-day x-axis."""
+    """Column chart with fixed bar color, formatted x-axis for readability."""
+    # Format labels as 'Mon DD' (e.g., Aug 21)
+    df = df.copy()
+    df["date_label"] = df["date"].dt.strftime("%b %d")
+
     return (
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),  # categorical trading days; no x-axis title
-            y=alt.Y(f"{value_col}:Q", title=None),                                 # no y-axis title
+            x=alt.X("date_label:N",
+                    axis=alt.Axis(title=None, labelAngle=-45)),  # angled labels
+            y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
             ]
         )
-        .properties(height=320)  # no per-chart title
+        .properties(height=320)
     )
 
 # ---------------------------
