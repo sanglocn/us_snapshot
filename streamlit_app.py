@@ -86,19 +86,20 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Chart:
+def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
+    """Column chart with fixed bar color, no axis titles, categorical trading-day x-axis."""
     return (
         alt.Chart(df)
-        .mark_bar()
+        .mark_bar(color=bar_color)
         .encode(
             x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),  # categorical trading days; no x-axis title
             y=alt.Y(f"{value_col}:Q", title=None),                                 # no y-axis title
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
-                alt.Tooltip(f"{value_col}:Q", title=title)
+                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
             ]
         )
-        .properties(height=320, title=title)
+        .properties(height=320)  # no per-chart title
     )
 
 # ---------------------------
@@ -243,16 +244,18 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         st.subheader("Breadth Gauge")
+        st.caption("Green = gaining momentum · Red = losing momentum")
         st.caption(f"From {start_date} to {end_date}")
+
         c1, c2 = st.columns(2)
         with c1:
             st.altair_chart(
-                breadth_column_chart(counts_21, "count_over_85", "Gain Momentum"),
+                breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
                 use_container_width=True
             )
         with c2:
             st.altair_chart(
-                breadth_column_chart(counts_21, "count_under_50", "Lose Momentum"),
+                breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
                 use_container_width=True
             )
     else:
