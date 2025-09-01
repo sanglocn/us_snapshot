@@ -135,20 +135,29 @@ def format_rank(value: float) -> str:
         f' color:inherit;">{pct}%</span>'
     )
 
+def format_performance(value: float) -> str:
+    if pd.isna(value):
+        return '<span style="display:block; text-align:right;">-</span>'
+    return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
+
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading (green >0, red <0, gray ==0)."""
+    """Right-aligned % with soft background shading:
+       - Green if > 0
+       - Red if < 0
+       - Gray if == 0
+    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct_text = f"{value:.1f}%"
     if value > 0:
-        bg = "rgba(16, 185, 129, 0.22)"
+        bg = "rgba(16, 185, 129, 0.22)"   # green
         border = "rgba(16, 185, 129, 0.35)"
     elif value < 0:
-        bg = "rgba(239, 68, 68, 0.22)"
+        bg = "rgba(239, 68, 68, 0.22)"    # red
         border = "rgba(239, 68, 68, 0.35)"
-    else:
-        bg = "rgba(156, 163, 175, 0.25)"
+    else:  # neutral zero
+        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
         border = "rgba(156, 163, 175, 0.35)"
 
     return (
@@ -157,56 +166,6 @@ def format_performance_intraday(value: float) -> str:
         f' background-color:{bg}; border:1px solid {border};'
         f' color:inherit;">{pct_text}</span>'
     )
-
-def format_return_microbar(value: float, cap: float = 5.0) -> str:
-    """
-    Compact zero-centered micro-bar for 1D/1W/1M:
-      - Soft green fill for positive, red for negative
-      - Length proportional to |value|, capped at ±cap (default 5%)
-      - Small, monospaced text; theme-safe via translucent RGBA
-    """
-    if pd.isna(value):
-        return '<span style="display:block; text-align:right;">-</span>'
-
-    v = float(value)
-    pct_txt = f"{v:+.1f}%"
-
-    # Scale to 0..100 based on cap, clamped
-    frac = min(abs(v) / cap, 1.0) * 100
-
-    # Colors (tailwind-ish hues)
-    pos_bg = "rgba(16,185,129,0.35)"   # green-500 ~35% alpha
-    neg_bg = "rgba(239,68,68,0.35)"    # red-500   ~35% alpha
-    track  = "rgba(156,163,175,0.25)"  # gray-400  ~25% alpha
-    border = "rgba(156,163,175,0.35)"  # gray-400  ~35% alpha
-
-    # Bar halves: left(neg) | right(pos)
-    if v >= 0:
-        left_fill  = "0%"
-        right_fill = f"{frac:.0f}%"
-        right_color = pos_bg
-        left_color  = "transparent"
-    else:
-        left_fill  = f"{frac:.0f}%"
-        right_fill = "0%"
-        right_color = "transparent"
-        left_color  = neg_bg
-
-    bar_html = (
-        f'<div style="display:flex; align-items:center; gap:6px;">'
-        f'  <div style="flex:1; display:flex; height:8px;'
-        f'              background:{track}; border:1px solid {border}; border-radius:6px; overflow:hidden;">'
-        f'    <div style="width:50%; position:relative; background:{track};">'
-        f'      <div style="position:absolute; right:0; width:{left_fill}; height:100%; background:{left_color};"></div>'
-        f'    </div>'
-        f'    <div style="width:50%; position:relative; background:{track};">'
-        f'      <div style="position:absolute; left:0; width:{right_fill}; height:100%; background:{right_color};"></div>'
-        f'    </div>'
-        f'  </div>'
-        f'  <span style="min-width:56px; text-align:right; font-variant-numeric: tabular-nums;">{pct_txt}</span>'
-        f'</div>'
-    )
-    return bar_html
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
@@ -307,9 +266,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
                 " ": "",
                 "Intraday": format_performance_intraday(row.get("ret_intraday")),
-                "1D Return": format_return_microbar(row.get("ret_1d")),
-                "1W Return": format_return_microbar(row.get("ret_1w")),
-                "1M Return": format_return_microbar(row.get("ret_1m")),
+                "1D Return": format_performance(row.get("ret_1d")),
+                "1W Return": format_performance(row.get("ret_1w")),
+                "1M Return": format_performance(row.get("ret_1m")),
                 "  ": "",
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
