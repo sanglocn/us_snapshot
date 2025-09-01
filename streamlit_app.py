@@ -32,8 +32,8 @@ GROUP_ORDER = [
 # ---------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    df_etf = pd.read_csv(DATA_URLS["etf"])
-    df_rs = pd.read_csv(DATA_URLS["rs"])
+    df_etf = pd.read_csv(DATA_URLS["etf"], compression="gzip")
+    df_rs = pd.read_csv(DATA_URLS["rs"], compression="gzip")
     df_etf["date"] = pd.to_datetime(df_etf["date"])
     df_rs["date"] = pd.to_datetime(df_rs["date"])
     return df_etf, df_rs
