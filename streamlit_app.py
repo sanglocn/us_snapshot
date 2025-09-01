@@ -108,12 +108,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """RS Rank with shaded background (like Intraday):
-       - Green shade if >= 85%
-       - Red shade if < 50%
-       - Gray shade if between 50–84%
-       - Dash if missing
-    """
+    """RS Rank with shaded background (like Intraday)."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
@@ -135,29 +130,20 @@ def format_rank(value: float) -> str:
         f' color:inherit;">{pct}%</span>'
     )
 
-def format_performance(value: float) -> str:
-    if pd.isna(value):
-        return '<span style="display:block; text-align:right;">-</span>'
-    return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
-
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading:
-       - Green if > 0
-       - Red if < 0
-       - Gray if == 0
-    """
+    """Right-aligned % with soft background shading (green >0, red <0, gray ==0)."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct_text = f"{value:.1f}%"
     if value > 0:
-        bg = "rgba(16, 185, 129, 0.22)"   # green
+        bg = "rgba(16, 185, 129, 0.22)"
         border = "rgba(16, 185, 129, 0.35)"
     elif value < 0:
-        bg = "rgba(239, 68, 68, 0.22)"    # red
+        bg = "rgba(239, 68, 68, 0.22)"
         border = "rgba(239, 68, 68, 0.35)"
-    else:  # neutral zero
-        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+    else:
+        bg = "rgba(156, 163, 175, 0.25)"
         border = "rgba(156, 163, 175, 0.35)"
 
     return (
@@ -165,6 +151,45 @@ def format_performance_intraday(value: float) -> str:
         f' padding:2px 6px; border-radius:6px;'
         f' background-color:{bg}; border:1px solid {border};'
         f' color:inherit;">{pct_text}</span>'
+    )
+
+def format_return_badge(value: float, strong=2.0, mild=0.5) -> str:
+    """
+    Return badge for 1D/1W/1M:
+      - strong moves (>= ±2%) saturated color
+      - mild moves (±0.5–2%) lighter color
+      - tiny moves (< ±0.5%) neutral outline
+    Always shows sign and uses monospaced digits.
+    """
+    if pd.isna(value):
+        return '<span style="display:block; text-align:right;">-</span>'
+
+    v = float(value)
+    txt = f"{v:+.1f}%"
+
+    # Default neutral
+    bg = "rgba(0,0,0,0)"                 
+    border = "rgba(156, 163, 175, 0.35)" 
+    color = "inherit"
+
+    av = abs(v)
+    if av >= strong:
+        if v > 0:
+            bg, border = "rgba(16, 185, 129, 0.22)", "rgba(16, 185, 129, 0.35)"
+        else:
+            bg, border = "rgba(239, 68, 68, 0.22)", "rgba(239, 68, 68, 0.35)"
+    elif av >= mild:
+        if v > 0:
+            bg, border = "rgba(16, 185, 129, 0.12)", "rgba(16, 185, 129, 0.25)"
+        else:
+            bg, border = "rgba(239, 68, 68, 0.12)", "rgba(239, 68, 68, 0.25)"
+
+    return (
+        f'<span style="display:block; text-align:right;'
+        f' font-variant-numeric: tabular-nums;'
+        f' padding:2px 6px; border-radius:6px;'
+        f' background-color:{bg}; border:1px solid {border};'
+        f' color:{color};">{txt}</span>'
     )
 
 def format_indicator(value: str) -> str:
@@ -266,9 +291,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
                 " ": "",
                 "Intraday": format_performance_intraday(row.get("ret_intraday")),
-                "1D Return": format_performance(row.get("ret_1d")),
-                "1W Return": format_performance(row.get("ret_1w")),
-                "1M Return": format_performance(row.get("ret_1m")),
+                "1D Return": format_return_badge(row.get("ret_1d")),
+                "1W Return": format_return_badge(row.get("ret_1w")),
+                "1M Return": format_return_badge(row.get("ret_1m")),
                 "  ": "",
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
