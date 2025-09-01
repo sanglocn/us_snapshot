@@ -108,7 +108,12 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """RS Rank with shaded background (like Intraday)."""
+    """RS Rank with shaded background (like Intraday):
+       - Green shade if >= 85%
+       - Red shade if < 50%
+       - Gray shade if between 50–84%
+       - Dash if missing
+    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
@@ -153,44 +158,55 @@ def format_performance_intraday(value: float) -> str:
         f' color:inherit;">{pct_text}</span>'
     )
 
-def format_return_badge(value: float, strong=2.0, mild=0.5) -> str:
+def format_return_microbar(value: float, cap: float = 5.0) -> str:
     """
-    Return badge for 1D/1W/1M:
-      - strong moves (>= ±2%) saturated color
-      - mild moves (±0.5–2%) lighter color
-      - tiny moves (< ±0.5%) neutral outline
-    Always shows sign and uses monospaced digits.
+    Compact zero-centered micro-bar for 1D/1W/1M:
+      - Soft green fill for positive, red for negative
+      - Length proportional to |value|, capped at ±cap (default 5%)
+      - Small, monospaced text; theme-safe via translucent RGBA
     """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     v = float(value)
-    txt = f"{v:+.1f}%"
+    pct_txt = f"{v:+.1f}%"
 
-    # Default neutral
-    bg = "rgba(0,0,0,0)"                 
-    border = "rgba(156, 163, 175, 0.35)" 
-    color = "inherit"
+    # Scale to 0..100 based on cap, clamped
+    frac = min(abs(v) / cap, 1.0) * 100
 
-    av = abs(v)
-    if av >= strong:
-        if v > 0:
-            bg, border = "rgba(16, 185, 129, 0.22)", "rgba(16, 185, 129, 0.35)"
-        else:
-            bg, border = "rgba(239, 68, 68, 0.22)", "rgba(239, 68, 68, 0.35)"
-    elif av >= mild:
-        if v > 0:
-            bg, border = "rgba(16, 185, 129, 0.12)", "rgba(16, 185, 129, 0.25)"
-        else:
-            bg, border = "rgba(239, 68, 68, 0.12)", "rgba(239, 68, 68, 0.25)"
+    # Colors (tailwind-ish hues)
+    pos_bg = "rgba(16,185,129,0.35)"   # green-500 ~35% alpha
+    neg_bg = "rgba(239,68,68,0.35)"    # red-500   ~35% alpha
+    track  = "rgba(156,163,175,0.25)"  # gray-400  ~25% alpha
+    border = "rgba(156,163,175,0.35)"  # gray-400  ~35% alpha
 
-    return (
-        f'<span style="display:block; text-align:right;'
-        f' font-variant-numeric: tabular-nums;'
-        f' padding:2px 6px; border-radius:6px;'
-        f' background-color:{bg}; border:1px solid {border};'
-        f' color:{color};">{txt}</span>'
+    # Bar halves: left(neg) | right(pos)
+    if v >= 0:
+        left_fill  = "0%"
+        right_fill = f"{frac:.0f}%"
+        right_color = pos_bg
+        left_color  = "transparent"
+    else:
+        left_fill  = f"{frac:.0f}%"
+        right_fill = "0%"
+        right_color = "transparent"
+        left_color  = neg_bg
+
+    bar_html = (
+        f'<div style="display:flex; align-items:center; gap:6px;">'
+        f'  <div style="flex:1; display:flex; height:8px;'
+        f'              background:{track}; border:1px solid {border}; border-radius:6px; overflow:hidden;">'
+        f'    <div style="width:50%; position:relative; background:{track};">'
+        f'      <div style="position:absolute; right:0; width:{left_fill}; height:100%; background:{left_color};"></div>'
+        f'    </div>'
+        f'    <div style="width:50%; position:relative; background:{track};">'
+        f'      <div style="position:absolute; left:0; width:{right_fill}; height:100%; background:{right_color};"></div>'
+        f'    </div>'
+        f'  </div>'
+        f'  <span style="min-width:56px; text-align:right; font-variant-numeric: tabular-nums;">{pct_txt}</span>'
+        f'</div>'
     )
+    return bar_html
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
@@ -291,9 +307,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
                 " ": "",
                 "Intraday": format_performance_intraday(row.get("ret_intraday")),
-                "1D Return": format_return_badge(row.get("ret_1d")),
-                "1W Return": format_return_badge(row.get("ret_1w")),
-                "1M Return": format_return_badge(row.get("ret_1m")),
+                "1D Return": format_return_microbar(row.get("ret_1d")),
+                "1W Return": format_return_microbar(row.get("ret_1w")),
+                "1M Return": format_return_microbar(row.get("ret_1m")),
                 "  ": "",
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
