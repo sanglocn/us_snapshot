@@ -108,31 +108,23 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
-    """Percentage with background shading:
-       - >=85%: green text + soft green bg
-       - <50%:  red text  + soft red bg
-       - else:  plain text
+    """Format rank value as percentage with colors only:
+       - Green if >= 85%
+       - Red if < 50%
+       - Black otherwise
     """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
     pct = int(round(value * 100))
     if pct >= 85:
-        text_color = "green"
-        bg = "rgba(16, 185, 129, 0.22)"
-        border = "rgba(16, 185, 129, 0.35)"
-        return (f'<span style="display:block; text-align:right; color:{text_color};'
-                f' padding:2px 6px; border-radius:6px;'
-                f' background-color:{bg}; border:1px solid {border};">{pct}%</span>')
+        color = "green"
     elif pct < 50:
-        text_color = "red"
-        bg = "rgba(239, 68, 68, 0.22)"
-        border = "rgba(239, 68, 68, 0.35)"
-        return (f'<span style="display:block; text-align:right; color:{text_color};'
-                f' padding:2px 6px; border-radius:6px;'
-                f' background-color:{bg}; border:1px solid {border};">{pct}%</span>')
+        color = "red"
     else:
-        return f'<span style="display:block; text-align:right;">{pct}%</span>'
+        color = "black"
+
+    return f'<span style="display:block; text-align:right; color:{color};">{pct}%</span>'
 
 def format_performance(value: float) -> str:
     if pd.isna(value):
@@ -140,7 +132,7 @@ def format_performance(value: float) -> str:
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
 
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading (green >0, red <0)."""
+    """Right-aligned % with soft background shading."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
