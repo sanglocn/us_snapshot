@@ -207,17 +207,12 @@ def slugify(text: str) -> str:
 # Table Rendering
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    """Render a styled table:
-       - Hide ALL vertical lines & outer border
-       - Strong header underline
-       - Dimmed divider under each data row
-       - Hover row highlight
-    """
+    """Styled table (no verticals, strong header underline, dim row dividers, no outer border)."""
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Remove any outer border and vertical lines */
+        /* Remove any outer border and all vertical lines */
         #{table_id} table, 
         #{table_id} table th, 
         #{table_id} table td {{
@@ -226,14 +221,14 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse; /* ensures only our custom bottom borders show */
+            border-collapse: collapse;
             border-spacing: 0;
         }}
 
         /* Header: strong underline only */
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
             padding: 6px 8px;
         }}
 
@@ -248,12 +243,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-bottom: none !important;
         }}
 
-        /* Hover row highlight across the full width */
-        #{table_id} table tbody tr:hover td {{
-            background-color: rgba(156, 163, 175, 0.12); /* soft gray that works in light/dark */
-        }}
-
-        /* Alignment rules (keep your two spacer columns intact) */
+        /* Alignment rules */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
