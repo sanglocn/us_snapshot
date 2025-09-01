@@ -13,8 +13,8 @@ st.set_page_config(page_title="US Market Snapshot", layout="wide")
 
 # Constants
 DATA_URLS = {
-    "etf": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_etf_price.csv.gz",
-    "rs": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_rs_sparkline.csv.gz"
+    "etf": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_etf_price.csv",
+    "rs": "https://raw.githubusercontent.com/<you>/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = [
@@ -32,8 +32,8 @@ GROUP_ORDER = [
 # ---------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    df_etf = pd.read_csv(DATA_URLS["etf"], compression="gzip")
-    df_rs = pd.read_csv(DATA_URLS["rs"], compression="gzip")
+    df_etf = pd.read_csv(DATA_URLS["etf"])
+    df_rs = pd.read_csv(DATA_URLS["rs"])
     df_etf["date"] = pd.to_datetime(df_etf["date"])
     df_rs["date"] = pd.to_datetime(df_rs["date"])
     return df_etf, df_rs
