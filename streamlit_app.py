@@ -296,7 +296,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         st.subheader("Breadth Gauge")
-        st.caption("Green = gaining momentum (count_over_85) · Red = losing momentum (count_under_50)")
+        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
 
         c1, c2 = st.columns(2)
