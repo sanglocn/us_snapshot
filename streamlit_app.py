@@ -132,7 +132,11 @@ def format_performance(value: float) -> str:
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
 
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading."""
+    """Right-aligned % with soft background shading:
+       - Green if > 0
+       - Red if < 0
+       - Gray if == 0
+    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
 
@@ -143,8 +147,9 @@ def format_performance_intraday(value: float) -> str:
     elif value < 0:
         bg = "rgba(239, 68, 68, 0.22)"    # red
         border = "rgba(239, 68, 68, 0.35)"
-    else:
-        return f'<span style="display:block; text-align:right;">{pct_text}</span>'
+    else:  # neutral (zero)
+        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+        border = "rgba(156, 163, 175, 0.35)"
 
     return (
         f'<span style="display:block; text-align:right;'
