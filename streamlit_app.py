@@ -91,8 +91,8 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
         alt.Chart(df)
         .mark_bar()
         .encode(
-            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),
-            y=alt.Y(f"{value_col}:Q", title=None),
+            x=alt.X("date_str:N", axis=alt.Axis(title=None, labelOverlap=True)),  # categorical trading days; no x-axis title
+            y=alt.Y(f"{value_col}:Q", title=None),                                 # no y-axis title
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip(f"{value_col}:Q", title=title)
@@ -136,13 +136,25 @@ def format_indicator(value: str) -> str:
         return '<span style="color:red; display:block; text-align:center;">❌</span>'
     return '<span style="display:block; text-align:center;">-</span>'
 
-def format_volume_alert(value: str) -> str:
-    """Format volume alert words with colored square emoji."""
+def format_volume_alert(value: str, rs_rank_252d) -> str:
+    """Format volume alert with conditions:
+       - 'positive' + rs_rank_252d >= 0.80 → 💎
+       - 'positive' → 🟩
+       - 'negative' → 🟥
+       - anything else → –
+    """
     if not isinstance(value, str):
         return '<span style="display:block; text-align:center;">-</span>'
 
     val = value.strip().lower()
-    if val == "positive":
+    try:
+        rs_val = float(rs_rank_252d)
+    except (ValueError, TypeError):
+        rs_val = None
+
+    if val == "positive" and rs_val is not None and rs_val >= 0.80:
+        return '<span style="display:block; text-align:center; font-size:16px;">💎</span>'
+    elif val == "positive":
         return '<span style="display:block; text-align:center; font-size:16px;">🟩</span>'
     elif val == "negative":
         return '<span style="display:block; text-align:center; font-size:16px;">🟥</span>'
@@ -212,7 +224,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
-                "Volume Alert": format_volume_alert(row.get("volume_alert", "-")),
+                "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
                 " ": "",
                 "Intraday": format_performance(row.get("ret_intraday")),
                 "1D Return": format_performance(row.get("ret_1d")),
