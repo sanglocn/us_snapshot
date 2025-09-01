@@ -105,9 +105,22 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, title: str) -> alt.Ch
 # Formatting Helpers
 # ---------------------------
 def format_rank(value: float) -> str:
+    """Format rank value as percentage with colors and 💎 emoji for >=85%."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-    return f'<span style="display:block; text-align:right;">{int(round(value * 100))}%</span>'
+
+    pct = int(round(value * 100))
+    if pct >= 85:
+        color = "green"
+        emoji = " 💎"
+    elif pct < 50:
+        color = "red"
+        emoji = ""
+    else:
+        color = "black"
+        emoji = ""
+
+    return f'<span style="display:block; text-align:right; color:{color};">{pct}%{emoji}</span>'
 
 def format_performance(value: float) -> str:
     if pd.isna(value):
@@ -123,8 +136,17 @@ def format_indicator(value: str) -> str:
     return '<span style="display:block; text-align:center;">-</span>'
 
 def format_volume_alert(value: str) -> str:
-    value = str(value).strip()
-    return f'<span style="display:block; text-align:center;">{value}</span>'
+    """Format volume alert words with colored square emoji."""
+    if not isinstance(value, str):
+        return '<span style="display:block; text-align:center;">-</span>'
+
+    val = value.strip().lower()
+    if val == "positive":
+        return '<span style="display:block; text-align:center; font-size:16px;">🟩</span>'
+    elif val == "negative":
+        return '<span style="display:block; text-align:center; font-size:16px;">🟥</span>'
+    else:
+        return '<span style="display:block; text-align:center;">-</span>'
 
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
@@ -202,12 +224,12 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             })
         render_group_table(group_name, rows)
 
-    # ---- Breadth charts moved to bottom ----
+    # ---- Breadth charts at bottom ----
     counts_21 = compute_threshold_counts(df_etf)
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
-        st.subheader("Breadth: RS Counts (Last 21 Trading Days)")
+        st.subheader("Breadth: RS Threshold Counts (Last 21 Trading Days)")
         st.caption(f"From {start_date} to {end_date}")
         c1, c2 = st.columns(2)
         with c1:
