@@ -208,49 +208,36 @@ def slugify(text: str) -> str:
 # ---------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a styled table:
-       - Keep outside border
-       - No vertical grid lines
-       - Strong header underline
+       - Hide vertical lines
+       - Bold header underline
        - Dimmed divider under each data row
-       - Hover row highlight
     """
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Keep a subtle outside border around the table */
+        /* Base table layout */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse;   /* collapse so only bottom borders show */
             border-spacing: 0;
-            border: 1px solid rgba(156, 163, 175, 0.35); /* outer border */
-            border-radius: 8px;
-            overflow: hidden; /* ensure rounded corners clip */
         }}
-
-        /* Header: strong underline, no verticals */
+        /* Header: strong underline; no vertical borders */
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* prominent header line */
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
-
-        /* Data cells: only bottom divider, no verticals */
+        /* Data cells: only a subtle bottom border (dimmed), no verticals */
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.18);
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22); /* dim row line */
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
-
-        /* Hover row highlight */
-        #{table_id} table tbody tr:hover td {{
-            background-color: rgba(156, 163, 175, 0.12);
-        }}
-
-        /* Alignment rules */
+        /* Alignment rules (keep your two spacer columns intact) */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
