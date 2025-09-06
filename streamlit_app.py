@@ -431,7 +431,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
-            border: 2px solid rgba(156, 163, 175, 0.7);
+            border: none;
             border-radius: 8px;
         }}
         #{table_id} table thead th {{
@@ -442,7 +442,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             padding: 6px 8px;
         }}
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.22);
+            border-bottom: none;
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
