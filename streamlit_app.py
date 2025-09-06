@@ -117,7 +117,9 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
 
     df["fund_ticker"]     = _clean_ticker_series(df["fund_ticker"])
+    # Preserve CSV casing + fix acronyms; do NOT title-case fund_name
     df["fund_name"]       = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
+    # Security name can be title-cased but also fix acronyms
     df["security_name"]   = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
     return df
@@ -152,7 +154,7 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sub = sub[sub["ingest_date"] == last_date]
 
     fund_name = _escape(sub["fund_name"].iloc[0])  # uses fixed casing (ETF not Etf)
-    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")  # Removed time
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
 
     topn = (
         sub[["security_name","security_ticker","security_weight"]]
@@ -166,6 +168,7 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sec = _escape(r["security_name"])
         tk  = _escape(r.get("security_ticker", ""))
         wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
+        # Add title attributes so full content is visible on hover
         rows.append(
             "<tr>"
             f"<td class='tt-sec' title='{sec}'>{sec}</td>"
@@ -256,24 +259,25 @@ def build_chip_css() -> str:
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: auto;
+  table-layout: auto;       /* let browser auto-size columns based on content */
 }
 .tt-table thead th {
   text-align: left;
   padding: 6px 6px;
   border-bottom: 1px solid #eee;
-  color: #667085; /* Keep header color */
 }
 .tt-table tbody td {
   padding: 6px 6px;
   border-bottom: 1px dashed #f0f0f0;
   vertical-align: top;
-  word-break: break-word;
-  color: inherit; /* Normal text color for data rows */
+  word-break: break-word;   /* wrap long security names nicely */
 }
 .tt-table tbody tr:last-child td { border-bottom: none; }
 
-/* Column behaviors */
+/* Column behaviors:
+   - Security flexes and wraps
+   - Ticker and Weight stay compact (width:1% trick) and don't wrap
+*/
 .tt-sec { width: auto; }
 .tt-tk  {
   width: 1%;
