@@ -198,7 +198,7 @@ def build_chip_css() -> str:
   box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card to the RIGHT; scroll if tall */
+/* Tooltip card (to the right; scroll if tall) */
 .tt-chip .tt-card {
   position: absolute;
   left: calc(100% + 8px);
@@ -236,20 +236,6 @@ def build_chip_css() -> str:
 .tt-table tbody tr:last-child td { border-bottom: none; }
 .tt-sec { width: 80%; }
 .tt-wt  { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
-
-/* Mobile fallback: show above chip */
-@media (max-width: 768px) {
-  .tt-chip .tt-card {
-    left: 0;
-    top: auto;
-    bottom: calc(100% + 8px);
-    transform: translateY(6px);
-    max-height: 50vh;
-  }
-  .tt-chip:hover .tt-card {
-    transform: translateY(0);
-  }
-}
 """
     group_css_parts = []
     if use_group_colors:
@@ -365,50 +351,59 @@ def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 # ---------------------------------
-# Table Rendering
+# Table Rendering (no outer border; only header underline)
 # ---------------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
+        /* Remove outer borders; keep only header underline */
         #{table_id} table {{
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;   /* keep header line crisp */
             border-spacing: 0;
-            border: 2px solid rgba(156, 163, 175, 0.7);
-            border-radius: 8px;
-            /* keep overflow visible so tooltips aren't clipped */
+            border: none;                /* no outside border */
+            border-radius: 0;
         }}
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* the only line we keep */
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
         #{table_id} table tbody td {{
-            border-bottom: 1px solid rgba(156, 163, 175, 0.22);
-            border-left: none !important;
-            border-right: none !important;
+            border: none;                /* no row dividers */
             padding: 6px 8px;
-            position: relative;
+            position: relative;          /* for tooltip positioning */
         }}
-        #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
+        /* Optional: subtle row hover */
+        #{table_id} table tbody tr:hover td {{
+            background: rgba(0,0,0,0.02);
+        }}
+
         /* Right align numeric-ish columns */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(10) {{ text-align: right !important; }}
+        #{table_id} table td:nth-child(10) {{
+            text-align: right !important;
+        }}
         #{table_id} table td:nth-child(5),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
         #{table_id} table td:nth-child(13),
-        #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
+        #{table_id} table td:nth-child(14) {{
+            text-align: center !important;
+        }}
         /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
+        #{table_id} table td:nth-child(1) {{
+            white-space: nowrap;
+            line-height: 1.25;
+        }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
