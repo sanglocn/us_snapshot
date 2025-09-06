@@ -59,6 +59,51 @@ INDA,iShares MSCI India ETF,Hindustan Unilever Ltd,HINDUNILVR,1.66,2025-09-06
 INDA,iShares MSCI India ETF,Kotak Mahindra Bank Ltd,KOTAKBANK,1.61,2025-09-06
 INDA,iShares MSCI India ETF,Maruti Suzuki India Ltd,MARUTI,1.39,2025-09-06
 INDA,iShares MSCI India ETF,Sun Pharmaceutical Industries Ltd,SUNPHARMA,1.15,2025-09-06
+IWM,iShares Russell 2000 ETF,Credo Technology Group Holding Ltd,CRDO,0.71,2025-09-06
+IWM,iShares Russell 2000 ETF,Fabrinet,FN,0.47,2025-09-06
+IWM,iShares Russell 2000 ETF,Bloom Energy Class A Corp,BE,0.41,2025-09-06
+IWM,iShares Russell 2000 ETF,Blk Csh Fnd Treasury Sl Agency,XTSLA,0.38,2025-09-06
+IWM,iShares Russell 2000 ETF,Kratos Defense And Security Soluti,KTOS,0.38,2025-09-06
+IWM,iShares Russell 2000 ETF,Ionq Inc,IONQ,0.36,2025-09-06
+IWM,iShares Russell 2000 ETF,Ensign Group Inc,ENSG,0.35,2025-09-06
+IWM,iShares Russell 2000 ETF,Nextracker Inc Class A,NXT,0.35,2025-09-06
+IWM,iShares Russell 2000 ETF,Chart Industries Inc,GTLS,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Coeur Mining Inc,CDE,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Echostar Corp Class A,SATS,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Hims Hers Health Inc Class A,HIMS,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Spx Technologies Inc,SPXC,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Umb Financial Corp,UMBF,0.33,2025-09-06
+IWM,iShares Russell 2000 ETF,Sterling Infrastructure Inc,STRL,0.31,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Applovin Corp-class A,APP,1.49,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Shopify Inc - Class A,SHOP,1.32,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Synopsys Inc,SNPS,1.24,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Advanced Micro Devices,AMD,1.22,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Fastenal Co,FAST,1.19,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Broadcom Inc,AVGO,1.18,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Idexx Laboratories Inc,IDXX,1.18,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Pdd Holdings Inc,PDD,1.18,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Ross Stores Inc,ROST,1.16,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Apple Inc,AAPL,1.15,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Baker Hughes Co,BKR,1.15,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Nvidia Corp,NVDA,1.15,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Cadence Design Sys Inc,CDNS,1.14,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Astrazeneca Plc-spons Adr,AZN,1.13,2025-09-06
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Intel Corp,INTC,1.13,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Western Digital Corp,WDC ,0.31,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Arista Networks Inc,ANET ,0.29,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Invesco Ltd,IVZ ,0.28,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Seagate Technology Holdings Plc,STX ,0.28,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Dr Horton Inc,DHI ,0.27,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Newmont Corp,NEM ,0.27,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Wynn Resorts Ltd,WYNN ,0.27,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Ch Robinson Worldwide Inc,CHRW ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Corning Inc,GLW ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Generac Holdings Inc,GNRC ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Humana Inc,HUM ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Norwegian Cruise Line Holdings Ltd,NCLH ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Royal Caribbean Cruises Ltd,RCL ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,Teradyne Inc,TER ,0.26,2025-09-06
+RSP,Invesco S&P 500 Equal Weight ETF,United Airlines Holdings Inc,UAL ,0.26,2025-09-06
 RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Paramount Skydance Corp,PSKY ,4.97,2025-09-06
 RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Match Group Inc,MTCH ,4.9,2025-09-06
 RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Tko Group Holdings Inc,TKO ,4.76,2025-09-06
@@ -224,6 +269,21 @@ RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Constellation Energy Corp,CEG ,3
 RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Pg&e Corp,PCG ,3.27,2025-09-06
 RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Xcel Energy Inc,XEL ,3.27,2025-09-06
 RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Ameren Corp,AEE ,3.26,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Nvidia Corp,NVDA,7.58,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Microsoft Corp,MSFT,6.83,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Apple Inc,AAPL,6.48,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Amazon.com Inc,AMZN,4.03,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Meta Platforms Inc Class A,META,2.94,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Broadcom Inc,AVGO,2.6,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl A,GOOGL,2.45,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl C,GOOG,1.98,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Tesla Inc,TSLA,1.72,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Berkshire Hathaway Inc Cl B,BRK.B,1.68,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Jpmorgan Chase + Co,JPM,1.53,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Visa Inc Class A Shares,V,1.09,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Eli Lilly + Co,LLY,1.06,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Netflix Inc,NFLX,0.97,2025-09-06
+SPY,SPDR S&P 500 ETF Trust,Exxon Mobil Corp,XOM,0.88,2025-09-06
 VNM,VanEck Vietnam ETF,Vinhomes Jsc,VHM VN,7.98,2025-09-06
 VNM,VanEck Vietnam ETF,Vingroup Jsc,VIC VN,7.81,2025-09-06
 VNM,VanEck Vietnam ETF,Ssi Securities Corp,SSI VN,6.97,2025-09-06
