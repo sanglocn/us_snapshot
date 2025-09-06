@@ -385,4 +385,101 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 # Dashboard Rendering
 # ---------------------------------
-def render_dashboard(df_etf: pd.Data
+def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
+    st.title("US Market Daily Snapshot")
+
+    # Inject tooltip CSS (once)
+    st.markdown(TOOLTIP_CSS, unsafe_allow_html=True)
+
+    latest, rs_last_n = process_data(df_etf, df_rs)
+    if "date" in latest.columns:
+        st.caption(f"Latest Update: {pd.to_datetime(latest['date']).max().date()}")
+    else:
+        st.caption("Latest Update: N/A")
+
+    # Load holdings for tooltips
+    try:
+        df_holdings = load_holdings_csv(DATA_URLS["holdings"])
+    except Exception as e:
+        df_holdings = pd.DataFrame()
+        st.warning(f"Holdings tooltips disabled — {e}")
+
+    if "group" not in latest.columns:
+        st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
+        return
+
+    group_tickers = latest.groupby("group").groups
+    for group_name in GROUP_ORDER:
+        if group_name not in group_tickers:
+            continue
+        st.header(f"📌 {group_name}")
+        tickers_in_group = group_tickers[group_name]
+
+        # Sort by rs_rank_21d if present
+        if "rs_rank_21d" in latest.columns:
+            tickers_in_group = sorted(
+                tickers_in_group,
+                key=lambda t: latest.loc[t, "rs_rank_21d"] if not pd.isna(latest.loc[t, "rs_rank_21d"]) else -1,
+                reverse=True,
+            )
+
+        rows = []
+        for ticker in tickers_in_group:
+            row = latest.loc[ticker]
+            spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
+
+            ticker_cell = ticker  # default plain text
+            if not df_holdings.empty:
+                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=15)
+                if card_html:
+                    ticker_cell = make_ticker_chip_with_tooltip(ticker, card_html)
+
+            rows.append({
+                "Ticker": ticker_cell,
+                "Relative Strength": create_sparkline(spark_series),
+                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
+                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
+                "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
+                " ": "",
+                "Intraday": format_performance_intraday(row.get("ret_intraday")),
+                "1D Return": format_performance(row.get("ret_1d")),
+                "1W Return": format_performance(row.get("ret_1w")),
+                "1M Return": format_performance(row.get("ret_1m")),
+                "  ": "",
+                "Above SMA5": format_indicator(row.get("above_sma5")),
+                "Above SMA10": format_indicator(row.get("above_sma10")),
+                "Above SMA20": format_indicator(row.get("above_sma20")),
+            })
+
+        render_group_table(group_name, rows)
+
+    # ---- Breadth charts at bottom ----
+    counts_21 = compute_threshold_counts(df_etf)
+    if not counts_21.empty:
+        start_date = counts_21["date"].min().date()
+        end_date = counts_21["date"].max().date()
+        st.subheader("Breadth Gauge")
+        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
+        st.caption(f"From {start_date} to {end_date}")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.altair_chart(breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
+                            use_container_width=True)
+        with c2:
+            st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
+                            use_container_width=True)
+    else:
+        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
+
+# ---------------------------------
+# Main
+# ---------------------------------
+try:
+    df_etf, df_rs = load_data()
+except Exception as e:
+    st.error(f"Failed to load price/RS data — {e}")
+else:
+    try:
+        render_dashboard(df_etf, df_rs)
+    except Exception as e:
+        st.exception(e)
