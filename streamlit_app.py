@@ -7,13 +7,19 @@ import base64
 import re
 from typing import List, Dict, Tuple
 
+# ---------------------------------
 # Configuration
+# ---------------------------------
 st.set_page_config(page_title="US Market Snapshot", layout="wide")
+
+# Quick heartbeat so something always shows
+st.write("🔄 Loading… (if this stays here, check the warnings/errors below)")
 
 # Constants
 DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
-    "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv"
+    "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
+    "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = [
@@ -23,23 +29,45 @@ GROUP_ORDER = [
     "Crypto",
     "Country",
     "Theme",
-    "Leader"
+    "Leader",
 ]
 
-# ---------------------------
+# ---------------------------------
 # Data Loading
-# ---------------------------
+# ---------------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_etf = pd.read_csv(DATA_URLS["etf"])
     df_rs = pd.read_csv(DATA_URLS["rs"])
-    df_etf["date"] = pd.to_datetime(df_etf["date"])
-    df_rs["date"] = pd.to_datetime(df_rs["date"])
+    # Basic schema checks to avoid silent failures
+    if "date" not in df_etf.columns or "ticker" not in df_etf.columns:
+        raise ValueError("ETF price CSV must include columns: 'date', 'ticker'.")
+    if "date" not in df_rs.columns or "ticker" not in df_rs.columns or "rs_to_spy" not in df_rs.columns:
+        raise ValueError("RS sparkline CSV must include columns: 'date', 'ticker', 'rs_to_spy'.")
+    df_etf["date"] = pd.to_datetime(df_etf["date"], errors="coerce")
+    df_rs["date"] = pd.to_datetime(df_rs["date"], errors="coerce")
     return df_etf, df_rs
 
-# ---------------------------
+@st.cache_data(ttl=900, show_spinner=False)
+def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
+    """
+    Expected columns: fund_ticker, fund_name, security_name, security_weight, ingest_date
+    """
+    df = pd.read_csv(url)
+    need = {"fund_ticker", "fund_name", "security_name", "security_weight", "ingest_date"}
+    missing = need - set(df.columns)
+    if missing:
+        raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
+    df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
+    df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
+    # Optional readable casing
+    df["fund_name"] = df["fund_name"].astype(str).str.title()
+    df["security_name"] = df["security_name"].astype(str).str.title()
+    return df
+
+# ---------------------------------
 # Data Processing
-# ---------------------------
+# ---------------------------------
 def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
     rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK_DAYS)
@@ -48,28 +76,126 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFram
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
     if "rs_rank_21d" not in df_etf.columns:
         return pd.DataFrame(columns=["date", "count_over_85", "count_under_50", "date_str"])
-
     tmp = df_etf.copy()
     tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
     tmp["under_50"] = tmp["rs_rank_21d"] < 0.50
-
     daily = (
         tmp.groupby("date", as_index=False)
-           .agg(count_over_85=("over_85", "sum"),
-                count_under_50=("under_50", "sum"))
+           .agg(count_over_85=("over_85", "sum"), count_under_50=("under_50", "sum"))
            .sort_values("date")
     )
     daily = daily.dropna(subset=["count_over_85", "count_under_50"])
-
     last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
-
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
 
-# ---------------------------
+# ---------------------------------
+# Tooltip helpers (HTML/CSS)
+# ---------------------------------
+def _escape(s) -> str:
+    import html
+    return html.escape("" if pd.isna(s) else str(s))
+
+def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int = 15) -> str:
+    sub = holdings_df[holdings_df["fund_ticker"] == ticker]
+    if sub.empty:
+        return ""
+    last_date = sub["ingest_date"].max()
+    if pd.notna(last_date):
+        sub = sub[sub["ingest_date"] == last_date]
+    # Title / date
+    fund_name = _escape(sub["fund_name"].iloc[0])
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
+    # Top holdings by weight
+    topn = (
+        sub[["security_name", "security_weight"]]
+        .dropna(subset=["security_name"])
+        .sort_values("security_weight", ascending=False)
+        .head(max_rows)
+    )
+    rows = []
+    for _, r in topn.iterrows():
+        sec = _escape(r["security_name"])
+        wt = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
+        rows.append(f"<tr><td class='tt-sec'>{sec}</td><td class='tt-wt'>{wt}</td></tr>")
+    table_html = (
+        "<table class='tt-table'><thead><tr><th>Security</th><th>Weight</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+    return f"""
+    <div class="tt-card">
+      <div class="tt-title">{fund_name}</div>
+      <div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>
+      {table_html}
+    </div>
+    """
+
+def make_ticker_chip_with_tooltip(ticker: str, card_html: str) -> str:
+    t = _escape(ticker)
+    return f"""
+    <span class="tt-chip">{t}
+      {card_html}
+    </span>
+    """
+
+TOOLTIP_CSS = """
+<style>
+/* Chip */
+.tt-chip {
+  position: relative;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: #f7f7f9;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  cursor: default;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.tt-chip:hover { background: #eef2ff; border-color: rgba(59,130,246,0.30); }
+
+/* Tooltip card */
+.tt-chip .tt-card {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .18s ease, transform .18s ease;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 1000;
+  width: min(520px, 90vw);
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.08),
+    0 2px 4px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 12px 12px 8px 12px;
+}
+.tt-chip:hover .tt-card { visibility: visible; opacity: 1; transform: translateY(0); }
+
+/* Card typography */
+.tt-card .tt-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.tt-card .tt-sub { color: #667085; font-size: 12px; margin-bottom: 8px; }
+.tt-card .tt-date { font-variant-numeric: tabular-nums; }
+
+/* Table */
+.tt-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+.tt-table thead th { text-align: left; padding: 6px 6px; border-bottom: 1px solid #eee; }
+.tt-table tbody td { padding: 6px 6px; border-bottom: 1px dashed #f0f0f0; vertical-align: top; word-wrap: break-word; }
+.tt-table tbody tr:last-child td { border-bottom: none; }
+.tt-sec { width: 80%; }
+.tt-wt { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+"""
+
+# ---------------------------------
 # Visualization Helpers
-# ---------------------------
+# ---------------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
     if not values:
         return ""
@@ -87,7 +213,6 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
-    """Column chart with fixed bar color, formatted x-axis for readability."""
     df = df.copy()
     df["date_label"] = df["date"].dt.strftime("%b %d")
     return (
@@ -98,41 +223,31 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
             y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
-                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
-            ]
+                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title()),
+            ],
         )
         .properties(height=320)
     )
 
-# ---------------------------
+# ---------------------------------
 # Formatting Helpers
-# ---------------------------
+# ---------------------------------
 def format_rank(value: float) -> str:
-    """RS Rank with shaded background (like Intraday):
-       - Green shade if >= 85%
-       - Red shade if < 50%
-       - Gray shade if between 50–84%
-       - Dash if missing
-    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-
     pct = int(round(value * 100))
     if pct >= 85:
-        bg = "rgba(16, 185, 129, 0.22)"   # green
+        bg = "rgba(16, 185, 129, 0.22)"
         border = "rgba(16, 185, 129, 0.35)"
     elif pct < 50:
-        bg = "rgba(239, 68, 68, 0.22)"    # red
+        bg = "rgba(239, 68, 68, 0.22)"
         border = "rgba(239, 68, 68, 0.35)"
     else:
-        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+        bg = "rgba(156, 163, 175, 0.25)"
         border = "rgba(156, 163, 175, 0.35)"
-
     return (
-        f'<span style="display:block; text-align:right;'
-        f' padding:2px 6px; border-radius:6px;'
-        f' background-color:{bg}; border:1px solid {border};'
-        f' color:inherit;">{pct}%</span>'
+        f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
+        f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct}%</span>'
     )
 
 def format_performance(value: float) -> str:
@@ -141,30 +256,21 @@ def format_performance(value: float) -> str:
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
 
 def format_performance_intraday(value: float) -> str:
-    """Right-aligned % with soft background shading:
-       - Green if > 0
-       - Red if < 0
-       - Gray if == 0
-    """
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-
     pct_text = f"{value:.1f}%"
     if value > 0:
-        bg = "rgba(16, 185, 129, 0.22)"   # green
+        bg = "rgba(16, 185, 129, 0.22)"
         border = "rgba(16, 185, 129, 0.35)"
     elif value < 0:
-        bg = "rgba(239, 68, 68, 0.22)"    # red
+        bg = "rgba(239, 68, 68, 0.22)"
         border = "rgba(239, 68, 68, 0.35)"
-    else:  # neutral zero
-        bg = "rgba(156, 163, 175, 0.25)"  # neutral gray
+    else:
+        bg = "rgba(156, 163, 175, 0.25)"
         border = "rgba(156, 163, 175, 0.35)"
-
     return (
-        f'<span style="display:block; text-align:right;'
-        f' padding:2px 6px; border-radius:6px;'
-        f' background-color:{bg}; border:1px solid {border};'
-        f' color:inherit;">{pct_text}</span>'
+        f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
+        f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>'
     )
 
 def format_indicator(value: str) -> str:
@@ -176,21 +282,13 @@ def format_indicator(value: str) -> str:
     return '<span style="display:block; text-align:center;">-</span>'
 
 def format_volume_alert(value: str, rs_rank_252d) -> str:
-    """Format volume alert with conditions:
-       - 'positive' + rs_rank_252d >= 0.80 → 💎
-       - 'positive' → 🟩
-       - 'negative' → 🟥
-       - anything else → –
-    """
     if not isinstance(value, str):
         return '<span style="display:block; text-align:center;">-</span>'
-
     val = value.strip().lower()
     try:
         rs_val = float(rs_rank_252d)
     except (ValueError, TypeError):
         rs_val = None
-
     if val == "positive" and rs_val is not None and rs_val >= 0.80:
         return '<span style="display:block; text-align:center; font-size:16px;">💎</span>'
     elif val == "positive":
@@ -203,11 +301,10 @@ def format_volume_alert(value: str, rs_rank_252d) -> str:
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
-# ---------------------------
+# ---------------------------------
 # Table Rendering
-# ---------------------------
+# ---------------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    """Base styling, hide vertical column borders, keep outer + row lines."""
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
@@ -216,7 +313,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
-            border: 2px solid rgba(156, 163, 175, 0.7); /* outside border */
+            border: 2px solid rgba(156, 163, 175, 0.7);
             border-radius: 8px;
             overflow: hidden;
         }}
@@ -254,14 +351,32 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
-# ---------------------------
+# ---------------------------------
 # Dashboard Rendering
-# ---------------------------
+# ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
 
+    # Inject tooltip CSS (once)
+    st.markdown(TOOLTIP_CSS, unsafe_allow_html=True)
+
     latest, rs_last_n = process_data(df_etf, df_rs)
-    st.caption(f"Latest Update: {latest['date'].max().date()}")
+    if "date" in latest.columns:
+        st.caption(f"Latest Update: {pd.to_datetime(latest['date']).max().date()}")
+    else:
+        st.caption("Latest Update: N/A")
+
+    # Load holdings for tooltips
+    try:
+        df_holdings = load_holdings_csv(DATA_URLS["holdings"])
+    except Exception as e:
+        df_holdings = pd.DataFrame()
+        st.warning(f"Holdings tooltips disabled — {e}")
+
+    # Guard: if required cols missing in latest, bail gracefully
+    if "group" not in latest.columns:
+        st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
+        return
 
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
@@ -269,19 +384,29 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             continue
         st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
-        # Sort tickers by rs_rank_21d descending if column exists
+
+        # Sort tickers by rs_rank_21d descending if present
         if "rs_rank_21d" in latest.columns:
             tickers_in_group = sorted(
                 tickers_in_group,
                 key=lambda t: latest.loc[t, "rs_rank_21d"] if not pd.isna(latest.loc[t, "rs_rank_21d"]) else -1,
-                reverse=True
+                reverse=True,
             )
+
         rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
+
+            # Default: plain ticker; if holdings available, wrap with tooltip
+            ticker_cell = ticker
+            if not df_holdings.empty:
+                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=15)
+                if card_html:
+                    ticker_cell = make_ticker_chip_with_tooltip(ticker, card_html)
+
             rows.append({
-                "Ticker": ticker,
+                "Ticker": ticker_cell,  # hoverable
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
@@ -296,6 +421,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
             })
+
         render_group_table(group_name, rows)
 
     # ---- Breadth charts at bottom ----
@@ -306,24 +432,25 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.subheader("Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
-
         c1, c2 = st.columns(2)
         with c1:
-            st.altair_chart(
-                breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
-                use_container_width=True
-            )
+            st.altair_chart(breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
+                            use_container_width=True)
         with c2:
-            st.altair_chart(
-                breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
-                use_container_width=True
-            )
+            st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
+                            use_container_width=True)
     else:
         st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
 
-# ---------------------------
+# ---------------------------------
 # Main
-# ---------------------------
-if __name__ == "__main__":
+# ---------------------------------
+try:
     df_etf, df_rs = load_data()
-    render_dashboard(df_etf, df_rs)
+except Exception as e:
+    st.error(f"Failed to load price/RS data — {e}")
+else:
+    try:
+        render_dashboard(df_etf, df_rs)
+    except Exception as e:
+        st.exception(e)
