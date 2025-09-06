@@ -96,8 +96,6 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         df_etf["group"] = _clean_text_series(df_etf["group"])
     if "ticker" in df_rs.columns:
         df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
-    if "group" in df_rs.columns:
-        df_rs["group"] = _clean_text_series(df_rs["group"])
 
     return df_etf, df_rs
 
@@ -117,9 +115,7 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
 
     df["fund_ticker"]     = _clean_ticker_series(df["fund_ticker"])
-    # Preserve CSV casing + fix acronyms; do NOT title-case fund_name
     df["fund_name"]       = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
-    # Security name can be title-cased but also fix acronyms
     df["security_name"]   = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
     return df
@@ -133,11 +129,18 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFram
     return latest, rs_last_n
 
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
-    if "count_over_85" not in df_etf.columns or "count_under_50" not in df_etf.columns:
+    if "rs_rank_21d" not in df_etf.columns:
         return pd.DataFrame(columns=["date","count_over_85","count_under_50","date_str"])
-    daily = df_etf[["date","count_over_85","count_under_50"]].drop_duplicates().sort_values("date")
+    tmp = df_etf.copy()
+    tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
+    tmp["under_50"] = tmp["rs_rank_21d"] < 0.50
+    daily = (
+        tmp.groupby("date", as_index=False)
+           .agg(count_over_85=("over_85","sum"), count_under_50=("under_50","sum"))
+           .sort_values("date")
+    )
     daily = daily.dropna(subset=["count_over_85","count_under_50"])
-    last_21_dates = daily["date"].tail(21)
+    last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
@@ -154,7 +157,8 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sub = sub[sub["ingest_date"] == last_date]
 
     fund_name = _escape(sub["fund_name"].iloc[0])  # uses fixed casing (ETF not Etf)
-    last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
+    # ✨ Show DATE only (remove time such as 00:00)
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")
 
     topn = (
         sub[["security_name","security_ticker","security_weight"]]
@@ -168,7 +172,6 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sec = _escape(r["security_name"])
         tk  = _escape(r.get("security_ticker", ""))
         wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
-        # Add title attributes so full content is visible on hover
         rows.append(
             "<tr>"
             f"<td class='tt-sec' title='{sec}'>{sec}</td>"
@@ -205,7 +208,7 @@ def build_chip_css() -> str:
   padding: 6px 12px;
   margin: 2px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #2563eb22, #07598522);
+  background: linear-gradient(135deg, #2563eb22, #1d4ed822);
   border: 1px solid #2563eb55;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: 13px;
@@ -271,6 +274,7 @@ def build_chip_css() -> str:
   border-bottom: 1px dashed #f0f0f0;
   vertical-align: top;
   word-break: break-word;   /* wrap long security names nicely */
+  color: inherit;           /* ✨ normal text color for data rows */
 }
 .tt-table tbody tr:last-child td { border-bottom: none; }
 
@@ -301,7 +305,6 @@ def build_chip_css() -> str:
     max-height: 50vh;
   }
   .tt-chip:hover .tt-card {
-    visibility: visible;
     transform: translateY(0);
   }
 }
@@ -431,7 +434,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
-            border: none;
+            border: 2px solid rgba(156, 163, 175, 0.7);
             border-radius: 8px;
         }}
         #{table_id} table thead th {{
@@ -442,7 +445,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             padding: 6px 8px;
         }}
         #{table_id} table tbody td {{
-            border-bottom: none;
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22);
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
@@ -551,7 +554,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
                             use_container_width=True)
     else:
-        st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
+        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
 
 # ---------------------------------
 # Main
