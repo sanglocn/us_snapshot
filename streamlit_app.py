@@ -50,6 +50,20 @@ def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
         s = s.str.title()
     return s
 
+def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
+    """Preserve CSV case but normalize common acronyms (ETF, USD, USA, REIT, AI, S&P, US)."""
+    s = s.astype(str)
+    # single-word acronyms
+    s = s.str.replace(r"\betf\b", "ETF", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\busd\b", "USD", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\busa\b", "USA", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\breit\b", "REIT", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\bai\b", "AI", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\bus\b", "US", regex=True, flags=re.IGNORECASE)
+    # keep S&P as is if variants appear
+    s = s.str.replace(r"s&?p", "S&P", regex=True, flags=re.IGNORECASE)
+    return s
+
 def _clean_ticker_series(s: pd.Series) -> pd.Series:
     return (
         s.astype(str)
@@ -96,9 +110,12 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
         raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
     df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
+
     df["fund_ticker"]   = _clean_ticker_series(df["fund_ticker"])
-    df["fund_name"]     = _clean_text_series(df["fund_name"], title_case=True)
-    df["security_name"] = _clean_text_series(df["security_name"], title_case=True)
+    # IMPORTANT: preserve CSV casing and fix acronyms; do NOT title-case fund_name
+    df["fund_name"]     = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
+    # You can keep title-casing for security_name, but also fix acronyms
+    df["security_name"] = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     return df
 
 # ---------------------------------
@@ -137,7 +154,7 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     if pd.notna(last_date):
         sub = sub[sub["ingest_date"] == last_date]
 
-    fund_name = _escape(sub["fund_name"].iloc[0])
+    fund_name = _escape(sub["fund_name"].iloc[0])  # uses fixed casing (ETF not Etf)
     last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
 
     topn = (
