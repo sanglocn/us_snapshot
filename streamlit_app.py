@@ -32,12 +32,9 @@ GROUP_PALETTE = {
     "Leader":   ("#db2777", "#9d174d"),  # pink
 }
 
-# ---------------------------------
-# Sidebar controls
-# ---------------------------------
-st.sidebar.header("Display")
-use_group_colors = st.sidebar.checkbox("Color-code ticker chips by group", value=True)
-max_holdings_rows = st.sidebar.slider("Rows in tooltip table", 8, 25, 15)
+# --- settings (no sidebar) ---
+use_group_colors = True        # color-code ticker chips by group
+max_holdings_rows = 15         # rows shown in tooltip table
 
 # ---------------------------------
 # Small helpers
@@ -168,7 +165,6 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
 
 def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
     t = _escape(ticker)
-    # Add group class if using color-coding
     group_class = ""
     if use_group_colors and group_name:
         group_slug = re.sub(r'[^a-z0-9]+', '-', group_name.lower()).strip('-')
@@ -176,7 +172,6 @@ def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str |
     return f'<span class="tt-chip{group_class}">{t}{card_html}</span>'
 
 def build_chip_css() -> str:
-    # Base chip (neutral blue)
     base_css = """
 /* Chip base */
 .tt-chip {
@@ -256,7 +251,6 @@ def build_chip_css() -> str:
   }
 }
 """
-    # Group-colored variants
     group_css_parts = []
     if use_group_colors:
         for g, (base, dark) in GROUP_PALETTE.items():
@@ -424,7 +418,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
 
-    # Inject CSS for chips/tooltips (built from palette + toggle)
+    # Inject CSS for chips/tooltips
     st.markdown(build_chip_css(), unsafe_allow_html=True)
 
     latest, rs_last_n = process_data(df_etf, df_rs)
