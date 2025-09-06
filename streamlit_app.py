@@ -53,14 +53,12 @@ def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
 def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
     """Preserve CSV case but normalize common acronyms (ETF, USD, USA, REIT, AI, S&P, US)."""
     s = s.astype(str)
-    # single-word acronyms
     s = s.str.replace(r"\betf\b", "ETF", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\busd\b", "USD", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\busa\b", "USA", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\breit\b", "REIT", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\bai\b", "AI", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\bus\b", "US", regex=True, flags=re.IGNORECASE)
-    # keep S&P as is if variants appear
     s = s.str.replace(r"s&?p", "S&P", regex=True, flags=re.IGNORECASE)
     return s
 
@@ -103,19 +101,25 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
 
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
+    """
+    Expected columns:
+      fund_ticker, fund_name, security_name, security_ticker, security_weight, ingest_date
+    """
     df = pd.read_csv(url)
-    need = {"fund_ticker","fund_name","security_name","security_weight","ingest_date"}
+    need = {"fund_ticker","fund_name","security_name","security_ticker","security_weight","ingest_date"}
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
+
     df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
 
-    df["fund_ticker"]   = _clean_ticker_series(df["fund_ticker"])
-    # IMPORTANT: preserve CSV casing and fix acronyms; do NOT title-case fund_name
-    df["fund_name"]     = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
-    # You can keep title-casing for security_name, but also fix acronyms
-    df["security_name"] = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
+    df["fund_ticker"]     = _clean_ticker_series(df["fund_ticker"])
+    # Preserve CSV casing + fix acronyms; do NOT title-case fund_name
+    df["fund_name"]       = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
+    # Security name can be title-cased but also fix acronyms
+    df["security_name"]   = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
+    df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
     return df
 
 # ---------------------------------
@@ -158,7 +162,7 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
 
     topn = (
-        sub[["security_name","security_weight"]]
+        sub[["security_name","security_ticker","security_weight"]]
         .dropna(subset=["security_name"])
         .sort_values("security_weight", ascending=False)
         .head(max_rows)
@@ -167,11 +171,13 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     rows = []
     for _, r in topn.iterrows():
         sec = _escape(r["security_name"])
-        wt = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
-        rows.append(f"<tr><td class='tt-sec'>{sec}</td><td class='tt-wt'>{wt}</td></tr>")
+        tk  = _escape(r.get("security_ticker", ""))
+        wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
+        rows.append(f"<tr><td class='tt-sec'>{sec}</td><td class='tt-tk'>{tk}</td><td class='tt-wt'>{wt}</td></tr>")
 
     table_html = (
-        "<table class='tt-table'><thead><tr><th>Security</th><th>Weight</th></tr></thead>"
+        "<table class='tt-table'>"
+        "<thead><tr><th>Security</th><th>Ticker</th><th>Weight</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
     return (
@@ -251,7 +257,8 @@ def build_chip_css() -> str:
 .tt-table thead th { text-align: left; padding: 6px 6px; border-bottom: 1px solid #eee; }
 .tt-table tbody td { padding: 6px 6px; border-bottom: 1px dashed #f0f0f0; vertical-align: top; word-wrap: break-word; }
 .tt-table tbody tr:last-child td { border-bottom: none; }
-.tt-sec { width: 80%; }
+.tt-sec { width: 60%; }
+.tt-tk  { width: 20%; text-align: left; font-family: ui-monospace, Menlo, Consolas, monospace; }
 .tt-wt  { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Mobile fallback: show above chip */
