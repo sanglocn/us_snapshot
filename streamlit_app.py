@@ -44,6 +44,15 @@ def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
         s = s.str.title()
     return s
 
+def _clean_ticker_series(s: pd.Series) -> pd.Series:
+    """Hard clean for tickers: drop ALL whitespace, uppercase."""
+    return (
+        s.astype(str)
+         .str.replace(r"[\r\n\t\s]+", "", regex=True)
+         .str.upper()
+         .str.strip()
+    )
+
 def _escape(s) -> str:
     import html
     return html.escape("" if pd.isna(s) else str(s))
@@ -66,11 +75,13 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_etf["date"] = pd.to_datetime(df_etf["date"], errors="coerce")
     df_rs["date"] = pd.to_datetime(df_rs["date"], errors="coerce")
 
-    # Clean textual fields to avoid \n artifacts
-    for col in [c for c in ["ticker", "group"] if c in df_etf.columns]:
-        df_etf[col] = _clean_text_series(df_etf[col], title_case=False)
-    for col in [c for c in ["ticker"] if c in df_rs.columns]:
-        df_rs[col] = _clean_text_series(df_rs[col], title_case=False)
+    # Clean textual fields
+    if "ticker" in df_etf.columns:
+        df_etf["ticker"] = _clean_ticker_series(df_etf["ticker"])
+    if "group" in df_etf.columns:
+        df_etf["group"] = _clean_text_series(df_etf["group"])
+    if "ticker" in df_rs.columns:
+        df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
 
     return df_etf, df_rs
 
@@ -89,8 +100,8 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
 
-    # Clean text fields (remove \n / multiple spaces). Title-case names.
-    df["fund_ticker"]   = _clean_text_series(df["fund_ticker"], title_case=False)
+    # Clean text fields
+    df["fund_ticker"]   = _clean_ticker_series(df["fund_ticker"])
     df["fund_name"]     = _clean_text_series(df["fund_name"], title_case=True)
     df["security_name"] = _clean_text_series(df["security_name"], title_case=True)
     return df
@@ -154,21 +165,13 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
 
-    return f"""
-    <div class="tt-card">
-      <div class="tt-title">{fund_name}</div>
-      <div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>
-      {table_html}
-    </div>
-    """
+    # Compact HTML to avoid spacing artifacts
+    return f'<div class="tt-card"><div class="tt-title">{fund_name}</div><div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>{table_html}</div>'
 
 def make_ticker_chip_with_tooltip(ticker: str, card_html: str) -> str:
+    # Compact single-line wrapper to avoid rendering stray whitespace
     t = _escape(ticker)
-    return f"""
-    <span class="tt-chip">{t}
-      {card_html}
-    </span>
-    """
+    return f'<span class="tt-chip">{t}{card_html}</span>'
 
 TOOLTIP_CSS = """
 <style>
@@ -364,6 +367,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table tbody tr:last-child td {{
             border-bottom: none;
         }}
+        /* Right align numeric-ish columns */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
@@ -378,6 +382,11 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(13),
         #{table_id} table td:nth-child(14) {{
             text-align: center !important;
+        }}
+        /* Keep Ticker column tight and on one line */
+        #{table_id} table td:nth-child(1) {{
+            white-space: nowrap;
+            line-height: 1.25;
         }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
