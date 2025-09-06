@@ -173,7 +173,14 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sec = _escape(r["security_name"])
         tk  = _escape(r.get("security_ticker", ""))
         wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
-        rows.append(f"<tr><td class='tt-sec'>{sec}</td><td class='tt-tk'>{tk}</td><td class='tt-wt'>{wt}</td></tr>")
+        # Add title attributes so full content is visible on hover
+        rows.append(
+            "<tr>"
+            f"<td class='tt-sec' title='{sec}'>{sec}</td>"
+            f"<td class='tt-tk' title='{tk}'>{tk}</td>"
+            f"<td class='tt-wt' title='{wt}'>{wt}</td>"
+            "</tr>"
+        )
 
     table_html = (
         "<table class='tt-table'>"
@@ -253,13 +260,41 @@ def build_chip_css() -> str:
 .tt-card .tt-date  { font-variant-numeric: tabular-nums; }
 
 /* Tooltip table */
-.tt-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-.tt-table thead th { text-align: left; padding: 6px 6px; border-bottom: 1px solid #eee; }
-.tt-table tbody td { padding: 6px 6px; border-bottom: 1px dashed #f0f0f0; vertical-align: top; word-wrap: break-word; }
+.tt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: auto;       /* let browser auto-size columns based on content */
+}
+.tt-table thead th {
+  text-align: left;
+  padding: 6px 6px;
+  border-bottom: 1px solid #eee;
+}
+.tt-table tbody td {
+  padding: 6px 6px;
+  border-bottom: 1px dashed #f0f0f0;
+  vertical-align: top;
+  word-break: break-word;   /* wrap long security names nicely */
+}
 .tt-table tbody tr:last-child td { border-bottom: none; }
-.tt-sec { width: 60%; }
-.tt-tk  { width: 20%; text-align: left; font-family: ui-monospace, Menlo, Consolas, monospace; }
-.tt-wt  { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Column behaviors:
+   - Security flexes and wraps
+   - Ticker and Weight stay compact (width:1% trick) and don't wrap
+*/
+.tt-sec { width: auto; }
+.tt-tk  {
+  width: 1%;
+  white-space: nowrap;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.tt-wt  {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 
 /* Mobile fallback: show above chip */
 @media (max-width: 768px) {
@@ -402,7 +437,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-spacing: 0;
             border: 2px solid rgba(156, 163, 175, 0.7);
             border-radius: 8px;
-            /* keep overflow visible so tooltips aren't clipped */
         }}
         #{table_id} table thead th {{
             text-align: center !important;
