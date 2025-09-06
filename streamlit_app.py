@@ -21,6 +21,24 @@ DATA_URLS = {
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
 
+# Palette per group (base, darker)
+GROUP_PALETTE = {
+    "Market":   ("#0284c7", "#075985"),  # cyan
+    "Sector":   ("#16a34a", "#166534"),  # green
+    "Commodity":("#b45309", "#7c2d12"),  # amber/brown
+    "Crypto":   ("#7c3aed", "#4c1d95"),  # purple
+    "Country":  ("#ea580c", "#9a3412"),  # orange
+    "Theme":    ("#2563eb", "#1e40af"),  # blue
+    "Leader":   ("#db2777", "#9d174d"),  # pink
+}
+
+# ---------------------------------
+# Sidebar controls
+# ---------------------------------
+st.sidebar.header("Display")
+use_group_colors = st.sidebar.checkbox("Color-code ticker chips by group", value=True)
+max_holdings_rows = st.sidebar.slider("Rows in tooltip table", 8, 25, 15)
+
 # ---------------------------------
 # Small helpers
 # ---------------------------------
@@ -56,9 +74,9 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_rs = pd.read_csv(DATA_URLS["rs"])
 
     if "date" not in df_etf.columns or "ticker" not in df_etf.columns:
-        raise ValueError("ETF price CSV must include columns: 'date', 'ticker'.")
+        raise ValueError("ETF price CSV must include 'date' and 'ticker'.")
     if "date" not in df_rs.columns or "ticker" not in df_rs.columns or "rs_to_spy" not in df_rs.columns:
-        raise ValueError("RS sparkline CSV must include columns: 'date', 'ticker', 'rs_to_spy'.")
+        raise ValueError("RS CSV must include 'date', 'ticker', 'rs_to_spy'.")
 
     df_etf["date"] = pd.to_datetime(df_etf["date"], errors="coerce")
     df_rs["date"] = pd.to_datetime(df_rs["date"], errors="coerce")
@@ -79,10 +97,8 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
-
     df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
-
     df["fund_ticker"]   = _clean_ticker_series(df["fund_ticker"])
     df["fund_name"]     = _clean_text_series(df["fund_name"], title_case=True)
     df["security_name"] = _clean_text_series(df["security_name"], title_case=True)
@@ -114,9 +130,9 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
     return daily_21
 
 # ---------------------------------
-# Tooltip (HTML/CSS)
+# Chips + Tooltip (HTML/CSS)
 # ---------------------------------
-def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int = 15) -> str:
+def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int) -> str:
     sub = holdings_df[holdings_df["fund_ticker"] == ticker]
     if sub.empty:
         return ""
@@ -144,57 +160,68 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         "<table class='tt-table'><thead><tr><th>Security</th><th>Weight</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
-
-    # compact HTML string
     return (
         f'<div class="tt-card"><div class="tt-title">{fund_name}</div>'
         f'<div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>'
         f'{table_html}</div>'
     )
 
-def make_ticker_chip_with_tooltip(ticker: str, card_html: str) -> str:
+def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
     t = _escape(ticker)
-    # show tooltip to the RIGHT of the chip (avoids bottom clipping)
-    return f'<span class="tt-chip">{t}{card_html}</span>'
+    # Add group class if using color-coding
+    group_class = ""
+    if use_group_colors and group_name:
+        group_slug = re.sub(r'[^a-z0-9]+', '-', group_name.lower()).strip('-')
+        group_class = f" chip--{group_slug}"
+    return f'<span class="tt-chip{group_class}">{t}{card_html}</span>'
 
-TOOLTIP_CSS = """
-<style>
-/* Chip */
+def build_chip_css() -> str:
+    # Base chip (neutral blue)
+    base_css = """
+/* Chip base */
 .tt-chip {
   position: relative;
   display: inline-block;
-  padding: 4px 8px;
+  padding: 6px 12px;
+  margin: 2px;
   border-radius: 9999px;
-  border: 1px solid rgba(0,0,0,0.10);
-  background: #f7f7f9;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
+  background: linear-gradient(135deg, #2563eb22, #1d4ed822);
+  border: 1px solid #2563eb55;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e3a8a;
   cursor: default;
   white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: all .2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.tt-chip:hover {
+  background: linear-gradient(135deg, #2563eb33, #1d4ed833);
+  border-color: #2563eb88;
+  color: #1e40af;
+  box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card — position to the RIGHT of the chip and make it scrollable */
+/* Tooltip card to the RIGHT; scroll if tall */
 .tt-chip .tt-card {
   position: absolute;
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%) translateX(6px);
-  z-index: 999999;              /* above everything */
+  z-index: 999999;
   width: min(520px, 90vw);
-  max-height: 60vh;             /* scroll if long */
+  max-height: 60vh;
   overflow: auto;
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.06);
   box-shadow: 0 12px 28px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
   border-radius: 12px;
   padding: 12px 12px 8px 12px;
-
-  /* reveal on hover */
   visibility: hidden;
   opacity: 0;
   transition: opacity .18s ease, transform .18s ease;
-  pointer-events: none; /* don't steal hover from chip */
+  pointer-events: none;
 }
 .tt-chip:hover .tt-card {
   visibility: visible;
@@ -202,12 +229,12 @@ TOOLTIP_CSS = """
   transform: translateY(-50%) translateX(0);
 }
 
-/* Card typography */
+/* Card text */
 .tt-card .tt-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
 .tt-card .tt-sub   { color: #667085; font-size: 12px; margin-bottom: 8px; }
 .tt-card .tt-date  { font-variant-numeric: tabular-nums; }
 
-/* Table */
+/* Tooltip table */
 .tt-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
 .tt-table thead th { text-align: left; padding: 6px 6px; border-bottom: 1px solid #eee; }
 .tt-table tbody td { padding: 6px 6px; border-bottom: 1px dashed #f0f0f0; vertical-align: top; word-wrap: break-word; }
@@ -215,7 +242,7 @@ TOOLTIP_CSS = """
 .tt-sec { width: 80%; }
 .tt-wt  { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
 
-/* Mobile: if not enough horizontal space, show ABOVE instead */
+/* Mobile fallback: show above chip */
 @media (max-width: 768px) {
   .tt-chip .tt-card {
     left: 0;
@@ -228,8 +255,26 @@ TOOLTIP_CSS = """
     transform: translateY(0);
   }
 }
-</style>
 """
+    # Group-colored variants
+    group_css_parts = []
+    if use_group_colors:
+        for g, (base, dark) in GROUP_PALETTE.items():
+            slug = re.sub(r'[^a-z0-9]+', '-', g.lower()).strip('-')
+            group_css_parts.append(f"""
+.tt-chip.chip--{slug} {{
+  background: linear-gradient(135deg, {base}22, {dark}22);
+  border-color: {base}55;
+  color: {dark};
+}}
+.tt-chip.chip--{slug}:hover {{
+  background: linear-gradient(135deg, {base}33, {dark}33);
+  border-color: {base}88;
+  color: {dark};
+  box-shadow: 0 2px 8px {base}55;
+}}
+""")
+    return "<style>" + base_css + "\n".join(group_css_parts) + "</style>"
 
 # ---------------------------------
 # Visualization Helpers
@@ -332,7 +377,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
-    # IMPORTANT: overflow: visible to allow tooltips to escape the table bounds
     css = f"""
         #{table_id} table {{
             width: 100%;
@@ -340,7 +384,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-spacing: 0;
             border: 2px solid rgba(156, 163, 175, 0.7);
             border-radius: 8px;
-            /* overflow intentionally visible so tooltips aren't clipped */
+            /* keep overflow visible so tooltips aren't clipped */
         }}
         #{table_id} table thead th {{
             text-align: center !important;
@@ -354,7 +398,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
-            position: relative; /* ensure .tt-chip absolute is scoped nicely */
+            position: relative;
         }}
         #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
         /* Right align numeric-ish columns */
@@ -380,8 +424,8 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
 
-    # Inject tooltip CSS (once)
-    st.markdown(TOOLTIP_CSS, unsafe_allow_html=True)
+    # Inject CSS for chips/tooltips (built from palette + toggle)
+    st.markdown(build_chip_css(), unsafe_allow_html=True)
 
     latest, rs_last_n = process_data(df_etf, df_rs)
     if "date" in latest.columns:
@@ -418,14 +462,14 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
-            ticker_cell = ticker
+            chip = ticker
             if not df_holdings.empty:
-                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=15)
+                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
                 if card_html:
-                    ticker_cell = make_ticker_chip_with_tooltip(ticker, card_html)
+                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
             rows.append({
-                "Ticker": ticker_cell,
+                "Ticker": chip,
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
@@ -443,6 +487,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
         render_group_table(group_name, rows)
 
+    # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
