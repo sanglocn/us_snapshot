@@ -39,27 +39,18 @@ max_holdings_rows = 15         # rows shown in tooltip table
 # ---------------------------------
 # Small helpers
 # ---------------------------------
-def _clean_text_series(s: pd.Series) -> pd.Series:
-    """Trim newlines/tabs/multiple spaces without changing case."""
-    return (
+def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
+    s = (
         s.astype(str)
          .str.replace(r"[\r\n\t]+", " ", regex=True)
          .str.replace(r"\s+", " ", regex=True)
          .str.strip()
     )
-
-def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
-    """Fix common acronyms inside names without title-casing whole string."""
-    s = s.astype(str)
-    # ETF -> uppercase
-    s = s.str.replace(r"\bEtf\b", "ETF", regex=True, flags=re.IGNORECASE)
-    # Add more as needed:
-    s = s.str.replace(r"\bUsa\b", "USA", regex=True, flags=re.IGNORECASE)
-    s = s.str.replace(r"\bUsd\b", "USD", regex=True, flags=re.IGNORECASE)
+    if title_case:
+        s = s.str.title()
     return s
 
 def _clean_ticker_series(s: pd.Series) -> pd.Series:
-    """Hard clean for tickers: drop ALL whitespace, uppercase."""
     return (
         s.astype(str)
          .str.replace(r"[\r\n\t\s]+", "", regex=True)
@@ -98,24 +89,16 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
 
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
-    """
-    Expected columns: fund_ticker, fund_name, security_name, security_weight, ingest_date
-    """
     df = pd.read_csv(url)
     need = {"fund_ticker","fund_name","security_name","security_weight","ingest_date"}
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
-
-    # Types
     df["ingest_date"] = pd.to_datetime(df["ingest_date"], errors="coerce")
     df["security_weight"] = pd.to_numeric(df["security_weight"], errors="coerce")
-
-    # Clean text fields (preserve case, just trim) and fix acronyms
     df["fund_ticker"]   = _clean_ticker_series(df["fund_ticker"])
-    df["fund_name"]     = _fix_acronyms_in_name(_clean_text_series(df["fund_name"]))
-    df["security_name"] = _fix_acronyms_in_name(_clean_text_series(df["security_name"]))
-
+    df["fund_name"]     = _clean_text_series(df["fund_name"], title_case=True)
+    df["security_name"] = _clean_text_series(df["security_name"], title_case=True)
     return df
 
 # ---------------------------------
@@ -154,7 +137,6 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     if pd.notna(last_date):
         sub = sub[sub["ingest_date"] == last_date]
 
-    # STRICTLY use fund_name from CSV (with acronym fix) for display
     fund_name = _escape(sub["fund_name"].iloc[0])
     last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
 
@@ -216,7 +198,7 @@ def build_chip_css() -> str:
   box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card (to the right; scroll if tall) */
+/* Tooltip card to the RIGHT; scroll if tall */
 .tt-chip .tt-card {
   position: absolute;
   left: calc(100% + 8px);
@@ -254,6 +236,20 @@ def build_chip_css() -> str:
 .tt-table tbody tr:last-child td { border-bottom: none; }
 .tt-sec { width: 80%; }
 .tt-wt  { width: 20%; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Mobile fallback: show above chip */
+@media (max-width: 768px) {
+  .tt-chip .tt-card {
+    left: 0;
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateY(6px);
+    max-height: 50vh;
+  }
+  .tt-chip:hover .tt-card {
+    transform: translateY(0);
+  }
+}
 """
     group_css_parts = []
     if use_group_colors:
@@ -369,59 +365,50 @@ def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 # ---------------------------------
-# Table Rendering (hide outer border; keep header underline)
+# Table Rendering
 # ---------------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     table_id = f"tbl-{slugify(group_name)}"
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        /* Keep outer border in layout but hide it (transparent) */
         #{table_id} table {{
             width: 100%;
-            border-collapse: separate;
+            border-collapse: collapse;
             border-spacing: 0;
-            border: 2px solid transparent;  /* visually hidden */
+            border: 2px solid rgba(156, 163, 175, 0.7);
             border-radius: 8px;
+            /* keep overflow visible so tooltips aren't clipped */
         }}
         #{table_id} table thead th {{
             text-align: center !important;
-            border-bottom: 2px solid rgba(156, 163, 175, 0.6); /* visible underline */
+            border-bottom: 2px solid rgba(156, 163, 175, 0.6);
             border-left: none !important;
             border-right: none !important;
             padding: 6px 8px;
         }}
         #{table_id} table tbody td {{
-            border: none;                /* no row lines */
+            border-bottom: 1px solid rgba(156, 163, 175, 0.22);
+            border-left: none !important;
+            border-right: none !important;
             padding: 6px 8px;
-            position: relative;          /* for tooltip positioning */
+            position: relative;
         }}
-        /* Subtle row hover (optional) */
-        #{table_id} table tbody tr:hover td {{
-            background: rgba(0,0,0,0.02);
-        }}
-
+        #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
         /* Right align numeric-ish columns */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(10) {{
-            text-align: right !important;
-        }}
+        #{table_id} table td:nth-child(10) {{ text-align: right !important; }}
         #{table_id} table td:nth-child(5),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
         #{table_id} table td:nth-child(13),
-        #{table_id} table td:nth-child(14) {{
-            text-align: center !important;
-        }}
+        #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{
-            white-space: nowrap;
-            line-height: 1.25;
-        }}
+        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
@@ -471,7 +458,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
             chip = ticker
             if not df_holdings.empty:
-                # Tooltip uses fund_name from CSV (with acronym fix) -> ensures 'ETF', not 'Etf'
                 card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
                 if card_html:
                     chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
