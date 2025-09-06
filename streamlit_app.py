@@ -261,7 +261,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
 
     latest, rs_last_n = process_data(df_etf, df_rs)
-    st.caption(f"Latest data update: {latest['date'].max().date()}")
+    st.caption(f"Latest Update: {latest['date'].max().date()}")
 
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
