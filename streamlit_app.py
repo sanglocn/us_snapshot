@@ -154,7 +154,7 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sub = sub[sub["ingest_date"] == last_date]
 
     fund_name = _escape(sub["fund_name"].iloc[0])  # uses fixed casing (ETF not Etf)
-    last_update_str = _escape(last_date.strftime("%Y-%m-%d %H:%M") if pd.notna(last_date) else "N/A")
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")  # Changed to show only date
 
     topn = (
         sub[["security_name","security_ticker","security_weight"]]
@@ -168,7 +168,6 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         sec = _escape(r["security_name"])
         tk  = _escape(r.get("security_ticker", ""))
         wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
-        # Add title attributes so full content is visible on hover
         rows.append(
             "<tr>"
             f"<td class='tt-sec' title='{sec}'>{sec}</td>"
