@@ -96,6 +96,8 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         df_etf["group"] = _clean_text_series(df_etf["group"])
     if "ticker" in df_rs.columns:
         df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
+    if "group" in df_rs.columns:
+        df_rs["group"] = _clean_text_series(df_rs["group"])
 
     return df_etf, df_rs
 
@@ -131,18 +133,11 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFram
     return latest, rs_last_n
 
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
-    if "rs_rank_21d" not in df_etf.columns:
+    if "count_over_85" not in df_etf.columns or "count_under_50" not in df_etf.columns:
         return pd.DataFrame(columns=["date","count_over_85","count_under_50","date_str"])
-    tmp = df_etf.copy()
-    tmp["over_85"] = tmp["rs_rank_21d"] >= 0.85
-    tmp["under_50"] = tmp["rs_rank_21d"] < 0.50
-    daily = (
-        tmp.groupby("date", as_index=False)
-           .agg(count_over_85=("over_85","sum"), count_under_50=("under_50","sum"))
-           .sort_values("date")
-    )
+    daily = df_etf[["date","count_over_85","count_under_50"]].drop_duplicates().sort_values("date")
     daily = daily.dropna(subset=["count_over_85","count_under_50"])
-    last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
+    last_21_dates = daily["date"].tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
@@ -210,7 +205,7 @@ def build_chip_css() -> str:
   padding: 6px 12px;
   margin: 2px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #2563eb22, #1d4ed822);
+  background: linear-gradient(135deg, #2563eb22, #07598522);
   border: 1px solid #2563eb55;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: 13px;
@@ -306,6 +301,7 @@ def build_chip_css() -> str:
     max-height: 50vh;
   }
   .tt-chip:hover .tt-card {
+    visibility: visible;
     transform: translateY(0);
   }
 }
@@ -555,7 +551,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
                             use_container_width=True)
     else:
-        st.info("`rs_rank_21d` not found in ETF data — breadth charts skipped.")
+        st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
 # ---------------------------------
 # Main
