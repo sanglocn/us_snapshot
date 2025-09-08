@@ -134,6 +134,21 @@ IWM,iShares Russell 2000 ETF,Umb Financial Corp,UMBF,0.33,2025-09-08
 IWM,iShares Russell 2000 ETF,Chart Industries Inc,GTLS,0.32,2025-09-08
 IWM,iShares Russell 2000 ETF,Sterling Infrastructure Inc,STRL,0.31,2025-09-08
 IWM,iShares Russell 2000 ETF,Bridgebio Pharma Inc,BBIO,0.3,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Citizens Financial Group,CFG,2.77,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Regions Financial Corp,RF,2.68,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Western Alliance Bancorp,WAL,2.68,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Zions Bancorp Na,ZION,2.59,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Truist Financial Corp,TFC,2.55,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Webster Financial Corp,WBS,2.55,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,East West Bancorp Inc,EWBC,2.52,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Southstate Bank Corp,SSB,2.52,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,First Horizon Corp,FHN,2.49,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Valley National Bancorp,VLY,2.48,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Huntington Bancshares Inc,HBAN,2.42,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,M + T Bank Corp,MTB,2.39,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Popular Inc,BPOP,2.17,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Umb Financial Corp,UMBF,2.05,2025-09-08
+KRE,SPDR S&P Regional Banking ETF,Old National Bancorp,ONB,2.03,2025-09-08
 QQQE,NASDAQ-100 Equal Weighted Index Shares,Applovin Corp-class A,APP,1.49,2025-09-08
 QQQE,NASDAQ-100 Equal Weighted Index Shares,Shopify Inc - Class A,SHOP,1.32,2025-09-08
 QQQE,NASDAQ-100 Equal Weighted Index Shares,Synopsys Inc,SNPS,1.24,2025-09-08
@@ -389,3 +404,48 @@ VNM,VanEck Vietnam ETF,Vincom Retail Jsc,VRE VN,2.76,2025-09-08
 VNM,VanEck Vietnam ETF,Gelex Group Jsc,GEX VN,2.48,2025-09-08
 VNM,VanEck Vietnam ETF,Vietnam Export Import Commercial Jsb,EIB VN,1.87,2025-09-08
 VNM,VanEck Vietnam ETF,No Va Land Investment Group Corp,NVL VN,1.86,2025-09-08
+XBI,SPDR S&P Biotech ETF,Alnylam Pharmaceuticals Inc,ALNY,3.4,2025-09-08
+XBI,SPDR S&P Biotech ETF,Insmed Inc,INSM,3.25,2025-09-08
+XBI,SPDR S&P Biotech ETF,United Therapeutics Corp,UTHR,3.08,2025-09-08
+XBI,SPDR S&P Biotech ETF,Halozyme Therapeutics Inc,HALO,3.05,2025-09-08
+XBI,SPDR S&P Biotech ETF,Incyte Corp,INCY,2.78,2025-09-08
+XBI,SPDR S&P Biotech ETF,Neurocrine Biosciences Inc,NBIX,2.53,2025-09-08
+XBI,SPDR S&P Biotech ETF,Abbvie Inc,ABBV,2.49,2025-09-08
+XBI,SPDR S&P Biotech ETF,Madrigal Pharmaceuticals Inc,MDGL,2.46,2025-09-08
+XBI,SPDR S&P Biotech ETF,Regeneron Pharmaceuticals,REGN,2.45,2025-09-08
+XBI,SPDR S&P Biotech ETF,Bridgebio Pharma Inc,BBIO,2.37,2025-09-08
+XBI,SPDR S&P Biotech ETF,Biogen Inc,BIIB,2.35,2025-09-08
+XBI,SPDR S&P Biotech ETF,Gilead Sciences Inc,GILD,2.31,2025-09-08
+XBI,SPDR S&P Biotech ETF,Natera Inc,NTRA,2.23,2025-09-08
+XBI,SPDR S&P Biotech ETF,Biomarin Pharmaceutical Inc,BMRN,2.22,2025-09-08
+XBI,SPDR S&P Biotech ETF,Amgen Inc,AMGN,2.15,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Installed Building Products,IBP,4.4,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Dr Horton Inc,DHI,3.94,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Topbuild Corp,BLD,3.93,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Somnigroup International Inc,SGI,3.72,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Pultegroup Inc,PHM,3.7,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Toll Brothers Inc,TOL,3.7,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Williams Sonoma Inc,WSM,3.63,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Builders Firstsource Inc,BLDR,3.49,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Allegion Plc,ALLE,3.45,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Lennar Corp A,LEN,3.45,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Meritage Homes Corp,MTH,3.45,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Kb Home,KBH,3.44,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Advanced Drainage Systems In,WMS,3.42,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Lowe S Cos Inc,LOW,3.32,2025-09-08
+XHB,SPDR S&P Homebuilders ETF,Taylor Morrison Home Corp,TMHC,3.32,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Astera Labs Inc,ALAB,4.93,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Credo Technology Group Holdi,CRDO,4.64,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Impinj Inc,PI,4.2,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Ambarella Inc,AMBA,3.72,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Semtech Corp,SMTC,3.54,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Advanced Micro Devices,AMD,3.31,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Lattice Semiconductor Corp,LSCC,3.21,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Rambus Inc,RMBS,3.06,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Broadcom Inc,AVGO,3.0,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Rigetti Computing Inc,RGTI,3.0,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,First Solar Inc,FSLR,2.98,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Nvidia Corp,NVDA,2.98,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Intel Corp,INTC,2.95,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Monolithic Power Systems Inc,MPWR,2.92,2025-09-08
+XSD,SPDR S&P Semiconductor ETF,Cirrus Logic Inc,CRUS,2.78,2025-09-08
