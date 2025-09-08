@@ -34,7 +34,7 @@ GROUP_PALETTE = {
 
 # --- settings (no sidebar) ---
 use_group_colors = True        # color-code ticker chips by group
-max_holdings_rows = 15         # rows shown in tooltip table
+max_holdings_rows = 10         # rows shown in tooltip table
 
 # ---------------------------------
 # Small helpers
