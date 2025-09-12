@@ -1,49 +1,49 @@
 fund_ticker,fund_name,security_name,security_ticker,security_weight,ingest_date
-ARKF,ARK Fintech innovation ETF,Shopify Inc - Class A,SHOP,10.07,2025-09-12
-ARKF,ARK Fintech innovation ETF,Coinbase Global Inc -class A,COIN,6.7,2025-09-12
-ARKF,ARK Fintech innovation ETF,Robinhood Markets Inc - A,HOOD,5.51,2025-09-12
-ARKF,ARK Fintech innovation ETF,Roblox Corp -class A,RBLX,4.7,2025-09-12
-ARKF,ARK Fintech innovation ETF,Palantir Technologies Inc-a,PLTR,4.38,2025-09-12
-ARKF,ARK Fintech innovation ETF,Sofi Technologies Inc,SOFI,4.3,2025-09-12
-ARKF,ARK Fintech innovation ETF,Toast Inc-class A,TOST,4.23,2025-09-12
-ARKF,ARK Fintech innovation ETF,Circle Internet Group Inc,CRCL,3.36,2025-09-12
-ARKF,ARK Fintech innovation ETF,Ark Bitcoin Etf Holdco (arkf),"""NaN""",3.29,2025-09-12
-ARKF,ARK Fintech innovation ETF,Block Inc,XYZ,3.08,2025-09-12
-ARKF,ARK Fintech innovation ETF,Roku Inc,ROKU,3.07,2025-09-12
-ARKF,ARK Fintech innovation ETF,Bitmine Immersion Technologi,BMNR,2.78,2025-09-12
-ARKF,ARK Fintech innovation ETF,Mercadolibre Inc,MELI,2.73,2025-09-12
-ARKF,ARK Fintech innovation ETF,Sea Ltd-adr,SE,2.38,2025-09-12
-ARKF,ARK Fintech innovation ETF,Meta Platforms Inc-class A,META,2.35,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Tempus Ai Inc,TEM,11.65,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Crispr Therapeutics Ag,CRSP,9.2,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Twist Bioscience Corp,TWST,5.04,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Recursion Pharmaceuticals-a,RXRX,5.0,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Natera Inc,NTRA,4.66,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Guardant Health Inc,GH,4.44,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Personalis Inc,PSNL,4.19,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Ionis Pharmaceuticals Inc,IONS,3.97,2025-09-12
-ARKG,ARK Genomic Revolution ETF,10x Genomics Inc-class A,TXG,3.91,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Beam Therapeutics Inc,BEAM,3.89,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Adaptive Biotechnologies,ADPT,3.87,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Veracyte Inc,VCYT,3.45,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Illumina Inc,ILMN,3.35,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Schrodinger Inc,SDGR,3.35,2025-09-12
-ARKG,ARK Genomic Revolution ETF,Intellia Therapeutics Inc,NTLA,3.14,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Kratos Defense & Security,KTOS,9.91,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Rocket Lab,RKLB UQ,9.29,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Aerovironment Inc,AVAV,7.02,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,L3harris Technologies Inc,LHX,6.39,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Teradyne Inc,TER,6.09,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Palantir Technologies Inc-a,PLTR,5.81,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Archer Aviation Inc-a,ACHR,5.19,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Iridium Communications Inc,IRDM,4.82,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Trimble Inc,TRMB,4.79,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Amazon.com Inc,AMZN,3.82,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Advanced Micro Devices,AMD,3.51,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Deere & Co,DE,3.42,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Joby Aviation Inc,JOBY,2.78,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Nvidia Corp,NVDA,2.73,2025-09-12
-ARKX,ARK Space Exploration & Innovation ETF,Komatsu Ltd,6301,2.54,2025-09-12
+ARKF,ARK Fintech innovation ETF,Shopify Inc - Class A,SHOP,9.61,2025-09-12
+ARKF,ARK Fintech innovation ETF,Coinbase Global Inc -class A,COIN,6.44,2025-09-12
+ARKF,ARK Fintech innovation ETF,Goldman Fs Trsy Oblig Inst 468,"""NaN""",5.18,2025-09-12
+ARKF,ARK Fintech innovation ETF,Robinhood Markets Inc - A,HOOD,5.0,2025-09-12
+ARKF,ARK Fintech innovation ETF,Roblox Corp -class A,RBLX,4.4,2025-09-12
+ARKF,ARK Fintech innovation ETF,Toast Inc-class A,TOST,4.21,2025-09-12
+ARKF,ARK Fintech innovation ETF,Sofi Technologies Inc,SOFI,4.09,2025-09-12
+ARKF,ARK Fintech innovation ETF,Palantir Technologies Inc-a,PLTR,4.03,2025-09-12
+ARKF,ARK Fintech innovation ETF,Circle Internet Group Inc,CRCL,3.7,2025-09-12
+ARKF,ARK Fintech innovation ETF,Ark Bitcoin Etf Holdco (arkf),"""NaN""",3.42,2025-09-12
+ARKF,ARK Fintech innovation ETF,Roku Inc,ROKU,2.91,2025-09-12
+ARKF,ARK Fintech innovation ETF,Block Inc,XYZ,2.9,2025-09-12
+ARKF,ARK Fintech innovation ETF,Bitmine Immersion Technologi,BMNR,2.73,2025-09-12
+ARKF,ARK Fintech innovation ETF,Mercadolibre Inc,MELI,2.54,2025-09-12
+ARKF,ARK Fintech innovation ETF,Sea Ltd-adr,SE,2.26,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Tempus Ai Inc,TEM,12.45,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Crispr Therapeutics Ag,CRSP,9.39,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Twist Bioscience Corp,TWST,5.06,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Recursion Pharmaceuticals-a,RXRX,5.05,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Natera Inc,NTRA,4.52,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Personalis Inc,PSNL,4.49,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Guardant Health Inc,GH,4.22,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Beam Therapeutics Inc,BEAM,3.99,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Adaptive Biotechnologies,ADPT,3.98,2025-09-12
+ARKG,ARK Genomic Revolution ETF,10x Genomics Inc-class A,TXG,3.84,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Ionis Pharmaceuticals Inc,IONS,3.76,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Veracyte Inc,VCYT,3.38,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Illumina Inc,ILMN,3.3,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Schrodinger Inc,SDGR,3.28,2025-09-12
+ARKG,ARK Genomic Revolution ETF,Intellia Therapeutics Inc,NTLA,3.01,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Kratos Defense & Security,KTOS,10.06,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Rocket Lab,RKLB UQ,9.6,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Aerovironment Inc,AVAV,6.77,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,L3harris Technologies Inc,LHX,6.41,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Teradyne Inc,TER,5.88,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Palantir Technologies Inc-a,PLTR,5.64,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Archer Aviation Inc-a,ACHR,5.26,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Trimble Inc,TRMB,4.87,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Iridium Communications Inc,IRDM,4.86,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Amazon.com Inc,AMZN,3.76,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Deere & Co,DE,3.4,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Advanced Micro Devices,AMD,3.37,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Joby Aviation Inc,JOBY,2.82,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Nvidia Corp,NVDA,2.68,2025-09-12
+ARKX,ARK Space Exploration & Innovation ETF,Komatsu Ltd,6301,2.52,2025-09-12
 COPX,Copper Miners ETF,Zijin Mining-h,2899 HK,5.51,2025-09-12
 COPX,Copper Miners ETF,Lundin Mining Corp,LUN CN,5.22,2025-09-12
 COPX,Copper Miners ETF,Hudbay Minerals Inc,HBM CN,5.03,2025-09-12
@@ -164,6 +164,21 @@ IWM,iShares Russell 2000 ETF,Spx Technologies Inc,SPXC,0.33,2025-09-12
 IWM,iShares Russell 2000 ETF,Sterling Infrastructure Inc,STRL,0.33,2025-09-12
 IWM,iShares Russell 2000 ETF,Umb Financial Corp,UMBF,0.32,2025-09-12
 IWM,iShares Russell 2000 ETF,Blk Csh Fnd Treasury Sl Agency,XTSLA,0.31,2025-09-12
+KIE,SPDR S&P Insurance ETF,Oscar Health Inc   Class A,OSCR,2.59,2025-09-12
+KIE,SPDR S&P Insurance ETF,Lincoln National Corp,LNC,2.37,2025-09-12
+KIE,SPDR S&P Insurance ETF,Genworth Financial Inc,GNW,2.33,2025-09-12
+KIE,SPDR S&P Insurance ETF,Mercury General Corp,MCY,2.25,2025-09-12
+KIE,SPDR S&P Insurance ETF,Globe Life Inc,GL,2.18,2025-09-12
+KIE,SPDR S&P Insurance ETF,Lemonade Inc,LMND,2.18,2025-09-12
+KIE,SPDR S&P Insurance ETF,First American Financial,FAF,2.13,2025-09-12
+KIE,SPDR S&P Insurance ETF,American Financial Group Inc,AFG,2.1,2025-09-12
+KIE,SPDR S&P Insurance ETF,Willis Towers Watson Plc,WTW,2.1,2025-09-12
+KIE,SPDR S&P Insurance ETF,Old Republic Intl Corp,ORI,2.05,2025-09-12
+KIE,SPDR S&P Insurance ETF,Loews Corp,L,2.04,2025-09-12
+KIE,SPDR S&P Insurance ETF,Assurant Inc,AIZ,2.01,2025-09-12
+KIE,SPDR S&P Insurance ETF,Fidelity National Financial,FNF,2.01,2025-09-12
+KIE,SPDR S&P Insurance ETF,Aflac Inc,AFL,1.99,2025-09-12
+KIE,SPDR S&P Insurance ETF,Hartford Insurance Group Inc,HIG,1.99,2025-09-12
 KRE,SPDR S&P Regional Banking ETF,Citizens Financial Group,CFG,2.78,2025-09-12
 KRE,SPDR S&P Regional Banking ETF,Regions Financial Corp,RF,2.69,2025-09-12
 KRE,SPDR S&P Regional Banking ETF,Western Alliance Bancorp,WAL,2.65,2025-09-12
@@ -239,6 +254,21 @@ QTUM,Defiance Quantum ETF,Hon Hai Precision Industry Co Ltd,2317 TT,1.55,2025-09
 QTUM,Defiance Quantum ETF,Advanced Micro Devices Inc,AMD,1.5,2025-09-12
 QTUM,Defiance Quantum ETF,Mitsubishi Electric Corp,6503 JP,1.49,2025-09-12
 QTUM,Defiance Quantum ETF,Radnet Inc,RDNT,1.49,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,China Northern Rare Earth Group High-te,600111 C1,10.66,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Mp Materials Corp,MP US,9.97,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Lynas Rare Earths Ltd,LYC AU,8.04,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Albemarle Corp,ALB US,6.15,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Sociedad Quimica Y Minera De Chile Sa,SQM US,5.46,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Pilbara Minerals Ltd,PLS AU,5.31,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Shenghe Resources Holding Co Ltd,600392 C1,5.0,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Ganfeng Lithium Group Co Ltd,1772 HK,4.92,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Jinduicheng Molybdenum Co Ltd,601958 C1,4.9,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Iperionx Ltd,IPX AU,4.72,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Iluka Resources Ltd,ILU AU,4.59,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Xiamen Tungsten Co Ltd,600549 C1,4.56,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Amg Critical Materials Nv,AMG NA,4.35,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Liontown Resources Ltd,LTR AU,4.34,2025-09-12
+REMX,VanEck Rare Earth and Strategic Metals ETF,Baoji Titanium Industry Co Ltd,600456 C1,3.05,2025-09-12
 RSP,Invesco S&P 500 Equal Weight ETF,Oracle Corp,ORCL ,0.36,2025-09-12
 RSP,Invesco S&P 500 Equal Weight ETF,Western Digital Corp,WDC ,0.33,2025-09-12
 RSP,Invesco S&P 500 Equal Weight ETF,Arista Networks Inc,ANET ,0.31,2025-09-12
@@ -479,6 +509,21 @@ VNM,VanEck Vietnam ETF,Vincom Retail Jsc,VRE VN,2.76,2025-09-12
 VNM,VanEck Vietnam ETF,Gelex Group Jsc,GEX VN,2.48,2025-09-12
 VNM,VanEck Vietnam ETF,Vietnam Export Import Commercial Jsb,EIB VN,1.87,2025-09-12
 VNM,VanEck Vietnam ETF,No Va Land Investment Group Corp,NVL VN,1.86,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Rocket Lab Corp,RKLB,5.36,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Kratos Defense + Security,KTOS,5.16,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Aerovironment Inc,AVAV,4.14,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Bwx Technologies Inc,BWXT,3.88,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Huntington Ingalls Industrie,HII,3.82,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Northrop Grumman Corp,NOC,3.77,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,General Dynamics Corp,GD,3.72,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,General Electric,GE,3.66,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,L3harris Technologies Inc,LHX,3.55,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Hexcel Corp,HXL,3.49,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Rtx Corp,RTX,3.47,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Howmet Aerospace Inc,HWM,3.42,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Boeing Co/the,BA,3.37,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Textron Inc,TXT,3.35,2025-09-12
+XAR,SPDR S&P Aerospace & Defense ETF,Curtiss Wright Corp,CW,3.33,2025-09-12
 XBI,SPDR S&P Biotech ETF,Alnylam Pharmaceuticals Inc,ALNY,3.5,2025-09-12
 XBI,SPDR S&P Biotech ETF,Insmed Inc,INSM,3.32,2025-09-12
 XBI,SPDR S&P Biotech ETF,United Therapeutics Corp,UTHR,3.19,2025-09-12
