@@ -426,12 +426,14 @@ def format_multiple(value) -> str:
     except (TypeError, ValueError):
         return '<span style="display:block; text-align:right;">-</span>'
     txt = f"{v:.2f}"
-    if v >= 10.0:
-        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # amber
-    elif v >= 1.0:
-        bg, border = "rgba(16,185,129,.18)", "rgba(16,185,129,.30)" # mild green
+    if v >= 10:
+        bg, border = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"   # red
+    elif v >= 4:
+        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # yellow/amber
+    elif v > 0:
+        bg, border = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)" # green
     else:
-        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)"
+        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)" # grey
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>')
 
