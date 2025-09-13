@@ -420,13 +420,13 @@ def format_volume_alert(value: str, rs_rank_252d) -> str:
         return '<span style="display:block; text-align:center;">-</span>'
 
 def format_multiple(value) -> str:
-    """Render numeric multiple like 1.75× with a subtle badge."""
+    """Render numeric multiple like 1.75 with a subtle badge."""
     try:
         v = float(value)
     except (TypeError, ValueError):
         return '<span style="display:block; text-align:right;">-</span>'
-    txt = f"{v:.2f}×"
-    if v >= 2.0:
+    txt = f"{v:.2f}"
+    if v >= 10.0:
         bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # amber
     elif v >= 1.0:
         bg, border = "rgba(16,185,129,.18)", "rgba(16,185,129,.30)" # mild green
