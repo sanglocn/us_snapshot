@@ -209,6 +209,21 @@ IWM,iShares Russell 2000 ETF,Sterling Infrastructure Inc,STRL,0.34,2025-09-13
 IWM,iShares Russell 2000 ETF,Spx Technologies Inc,SPXC,0.33,2025-09-13
 IWM,iShares Russell 2000 ETF,Blk Csh Fnd Treasury Sl Agency,XTSLA,0.32,2025-09-13
 IWM,iShares Russell 2000 ETF,Chart Industries Inc,GTLS,0.32,2025-09-13
+JETS,U.S. Global Jets ETF,Southwest Airlines Co,LUV,10.78,2025-09-13
+JETS,U.S. Global Jets ETF,American Airlines Group Inc,AAL,10.76,2025-09-13
+JETS,U.S. Global Jets ETF,Delta Air Lines Inc,DAL,10.69,2025-09-13
+JETS,U.S. Global Jets ETF,United Airlines Holdings Inc,UAL,10.53,2025-09-13
+JETS,U.S. Global Jets ETF,Sun Country Airlines Holdings Inc,SNCY,3.02,2025-09-13
+JETS,U.S. Global Jets ETF,Air Canada,AC CN,3.01,2025-09-13
+JETS,U.S. Global Jets ETF,Allegiant Travel Co,ALGT,3.01,2025-09-13
+JETS,U.S. Global Jets ETF,Alaska Air Group Inc,ALK,2.99,2025-09-13
+JETS,U.S. Global Jets ETF,Skywest Inc,SKYW,2.97,2025-09-13
+JETS,U.S. Global Jets ETF,Jetblue Airways Corp,JBLU,2.93,2025-09-13
+JETS,U.S. Global Jets ETF,Frontier Group Holdings Inc,ULCC,2.9,2025-09-13
+JETS,U.S. Global Jets ETF,Expedia Group Inc,EXPE,2.02,2025-09-13
+JETS,U.S. Global Jets ETF,Bombardier Inc,BBD/B CN,2.01,2025-09-13
+JETS,U.S. Global Jets ETF,Booking Holdings Inc,BKNG,2.0,2025-09-13
+JETS,U.S. Global Jets ETF,General Dynamics Corp,GD,1.99,2025-09-13
 KIE,SPDR S&P Insurance ETF,Oscar Health Inc   Class A,OSCR,2.54,2025-09-13
 KIE,SPDR S&P Insurance ETF,Lincoln National Corp,LNC,2.36,2025-09-13
 KIE,SPDR S&P Insurance ETF,Genworth Financial Inc,GNW,2.35,2025-09-13
@@ -254,6 +269,21 @@ KWEB,KraneShares CSI China Internet ETF,Netease Inc,9999,3.89,2025-09-13
 KWEB,KraneShares CSI China Internet ETF,Full Truck A-adr,YMM,3.76,2025-09-13
 KWEB,KraneShares CSI China Internet ETF,Ke Holdings Inc-cl A,2423,3.64,2025-09-13
 KWEB,KraneShares CSI China Internet ETF,Bilibili Inc-class Z,9626,3.42,2025-09-13
+MAGS,Magnificent Seven ETF,United States Treasury Bill 10/16/2025,912797QF7,53.49,2025-09-13
+MAGS,Magnificent Seven ETF,Nvidia Corp Swap,67066G104 TRS 071426 NM,8.32,2025-09-13
+MAGS,Magnificent Seven ETF,Alphabet Inc-cl A Swap,02079K305 TRS 071426 NM,8.15,2025-09-13
+MAGS,Magnificent Seven ETF,Tesla Inc Swap,88160R101 TRS 071426 NM,7.8,2025-09-13
+MAGS,Magnificent Seven ETF,Microsoft Corp Swap,594918104 TRS 071426 NM,7.37,2025-09-13
+MAGS,Magnificent Seven ETF,Alphabet Inc,GOOGL,6.82,2025-09-13
+MAGS,Magnificent Seven ETF,Meta Platforms Inc-class A Swap,30303M102 TRS 071426 NM,6.38,2025-09-13
+MAGS,Magnificent Seven ETF,Amazon.com Inc Swap,023135106 TRS 071426 NM,6.37,2025-09-13
+MAGS,Magnificent Seven ETF,Apple Inc Swap,037833100 TRS 071426 NM,6.02,2025-09-13
+MAGS,Magnificent Seven ETF,Apple Inc,AAPL,5.56,2025-09-13
+MAGS,Magnificent Seven ETF,Amazon.com Inc,AMZN,4.8,2025-09-13
+MAGS,Magnificent Seven ETF,Nvidia Corp,NVDA,3.99,2025-09-13
+MAGS,Magnificent Seven ETF,Meta Platforms Inc,META,3.96,2025-09-13
+MAGS,Magnificent Seven ETF,Tesla Inc,TSLA,3.15,2025-09-13
+MAGS,Magnificent Seven ETF,Microsoft Corp,MSFT,3.03,2025-09-13
 MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Nomura,"""NaN""",60.78,2025-09-13
 MSOS,AdvisorShares Pure US Cannabis ETF,Curaleaf Holdings Inc Swap,CURLF,22.66,2025-09-13
 MSOS,AdvisorShares Pure US Cannabis ETF,Trulieve Cannabis Swap,TCNNF,22.02,2025-09-13
@@ -269,6 +299,21 @@ MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Clearstreet,"""Na
 MSOS,AdvisorShares Pure US Cannabis ETF,Jushi Holdings Inc Swap,JUSHF,2.52,2025-09-13
 MSOS,AdvisorShares Pure US Cannabis ETF,Village Farms International,VFF,1.15,2025-09-13
 MSOS,AdvisorShares Pure US Cannabis ETF,Cannabist Company Holdings Inc Swap,CBSTF,0.79,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Cameco Corp,CCJ,10.23,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Constellation Energy,CEG,8.02,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Centrus Energy Corp-class A,LEU,4.08,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Oklo Inc,OKLO,3.96,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Ge Vernova Inc,GEV,3.84,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Nuscale Power Corp,SMR,2.93,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Rolls-royce Holdings Plc,RR/ LN,2.93,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Asp Isotopes Inc,ASPI,2.81,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Vistra Corp,VST,2.67,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Samsung C&t Corp,028260 KS,2.64,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Curtiss-wright Corp,CW,2.61,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Quanta Services Inc,PWR,2.44,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Mitsubishi Heavy Industries,7011 JP,2.25,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Cez As,CEZ CP,2.21,2025-09-13
+NUKZ,Range Nuclear Renaissance Index ETF,Talen Energy Corp,TLN,2.17,2025-09-13
 OIH,VanEck Oil Services ETF,Schlumberger Nv,SLB US,22.56,2025-09-13
 OIH,VanEck Oil Services ETF,Baker Hughes Co,BKR US,15.37,2025-09-13
 OIH,VanEck Oil Services ETF,Halliburton Co,HAL US,6.88,2025-09-13
@@ -554,6 +599,21 @@ TAN,Invesco Solar ETF,Solaria Energia Y Medio Ambiente Sa,SLR ,3.14,2025-09-13
 TAN,Invesco Solar ETF,Clearway Energy Inc,CWEN ,3.07,2025-09-13
 TAN,Invesco Solar ETF,Jinkosolar Holding Co Ltd Adr,JKS ,2.79,2025-09-13
 TAN,Invesco Solar ETF,Array Technologies Inc,ARRY ,2.73,2025-09-13
+URNM,Sprott Uranium Miners ETF,Cameco Corp.,CCJ,17.59,2025-09-13
+URNM,Sprott Uranium Miners ETF,Nac Kazatomprom Jsc,KAP LI,13.14,2025-09-13
+URNM,Sprott Uranium Miners ETF,Sprott Physical Uranium Trust,U-U CN,10.33,2025-09-13
+URNM,Sprott Uranium Miners ETF,Energy Fuels Inc.,UUUU,8.39,2025-09-13
+URNM,Sprott Uranium Miners ETF,Uranium Energy Corp.,UEC,6.58,2025-09-13
+URNM,Sprott Uranium Miners ETF,Cgn Mining Co. Ltd.,1164 HK,5.32,2025-09-13
+URNM,Sprott Uranium Miners ETF,Denison Mines Corp.,DNN,4.98,2025-09-13
+URNM,Sprott Uranium Miners ETF,Deep Yellow Ltd.,DYL AU,4.95,2025-09-13
+URNM,Sprott Uranium Miners ETF,Nexgen Energy Ltd.,NXE,4.84,2025-09-13
+URNM,Sprott Uranium Miners ETF,Paladin Energy Ltd.,PDN AU,3.68,2025-09-13
+URNM,Sprott Uranium Miners ETF,Yellow Cake Plc,YCA LN,3.36,2025-09-13
+URNM,Sprott Uranium Miners ETF,Ur-energy Inc.,URG,2.18,2025-09-13
+URNM,Sprott Uranium Miners ETF,Boss Energy Ltd.,BOE AU,1.91,2025-09-13
+URNM,Sprott Uranium Miners ETF,Encore Energy Corp.,EU CN,1.73,2025-09-13
+URNM,Sprott Uranium Miners ETF,Bannerman Energy Ltd.,BMN AU,1.67,2025-09-13
 VNM,VanEck Vietnam ETF,Vinhomes Jsc,VHM VN,7.98,2025-09-13
 VNM,VanEck Vietnam ETF,Vingroup Jsc,VIC VN,7.81,2025-09-13
 VNM,VanEck Vietnam ETF,Ssi Securities Corp,SSI VN,6.97,2025-09-13
