@@ -98,7 +98,11 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
     if "group" in df_rs.columns:
         df_rs["group"] = _clean_text_series(df_rs["group"])
-
+    if "ratio_pct_dist_to_atr_pct" in df_etf.columns:
+        df_etf["ratio_pct_dist_to_atr_pct"] = pd.to_numeric(
+            df_etf["ratio_pct_dist_to_atr_pct"], errors="coerce"
+        )
+    
     return df_etf, df_rs
 
 @st.cache_data(ttl=900, show_spinner=False)
