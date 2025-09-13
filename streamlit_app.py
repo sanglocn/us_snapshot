@@ -419,6 +419,22 @@ def format_volume_alert(value: str, rs_rank_252d) -> str:
     else:
         return '<span style="display:block; text-align:center;">-</span>'
 
+def format_multiple(value) -> str:
+    """Render numeric multiple like 1.75× with a subtle badge."""
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return '<span style="display:block; text-align:right;">-</span>'
+    txt = f"{v:.2f}×"
+    if v >= 2.0:
+        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # amber
+    elif v >= 1.0:
+        bg, border = "rgba(16,185,129,.18)", "rgba(16,185,129,.30)" # mild green
+    else:
+        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)"
+    return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
+            f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>')
+
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
@@ -531,7 +547,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
                 "  ": "",
-                "Extension Multiple": format_indicator(row.get("ratio_pct_dist_to_atr_pct")),
+                "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
