@@ -59,7 +59,7 @@ def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
     s = s.str.replace(r"\breit\b", "REIT", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\bai\b", "AI", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\bus\b", "US", regex=True, flags=re.IGNORECASE)
-    s = s.str.replace(r"s&?p", "S&P", regex=True, flags=re.IGNORECASE)
+    s = s.str.replace(r"\bS\s*(?:&|and|-)\s*P\b", "S&P", regex=True, flags=re.IGNORECASE)
     return s
 
 def _clean_ticker_series(s: pd.Series) -> pd.Series:
