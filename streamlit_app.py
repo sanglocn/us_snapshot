@@ -427,13 +427,13 @@ def format_multiple(value) -> str:
         return '<span style="display:block; text-align:right;">-</span>'
     txt = f"{v:.2f}"
     if v >= 10:
-        bg, border = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"   # red
+        emoji, bg, border = "🔴", "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"
     elif v >= 4:
-        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # yellow/amber
+        emoji, bg, border = "🟡", "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"
     elif v > 0:
-        bg, border = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)" # green
+        emoji, bg, border = "🟢", "rgba(16,185,129,.22)", "rgba(16,185,129,.35)"
     else:
-        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)" # grey
+        emoji, bg, border = "⚪", "rgba(156,163,175,.18)", "rgba(156,163,175,.30)"
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>')
 
