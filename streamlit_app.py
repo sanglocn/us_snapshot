@@ -544,6 +544,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
+                "52W High": row.get("pct_below_high"),
+                "52W Low": row.get("pct_above_low"),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
