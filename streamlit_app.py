@@ -393,7 +393,7 @@ def format_performance_intraday(value: float) -> str:
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
 def format_pct_plain(value, zero_emoji=None, zero_color=None) -> str:
-    """Render plain number (no color/bold). Show emoji if exactly 0%."""
+    """Render plain number. Show colored emoji if exactly 0%."""
     try:
         v = float(value)
     except (TypeError, ValueError):
@@ -401,11 +401,11 @@ def format_pct_plain(value, zero_emoji=None, zero_color=None) -> str:
     if pd.isna(v):
         return '<span style="display:block; text-align:right;">-</span>'
 
-    # Show emoji if exactly 0%
     if v == 0 and zero_emoji:
+        # Apply custom color via CSS
         return (
-            f"<span style='display:block; text-align:center; font-size:14px; "
-            f"color:{zero_color};'>{zero_emoji}</span>"
+            f"<span style='display:block; text-align:center; font-size:18px; color:{zero_color};'>"
+            f"{zero_emoji}</span>"
         )
 
     formatted = f"{v:,.1f}%"
