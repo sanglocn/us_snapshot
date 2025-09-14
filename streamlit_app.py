@@ -408,36 +408,53 @@ def format_performance_intraday(value: float) -> str:
 
 def format_pct_bar(value, width_pct=None) -> str:
     """
-    Horizontal bar with centered % label on a high-contrast pill.
-    Colors: negative=red, positive=green.
-    width_pct: pre-normalized width [0..100] (scaled within group). If None, falls back to abs(value) capped at 100.
+    Excel-like data bar with centered % label.
+    - Negative -> red gradient; Positive -> green gradient
+    - Thin border + subtle inset for depth
+    - Ensures the label stays readable (min visual width)
+    - width_pct: pre-normalized width [0..100] (scaled within group)
     """
     try:
         v = float(value)
     except (TypeError, ValueError):
         return '<span style="display:block; text-align:right;">-</span>'
 
+    # Pre-normalized width (per-section) if provided; else fall back to abs(value)
     width = float(width_pct) if width_pct is not None else min(abs(v), 100.0)
     width = max(0.0, min(width, 100.0))
 
-    fill = "rgba(16,185,129,0.95)" if v >= 0 else "rgba(239,68,68,0.95)"  # green / red
-    track = "rgba(156,163,175,0.22)"  # neutral track that works in both themes
+    # Colors & gradients
+    if v >= 0:
+        fill = "linear-gradient(90deg, rgba(134,239,172,0.9) 0%, rgba(34,197,94,0.95) 100%)"  # green
+        border = "rgba(22,101,52,0.8)"
+    else:
+        fill = "linear-gradient(90deg, rgba(254,178,178,0.9) 0%, rgba(239,68,68,0.95) 100%)"  # red
+        border = "rgba(127,29,29,0.8)"
+
+    track = "linear-gradient(180deg, rgba(148,163,184,0.18), rgba(148,163,184,0.14))"  # neutral
     txt = f"{v:.1f}%"
 
-    # Centered label on a dark pill for readability on both light and dark themes
+    # Make tiny values still readable: enforce a minimum *visual* width for the fill
+    # Using CSS max() so width is max(percent, 36px)
+    min_px = 36  # fits "-48.6%" style values from your sample
     return (
         "<div role='img' aria-label='percentage bar' style='width:100%;'>"
-        "  <div style='position:relative; height:22px; border-radius:9999px; overflow:hidden; "
+        "  <div style='position:relative; height:22px; border-radius:6px; overflow:hidden; "
         f"             background:{track}; border:1px solid rgba(0,0,0,0.10);'>"
-        f"    <div style='position:absolute; top:0; left:0; height:100%; width:{width}%; background:{fill};'></div>"
-        "    <div style='position:absolute; inset:0; display:flex; align-items:center; justify-content:center;'>"
-        "      <span style='padding:1px 8px; border-radius:9999px; "
-        "                   background:rgba(0,0,0,0.55); color:#fff; font-weight:700; font-size:12px; "
-        "                   line-height:1; font-variant-numeric:tabular-nums; "
-        "                   border:1px solid rgba(255,255,255,0.18); "
-        "                   text-shadow:0 1px 1px rgba(0,0,0,0.6);'>"
-        f"        {txt}"
-        "      </span>"
+        f"    <div style='position:absolute; top:0; left:0; height:100%; "
+        f"                width:max({width}%, {min_px}px); "
+        f"                background:{fill}; border-right:1px solid {border}; "
+        "                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);'></div>"
+        # Centered white label with strong outline so it pops on red/green and in dark/light themes
+        "    <div style='position:absolute; inset:0; display:flex; align-items:center; justify-content:center; "
+        "                font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; "
+        "                color:#fff; "
+        "                text-shadow: "
+        "                   -1px 0 1px rgba(0,0,0,0.8), "
+        "                    1px 0 1px rgba(0,0,0,0.8), "
+        "                    0 -1px 1px rgba(0,0,0,0.8), "
+        "                    0  1px 1px rgba(0,0,0,0.8);'>"
+        f"      {txt}"
         "    </div>"
         "  </div>"
         "</div>"
