@@ -393,23 +393,28 @@ def format_performance_intraday(value: float) -> str:
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
 def format_pct_bar(value) -> str:
-    """Horizontal bar: negative=red, positive=green. Width=|value| capped at 100%."""
+    """Horizontal bar with centered % label. Negative=red, Positive=green. Width=|value| capped at 100%."""
     try:
         v = float(value)
     except (TypeError, ValueError):
         return '<span style="display:block; text-align:right;">-</span>'
 
     width = min(abs(v), 100.0)
-    color = "rgba(16,185,129,.85)" if v >= 0 else "rgba(239,68,68,.85)"  # green / red
-    bg = "rgba(156,163,175,.20)"  # subtle gray track
+    fill = "rgba(16,185,129,0.90)" if v >= 0 else "rgba(239,68,68,0.90)"  # green / red
+    track = "rgba(156,163,175,0.18)"  # subtle gray background
     txt = f"{v:.1f}%"
 
     return (
-        "<div style='display:flex; align-items:center; gap:8px;'>"
-        f"  <div style='flex:1; height:8px; background:{bg}; border-radius:9999px; overflow:hidden;'>"
-        f"    <div style='height:100%; width:{width}%; background:{color};'></div>"
+        "<div style='width:100%;'>"
+        "  <div style='position:relative; height:20px; border-radius:9999px; overflow:hidden; "
+        f"             background:{track}; border:1px solid rgba(0,0,0,0.06);'>"
+        f"    <div style='position:absolute; top:0; left:0; height:100%; width:{width}%; background:{fill};'></div>"
+        "    <div style='position:absolute; inset:0; display:flex; align-items:center; justify-content:center; "
+        "                font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; "
+        "                color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.45);'>"
+        f"      {txt}"
+        "    </div>"
         "  </div>"
-        f"  <div style='min-width:54px; text-align:right; font-variant-numeric:tabular-nums;'>{txt}</div>"
         "</div>"
     )
 
