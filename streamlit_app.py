@@ -393,15 +393,20 @@ def format_performance_intraday(value: float) -> str:
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
 def format_pct_color(value) -> str:
-    """Render number with red for negative, green for positive."""
+    """Render number with red for negative, green for positive (right-aligned, 1 decimal, with %)."""
     try:
         v = float(value)
     except (TypeError, ValueError):
         return '<span style="display:block; text-align:right;">-</span>'
-    color = "#16a34a" if v >= 0 else "#dc2626"  # Tailwind green-600 / red-600
-    return f'<span style="display:block; text-align:right; color:{color}; font-weight:600;' \
-           f'font-variant-numeric:tabular-nums;' \
-           f"'>{v:.1f}%</span>"
+    if pd.isna(v):
+        return '<span style="display:block; text-align:right;">-</span>'
+
+    color = "#16a34a" if v >= 0 else "#dc2626"  # green / red
+    return (
+        f'<span style="display:block; text-align:right; '
+        f'color:{color}; font-weight:600; font-variant-numeric:tabular-nums;">'
+        f'{v:.1f}%</span>'
+    )
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
