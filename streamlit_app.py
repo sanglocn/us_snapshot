@@ -392,8 +392,8 @@ def format_performance_intraday(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
-def format_pct_color(value) -> str:
-    """Render number with red for negative, green for positive (right-aligned, 1 decimal, with %)."""
+def format_pct_color(value, zero_emoji=None, zero_color=None) -> str:
+    """Render number with red/green color. Show emoji if exactly 0%."""
     try:
         v = float(value)
     except (TypeError, ValueError):
@@ -401,11 +401,19 @@ def format_pct_color(value) -> str:
     if pd.isna(v):
         return '<span style="display:block; text-align:right;">-</span>'
 
-    color = "#16a34a" if v >= 0 else "#dc2626"  # green / red
+    # Exactly 0 → show emoji instead of number
+    if v == 0 and zero_emoji:
+        return (
+            f"<span style='display:block; text-align:center; font-size:14px; "
+            f"color:{zero_color};'>{zero_emoji}</span>"
+        )
+
+    color = "#16a34a" if v > 0 else "#dc2626"  # green / red
+    formatted = f"{v:,.1f}%"
     return (
         f'<span style="display:block; text-align:right; '
         f'color:{color}; font-weight:600; font-variant-numeric:tabular-nums;">'
-        f'{v:.1f}%</span>'
+        f'{formatted}</span>'
     )
 
 def format_indicator(value: str) -> str:
@@ -560,8 +568,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_pct_color(row.get("pct_below_high")),
-                "52W Low": format_pct_color(row.get("pct_above_low")),
+                "52W High": format_pct_color(row.get("pct_below_high"), zero_emoji="🟢", zero_color="#16a34a"), 
+                "52W Low": format_pct_color(row.get("pct_above_low"), zero_emoji="🔴", zero_color="#dc2626"),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
