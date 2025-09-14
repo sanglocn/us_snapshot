@@ -392,11 +392,13 @@ def format_performance_intraday(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
-def format_pct_plain(value, rocket_mode=False, snail_mode=False) -> str:
+def format_pct_with_emoji(value, mode: str = "below_high") -> str:
     """
-    Plain number with %, but show:
-      - 🚀 if value >= -5 (within 5% of 52w high)
-      - 🐌 if value <= 5  (within 5% of 52w low)
+    Single formatter for pct_below_high (mode='below_high') or pct_above_low (mode='above_low').
+
+    Rules:
+      - below_high: 🚀 when value >= -5, else plain number
+      - above_low:  🐌 when value < 5,  else plain number
     """
     try:
         v = float(value)
@@ -405,16 +407,13 @@ def format_pct_plain(value, rocket_mode=False, snail_mode=False) -> str:
     if pd.isna(v):
         return '<span style="display:block; text-align:right;">-</span>'
 
-    # Condition for rocket/snail
-    if rocket_mode and v >= -5:
+    if mode == "below_high" and v >= -5:
         return "<span style='display:block; text-align:center; font-size:18px;'>🚀</span>"
-    if snail_mode and v <= 5:
+    if mode == "above_low" and v < 5:
         return "<span style='display:block; text-align:center; font-size:18px;'>🐌</span>"
 
-    # Otherwise, just show number
     formatted = f"{v:,.1f}%"
-    return f'<span style="display:block; text-align:right; font-variant-numeric:tabular-nums;' \
-           f"'> {formatted}</span>"
+    return f'<span style="display:block; text-align:right; font-variant-numeric:tabular-nums;">{formatted}</span>'
 
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
@@ -568,8 +567,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_pct_plain(row.get("pct_below_high"), rocket_mode=True), 
-                "52W Low": format_pct_plain(row.get("pct_above_low"),  snail_mode=True),
+                "52W High": format_pct_with_emoji(row.get("pct_below_high"), mode="below_high"), 
+                "52W Low": format_pct_with_emoji(row.get("pct_above_low"),  mode="above_low"),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
