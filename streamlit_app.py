@@ -142,20 +142,6 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
 
-def build_group_scalers(latest: pd.DataFrame, fields=("pct_below_high","pct_above_low")) -> dict:
-    """
-    Returns {(group, field): max_abs} for normalizing bar widths within each section.
-    """
-    scalers = {}
-    for g, sub in latest.groupby("group"):
-        for f in fields:
-            if f in sub.columns:
-                m = pd.to_numeric(sub[f], errors="coerce").abs().max()
-                scalers[(g, f)] = float(m) if pd.notna(m) and m not in (None, 0) else 1.0
-            else:
-                scalers[(g, f)] = 1.0
-    return scalers
-
 # ---------------------------------
 # Chips + Tooltip (HTML/CSS)
 # ---------------------------------
@@ -406,60 +392,6 @@ def format_performance_intraday(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
-def format_pct_bar(value, width_pct=None) -> str:
-    """
-    Excel-like data bar with centered % label.
-    - Negative -> red gradient; Positive -> green gradient
-    - Thin border + subtle inset for depth
-    - Ensures the label stays readable (min visual width)
-    - width_pct: pre-normalized width [0..100] (scaled within group)
-    """
-    try:
-        v = float(value)
-    except (TypeError, ValueError):
-        return '<span style="display:block; text-align:right;">-</span>'
-
-    # Pre-normalized width (per-section) if provided; else fall back to abs(value)
-    width = float(width_pct) if width_pct is not None else min(abs(v), 100.0)
-    width = max(0.0, min(width, 100.0))
-
-    # Colors & gradients
-    if v >= 0:
-        fill = "linear-gradient(90deg, rgba(134,239,172,0.9) 0%, rgba(34,197,94,0.95) 100%)"  # green
-        border = "rgba(22,101,52,0.8)"
-    else:
-        fill = "linear-gradient(90deg, rgba(254,178,178,0.9) 0%, rgba(239,68,68,0.95) 100%)"  # red
-        border = "rgba(127,29,29,0.8)"
-
-    track = "linear-gradient(180deg, rgba(148,163,184,0.18), rgba(148,163,184,0.14))"  # neutral
-    txt = f"{v:.1f}%"
-
-    # Make tiny values still readable: enforce a minimum *visual* width for the fill
-    # Using CSS max() so width is max(percent, 36px)
-    min_px = 36  # fits "-48.6%" style values from your sample
-    return (
-        "<div role='img' aria-label='percentage bar' style='width:100%;'>"
-        "  <div style='position:relative; height:22px; border-radius:6px; overflow:hidden; "
-        f"             background:{track}; border:1px solid rgba(0,0,0,0.10);'>"
-        f"    <div style='position:absolute; top:0; left:0; height:100%; "
-        f"                width:max({width}%, {min_px}px); "
-        f"                background:{fill}; border-right:1px solid {border}; "
-        "                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);'></div>"
-        # Centered white label with strong outline so it pops on red/green and in dark/light themes
-        "    <div style='position:absolute; inset:0; display:flex; align-items:center; justify-content:center; "
-        "                font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; "
-        "                color:#fff; "
-        "                text-shadow: "
-        "                   -1px 0 1px rgba(0,0,0,0.8), "
-        "                    1px 0 1px rgba(0,0,0,0.8), "
-        "                    0 -1px 1px rgba(0,0,0,0.8), "
-        "                    0  1px 1px rgba(0,0,0,0.8);'>"
-        f"      {txt}"
-        "    </div>"
-        "  </div>"
-        "</div>"
-    )
-
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
     if value == "yes": return '<span style="color:green; display:block; text-align:center;">✅</span>'
@@ -561,8 +493,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.markdown(build_chip_css(), unsafe_allow_html=True)
 
     latest, rs_last_n = process_data(df_etf, df_rs)
-    scalers = build_group_scalers(latest)
-
     if "date" in latest.columns:
         st.caption(f"Latest Update: {pd.to_datetime(latest['date']).max().date()}")
     else:
@@ -584,9 +514,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             continue
         st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
-        # Get max values for this group to scale bar widths
-        max_bh = scalers.get((group_name, "pct_below_high"), 1.0)
-        max_al = scalers.get((group_name, "pct_above_low"), 1.0)
 
         if "rs_rank_21d" in latest.columns:
             tickers_in_group = sorted(
@@ -598,22 +525,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
-            
-            # Get raw values
-            val_bh = row.get("pct_below_high")
-            val_al = row.get("pct_above_low")
-            
-            # Normalize width within this section
-            try:
-                width_bh = min(abs(float(val_bh)) / max_bh * 100.0, 100.0) if max_bh else 0.0
-            except (TypeError, ValueError):
-                width_bh = None
-        
-            try:
-                width_al = min(abs(float(val_al)) / max_al * 100.0, 100.0) if max_al else 0.0
-            except (TypeError, ValueError):
-                width_al = None
-
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
             chip = ticker
@@ -633,8 +544,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_pct_bar(val_bh, width_pct=width_bh),
-                "52W Low": format_pct_bar(val_al, width_pct=width_al),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
