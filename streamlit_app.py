@@ -102,6 +102,18 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     
     return df_etf, df_rs
 
+@st.cache_data(ttl=900)
+def load_summary_json(url: str = DATA_URLS["summary"]) -> dict:
+    """Load JSON summary from remote source (GitHub)."""
+    import requests
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        st.warning(f"Could not load summary JSON: {e}")
+        return {}
+
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     """
@@ -522,6 +534,12 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.caption("Latest Update: N/A")
 
+    meta = load_summary_json()
+    if meta:
+        st.subheader("🧠 Summary by AI")
+        st.markdown(f"**ETF Insight**  \n{meta.get('etf_comment','-')}")
+        st.markdown(f"**Stock Insight**  \n{meta.get('stock_comment','-')}")
+    
     try:
         df_holdings = load_holdings_csv(DATA_URLS["holdings"])
     except Exception as e:
