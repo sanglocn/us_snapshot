@@ -17,6 +17,7 @@ DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
+    "summary": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_summary.json"
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
