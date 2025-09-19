@@ -1,4 +1,5 @@
 {
-  "etf_comment": "In the ETF market, several themes are showing strength. QBTS, IONQ, and ALAB from the Leader group are all posting impressive gains, with RS ranks above 90 and positive volume alerts. However, MAGS and SOFI from the Theme group are experiencing sell pressure on volume and are 3% off their highs. EWY, a country ETF, is also below its SMA10 and showing negative volume, indicating potential weakness.",
-  "stock_comment": "Among the Leader stocks, RIOT, APP, IONQ, QTUM, and ALAB are all posting strong gains, with RS ranks above 90 and positive volume alerts. Notably, RIOT and APP have extended multiples above 10, signaling taking profit opportunities. On the other hand, RDDT is showing negative volume and is 350.5% above its 52-week low, indicating sell pressure. BABA and RGTI are also holding near highs, but with more moderate gains."
+  "date": "2025-09-18",
+  "etf_comment": "SOFI, MU, RDDT, ALAB, QTUM, SOLZ, RGTI, OKLO all show RS rankings above 90 (signifying relative strength), holding near their highs with a positive volume surge. Only QBTS falls short with an ext_multiple of 7.53.",
+  "stock_comment": "Both SOFI and MU have a small pct_above_low (268.41 and 161.21), indicating prices above their 52-week lows. Of the five notable tickers, RDDT and ALAB have the highest ext_multiple at 443.67 and 4725.62, hinting potential profit-taking opportunities. RGTI, OKLO, and QBTS boast even higher ext_multiples, suggesting continued buying pressure."
 }
