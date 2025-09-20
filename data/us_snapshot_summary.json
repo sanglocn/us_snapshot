@@ -1,5 +1,5 @@
 {
-  "date": "2025-09-18",
-  "etf_comment": "SOFI, MU, RDDT, ALAB, QTUM, SOLZ, RGTI, OKLO all show RS rankings above 90 (signifying relative strength), holding near their highs with a positive volume surge. Only QBTS falls short with an ext_multiple of 7.53.",
-  "stock_comment": "Both SOFI and MU have a small pct_above_low (268.41 and 161.21), indicating prices above their 52-week lows. Of the five notable tickers, RDDT and ALAB have the highest ext_multiple at 443.67 and 4725.62, hinting potential profit-taking opportunities. RGTI, OKLO, and QBTS boast even higher ext_multiples, suggesting continued buying pressure."
+  "date": "2025-09-19",
+  "etf_comment": "The theme ETFs GDX and QTUM led with RS>90, both holding above SMA5 and showing a positive volume surge. NUKZ and SLV also performed well, though extending beyond the 4x SMA to 5x and 7x, respectively.",
+  "stock_comment": "In the leader group, IONQ, QBTS, SOFI, and OKLO showed strong performance. IONQ and QBTS, both holding above SMA5, extended 10x and 9x their 50MA, respectively. SOFI and OKLO have a more cautious but extended position, having shown a positive volume surge and extended 5x their 50MA. MU and ALAB, on the other hand, posted negative gains for the day with ALAB particularly weakening, showing a sell pressure on volume while extending 8x its 50MA."
 }
