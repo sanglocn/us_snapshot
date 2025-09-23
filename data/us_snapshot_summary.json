@@ -1,5 +1,5 @@
 {
-  "date": "2025-09-19",
-  "etf_comment": "The theme ETFs GDX and QTUM led with RS>90, both holding above SMA5 and showing a positive volume surge. NUKZ and SLV also performed well, though extending beyond the 4x SMA to 5x and 7x, respectively.",
-  "stock_comment": "In the leader group, IONQ, QBTS, SOFI, and OKLO showed strong performance. IONQ and QBTS, both holding above SMA5, extended 10x and 9x their 50MA, respectively. SOFI and OKLO have a more cautious but extended position, having shown a positive volume surge and extended 5x their 50MA. MU and ALAB, on the other hand, posted negative gains for the day with ALAB particularly weakening, showing a sell pressure on volume while extending 8x its 50MA."
+  "date": "2025-09-22",
+  "etf_comment": "The standout ETFs today were HYG, AGG, and XLK, all showing positive volume surges. However, they extended themselves with an ext_multiple of 8.29, 11.35, and 10.17 respectively, indicating caution. In contrast, TLT and IEF exhibited extended signals with an ext_multiple of 10.1 and 12.87, suggesting profit-taking.",
+  "stock_comment": "Leading the stocks was WGMI, with a remarkable rise of 5.51% and a positive volume surge. Its ext_multiple stood at 10.17, offering a buyable opportunity. SMH and XLK also led with RS > 90, posting impressive returns of 1.77% and 0.76%. RSPT followed closely with a gain of 1.43%, although its ext_multiple was higher at 6.19."
 }
