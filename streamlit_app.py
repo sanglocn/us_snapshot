@@ -17,7 +17,6 @@ DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
-    "summary": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_summary.json"
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
@@ -101,18 +100,6 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         df_rs["group"] = _clean_text_series(df_rs["group"])
     
     return df_etf, df_rs
-
-@st.cache_data(ttl=900)
-def load_summary_json(url: str = DATA_URLS["summary"]) -> dict:
-    """Load JSON summary from remote source (GitHub)."""
-    import requests
-    try:
-        resp = requests.get(url, timeout=10)
-        resp.raise_for_status()
-        return resp.json()
-    except Exception as e:
-        st.warning(f"Could not load summary JSON: {e}")
-        return {}
 
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
@@ -405,29 +392,6 @@ def format_performance_intraday(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
-def format_pct_with_emoji(value, mode: str = "below_high") -> str:
-    """
-    Single formatter for pct_below_high (mode='below_high') or pct_above_low (mode='above_low').
-
-    Rules:
-      - below_high: 🚀 when value >= -5, else plain number
-      - above_low:  🐌 when value < 5,  else plain number
-    """
-    try:
-        v = float(value)
-    except (TypeError, ValueError):
-        return '<span style="display:block; text-align:right;">-</span>'
-    if pd.isna(v):
-        return '<span style="display:block; text-align:right;">-</span>'
-
-    if mode == "below_high" and v >= -5:
-        return "<span style='display:block; text-align:center; font-size:18px;'>🚀</span>"
-    if mode == "above_low" and v < 5:
-        return "<span style='display:block; text-align:center; font-size:18px;'>🐌</span>"
-
-    formatted = f"{v:,.1f}%"
-    return f'<span style="display:block; text-align:right; font-variant-numeric:tabular-nums;">{formatted}</span>'
-
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
     if value == "yes": return '<span style="color:green; display:block; text-align:center;">✅</span>'
@@ -534,12 +498,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.caption("Latest Update: N/A")
 
-    meta = load_summary_json()
-    if meta:
-        st.subheader("🧠 Summary by AI")
-        st.markdown(f"**ETF Insight**  \n{meta.get('etf_comment','-')}")
-        st.markdown(f"**Stock Insight**  \n{meta.get('stock_comment','-')}")
-    
     try:
         df_holdings = load_holdings_csv(DATA_URLS["holdings"])
     except Exception as e:
@@ -586,8 +544,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_pct_with_emoji(row.get("pct_below_high"), mode="below_high"), 
-                "52W Low": format_pct_with_emoji(row.get("pct_above_low"),  mode="above_low"),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
