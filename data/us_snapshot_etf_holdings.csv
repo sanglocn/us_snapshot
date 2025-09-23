@@ -1,501 +1,521 @@
 fund_ticker,fund_name,security_name,security_ticker,security_weight,ingest_date
-ARKF,ARK Fintech innovation ETF,Shopify Inc - Class A,SHOP,9.61,2025-09-13
-ARKF,ARK Fintech innovation ETF,Coinbase Global Inc -class A,COIN,6.44,2025-09-13
-ARKF,ARK Fintech innovation ETF,Goldman Fs Trsy Oblig Inst 468,"""NaN""",5.18,2025-09-13
-ARKF,ARK Fintech innovation ETF,Robinhood Markets Inc - A,HOOD,5.0,2025-09-13
-ARKF,ARK Fintech innovation ETF,Roblox Corp -class A,RBLX,4.4,2025-09-13
-ARKF,ARK Fintech innovation ETF,Toast Inc-class A,TOST,4.21,2025-09-13
-ARKF,ARK Fintech innovation ETF,Sofi Technologies Inc,SOFI,4.09,2025-09-13
-ARKF,ARK Fintech innovation ETF,Palantir Technologies Inc-a,PLTR,4.03,2025-09-13
-ARKF,ARK Fintech innovation ETF,Circle Internet Group Inc,CRCL,3.7,2025-09-13
-ARKF,ARK Fintech innovation ETF,Ark Bitcoin Etf Holdco (arkf),"""NaN""",3.42,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Tempus Ai Inc,TEM,12.45,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Crispr Therapeutics Ag,CRSP,9.39,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Twist Bioscience Corp,TWST,5.06,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Recursion Pharmaceuticals-a,RXRX,5.05,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Natera Inc,NTRA,4.52,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Personalis Inc,PSNL,4.49,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Guardant Health Inc,GH,4.22,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Beam Therapeutics Inc,BEAM,3.99,2025-09-13
-ARKG,ARK Genomic Revolution ETF,Adaptive Biotechnologies,ADPT,3.98,2025-09-13
-ARKG,ARK Genomic Revolution ETF,10x Genomics Inc-class A,TXG,3.84,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Kratos Defense & Security,KTOS,10.06,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Rocket Lab,RKLB UQ,9.6,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Aerovironment Inc,AVAV,6.77,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,L3harris Technologies Inc,LHX,6.41,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Teradyne Inc,TER,5.88,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Palantir Technologies Inc-a,PLTR,5.64,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Archer Aviation Inc-a,ACHR,5.26,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Trimble Inc,TRMB,4.87,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Iridium Communications Inc,IRDM,4.86,2025-09-13
-ARKX,ARK Space Exploration & Innovation ETF,Amazon.com Inc,AMZN,3.76,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Nvidia Corp,NVDA,11.68,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Abb Ltd-reg,ABBN SW,9.41,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Fanuc Corp,6954 JP,7.12,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Keyence Corp,6861 JP,6.69,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Intuitive Surgical Inc,ISRG,6.17,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Daifuku Co Ltd,6383 JP,4.61,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Pegasystems Inc,PEGA,3.9,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Dynatrace Inc,DT,3.75,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Smc Corp,6273 JP,3.35,2025-09-13
-BOTZ,Robotics & Artificial Intelligence ETF,Cognex Corp,CGNX,2.98,2025-09-13
-COPX,Copper Miners ETF,Zijin Mining-h,2899 HK,5.51,2025-09-13
-COPX,Copper Miners ETF,Lundin Mining Corp,LUN CN,5.22,2025-09-13
-COPX,Copper Miners ETF,Hudbay Minerals Inc,HBM CN,5.03,2025-09-13
-COPX,Copper Miners ETF,First Quantum,FM CN,4.97,2025-09-13
-COPX,Copper Miners ETF,Sumitomo Met Min,5713 JP,4.89,2025-09-13
-COPX,Copper Miners ETF,Antofagasta Plc,ANTO LN,4.72,2025-09-13
-COPX,Copper Miners ETF,Freeport-mcmoran Inc,FCX,4.69,2025-09-13
-COPX,Copper Miners ETF,Boliden Ab,BOL SS,4.16,2025-09-13
-COPX,Copper Miners ETF,Southern Copper Corp,SCCO,4.11,2025-09-13
-COPX,Copper Miners ETF,Kghm Polska Miedz Sa,KGH PW,4.07,2025-09-13
-EWJ,iShares MSCI Japan ETF,Toyota Motor Corp,7203,4.23,2025-09-13
-EWJ,iShares MSCI Japan ETF,Mitsubishi Ufj Financial Group Inc,8306,4.05,2025-09-13
-EWJ,iShares MSCI Japan ETF,Sony Group Corp,6758,4.05,2025-09-13
-EWJ,iShares MSCI Japan ETF,Hitachi Ltd,6501,2.92,2025-09-13
-EWJ,iShares MSCI Japan ETF,Softbank Group Corp,9984,2.65,2025-09-13
-EWJ,iShares MSCI Japan ETF,Nintendo Ltd,7974,2.42,2025-09-13
-EWJ,iShares MSCI Japan ETF,Sumitomo Mitsui Financial Group In,8316,2.33,2025-09-13
-EWJ,iShares MSCI Japan ETF,Mitsubishi Heavy Industries Ltd,7011,1.89,2025-09-13
-EWJ,iShares MSCI Japan ETF,Mizuho Financial Group Inc,8411,1.88,2025-09-13
-EWJ,iShares MSCI Japan ETF,Tokio Marine Holdings Inc,8766,1.84,2025-09-13
-EWY,iShares MSCI South Korea ETF,Samsung Electronics Ltd,005930,21.48,2025-09-13
-EWY,iShares MSCI South Korea ETF,Sk Hynix Inc,000660,11.95,2025-09-13
-EWY,iShares MSCI South Korea ETF,Kb Financial Group Inc,105560,3.19,2025-09-13
-EWY,iShares MSCI South Korea ETF,Hanwha Aerospace Ltd,012450,2.54,2025-09-13
-EWY,iShares MSCI South Korea ETF,Naver Corp,035420,2.41,2025-09-13
-EWY,iShares MSCI South Korea ETF,Hyundai Motor,005380,2.21,2025-09-13
-EWY,iShares MSCI South Korea ETF,Shinhan Financial Group Ltd,055550,2.13,2025-09-13
-EWY,iShares MSCI South Korea ETF,Celltrion Inc,068270,2.05,2025-09-13
-EWY,iShares MSCI South Korea ETF,Doosan Enerbility Ltd,034020,2.05,2025-09-13
-EWY,iShares MSCI South Korea ETF,Hana Financial Group Inc,086790,1.86,2025-09-13
-GDX,VanEck Gold Miners ETF,Newmont Corp,NEM US,13.07,2025-09-13
-GDX,VanEck Gold Miners ETF,Agnico Eagle Mines Ltd,AEM US,11.56,2025-09-13
-GDX,VanEck Gold Miners ETF,Barrick Mining Corp,B US,7.59,2025-09-13
-GDX,VanEck Gold Miners ETF,Wheaton Precious Metals Corp,WPM US,7.16,2025-09-13
-GDX,VanEck Gold Miners ETF,Franco-nevada Corp,FNV US,5.72,2025-09-13
-GDX,VanEck Gold Miners ETF,Gold Fields Ltd,GFI US,4.95,2025-09-13
-GDX,VanEck Gold Miners ETF,Anglogold Ashanti Plc,AU US,4.55,2025-09-13
-GDX,VanEck Gold Miners ETF,Kinross Gold Corp,KGC US,4.21,2025-09-13
-GDX,VanEck Gold Miners ETF,Zijin Mining Group Co Ltd,2899 HK,3.32,2025-09-13
-GDX,VanEck Gold Miners ETF,Northern Star Resources Ltd,NST AU,2.86,2025-09-13
-GXC,SPDR S&P China ETF,Tencent Holdings Ltd,700,13.42,2025-09-13
-GXC,SPDR S&P China ETF,Alibaba Group Holding Ltd,9988,7.96,2025-09-13
-GXC,SPDR S&P China ETF,Xiaomi Corp Class B,1810,3.17,2025-09-13
-GXC,SPDR S&P China ETF,China Construction Bank H,939,2.72,2025-09-13
-GXC,SPDR S&P China ETF,Pdd Holdings Inc,PDD,2.49,2025-09-13
-GXC,SPDR S&P China ETF,Meituan Class B,3690,1.86,2025-09-13
-GXC,SPDR S&P China ETF,Ind + Comm Bk Of China H,1398,1.53,2025-09-13
-GXC,SPDR S&P China ETF,Netease Inc,9999,1.38,2025-09-13
-GXC,SPDR S&P China ETF,Bank Of China Ltd H,3988,1.31,2025-09-13
-GXC,SPDR S&P China ETF,Byd Co Ltd H,1211,1.3,2025-09-13
-HACK,Amplify Cybersecurity ETF,Broadcom Inc,AVGO,10.87,2025-09-13
-HACK,Amplify Cybersecurity ETF,Cisco Systems Inc,CSCO,6.16,2025-09-13
-HACK,Amplify Cybersecurity ETF,Cloudflare Inc,NET,6.02,2025-09-13
-HACK,Amplify Cybersecurity ETF,Northrop Grumman Corp,NOC,5.69,2025-09-13
-HACK,Amplify Cybersecurity ETF,General Dynamics Corp,GD,5.68,2025-09-13
-HACK,Amplify Cybersecurity ETF,Palo Alto Networks Inc,PANW,5.4,2025-09-13
-HACK,Amplify Cybersecurity ETF,Cyberark Software Ltd,CYBR,4.91,2025-09-13
-HACK,Amplify Cybersecurity ETF,Crowdstrike Holdings Inc,CRWD,4.84,2025-09-13
-HACK,Amplify Cybersecurity ETF,Zscaler Inc,ZS,4.37,2025-09-13
-HACK,Amplify Cybersecurity ETF,F5 Inc,FFIV,4.31,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Oracle Corp,ORCL,12.51,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Palantir Technologies Inc Class A,PLTR,9.88,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Microsoft Corp,MSFT,8.5,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Salesforce Inc,CRM,6.92,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Intuit Inc,INTU,5.41,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Servicenow Inc,NOW,4.53,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Palo Alto Networks Inc,PANW,4.02,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Applovin Corp Class A,APP,3.88,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Adobe Inc,ADBE,3.64,2025-09-13
-IGV,iShares Expanded Tech-Software Sector ETF,Crowdstrike Holdings Inc Class A,CRWD,3.31,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Unitedhealth Group Inc,UNH,25.06,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Cvs Health Corp,CVS,11.43,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Elevance Health Inc,ELV,8.61,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Humana Inc,HUM,5.29,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Hca Healthcare Inc,HCA,4.82,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Cigna,CI,4.34,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Veeva Systems Inc Class A,VEEV,4.26,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Labcorp Holdings Inc,LH,3.69,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Quest Diagnostics Inc,DGX,3.22,2025-09-13
-IHF,iShares U.S. Healthcare Providers ETF,Tenet Healthcare Corp,THC,2.83,2025-09-13
-INDA,iShares MSCI India ETF,Hdfc Bank Ltd,HDFCBANK,8.22,2025-09-13
-INDA,iShares MSCI India ETF,Reliance Industries Ltd,RELIANCE,6.3,2025-09-13
-INDA,iShares MSCI India ETF,Icici Bank Ltd,ICICIBANK,5.55,2025-09-13
-INDA,iShares MSCI India ETF,Infosys Ltd,INFY,3.75,2025-09-13
-INDA,iShares MSCI India ETF,Bharti Airtel Ltd,BHARTIARTL,3.67,2025-09-13
-INDA,iShares MSCI India ETF,Blk Csh Fnd Treasury Sl Agency,XTSLA,2.85,2025-09-13
-INDA,iShares MSCI India ETF,Mahindra And Mahindra Ltd,M&M,2.51,2025-09-13
-INDA,iShares MSCI India ETF,Tata Consultancy Services Ltd,TCS,2.11,2025-09-13
-INDA,iShares MSCI India ETF,Bajaj Finance Ltd,BAJFINANCE,2.03,2025-09-13
-INDA,iShares MSCI India ETF,Axis Bank Ltd,AXISBANK,1.87,2025-09-13
-IWM,iShares Russell 2000 ETF,Credo Technology Group Holding Ltd,CRDO,0.83,2025-09-13
-IWM,iShares Russell 2000 ETF,Bloom Energy Class A Corp,BE,0.49,2025-09-13
-IWM,iShares Russell 2000 ETF,Fabrinet,FN,0.46,2025-09-13
-IWM,iShares Russell 2000 ETF,Ionq Inc,IONQ,0.4,2025-09-13
-IWM,iShares Russell 2000 ETF,Kratos Defense And Security Soluti,KTOS,0.4,2025-09-13
-IWM,iShares Russell 2000 ETF,Echostar Corp Class A,SATS,0.37,2025-09-13
-IWM,iShares Russell 2000 ETF,Coeur Mining Inc,CDE,0.35,2025-09-13
-IWM,iShares Russell 2000 ETF,Hims Hers Health Inc Class A,HIMS,0.35,2025-09-13
-IWM,iShares Russell 2000 ETF,Ensign Group Inc,ENSG,0.34,2025-09-13
-IWM,iShares Russell 2000 ETF,Nextracker Inc Class A,NXT,0.34,2025-09-13
-JETS,U.S. Global Jets ETF,Southwest Airlines Co,LUV,10.78,2025-09-13
-JETS,U.S. Global Jets ETF,American Airlines Group Inc,AAL,10.76,2025-09-13
-JETS,U.S. Global Jets ETF,Delta Air Lines Inc,DAL,10.69,2025-09-13
-JETS,U.S. Global Jets ETF,United Airlines Holdings Inc,UAL,10.53,2025-09-13
-JETS,U.S. Global Jets ETF,Sun Country Airlines Holdings Inc,SNCY,3.02,2025-09-13
-JETS,U.S. Global Jets ETF,Air Canada,AC CN,3.01,2025-09-13
-JETS,U.S. Global Jets ETF,Allegiant Travel Co,ALGT,3.01,2025-09-13
-JETS,U.S. Global Jets ETF,Alaska Air Group Inc,ALK,2.99,2025-09-13
-JETS,U.S. Global Jets ETF,Skywest Inc,SKYW,2.97,2025-09-13
-JETS,U.S. Global Jets ETF,Jetblue Airways Corp,JBLU,2.93,2025-09-13
-KIE,SPDR S&P Insurance ETF,Oscar Health Inc   Class A,OSCR,2.54,2025-09-13
-KIE,SPDR S&P Insurance ETF,Lincoln National Corp,LNC,2.36,2025-09-13
-KIE,SPDR S&P Insurance ETF,Genworth Financial Inc,GNW,2.35,2025-09-13
-KIE,SPDR S&P Insurance ETF,Mercury General Corp,MCY,2.25,2025-09-13
-KIE,SPDR S&P Insurance ETF,Globe Life Inc,GL,2.2,2025-09-13
-KIE,SPDR S&P Insurance ETF,Lemonade Inc,LMND,2.2,2025-09-13
-KIE,SPDR S&P Insurance ETF,First American Financial,FAF,2.15,2025-09-13
-KIE,SPDR S&P Insurance ETF,Willis Towers Watson Plc,WTW,2.13,2025-09-13
-KIE,SPDR S&P Insurance ETF,American Financial Group Inc,AFG,2.11,2025-09-13
-KIE,SPDR S&P Insurance ETF,Loews Corp,L,2.05,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Citizens Financial Group,CFG,2.76,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Regions Financial Corp,RF,2.68,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Western Alliance Bancorp,WAL,2.66,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Zions Bancorp Na,ZION,2.63,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,East West Bancorp Inc,EWBC,2.58,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Valley National Bancorp,VLY,2.54,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Webster Financial Corp,WBS,2.54,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Southstate Bank Corp,SSB,2.52,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,First Horizon Corp,FHN,2.5,2025-09-13
-KRE,SPDR S&P Regional Banking ETF,Truist Financial Corp,TFC,2.49,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Tencent Holdings Ltd,700,10.69,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Alibaba Group Holding Ltd,9988,9.72,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Pdd Holdings Inc,PDD,7.47,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Jd Health,6618,5.14,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Jd.com Inc-class A,9618,5.13,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Tencent Musi-adr,TME,4.73,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Kanzhun Ltd - Adr,BZ,4.61,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Meituan-class B,3690,4.61,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Baidu Inc-class A,9888,4.34,2025-09-13
-KWEB,KraneShares CSI China Internet ETF,Kuaishou Technology,1024,4.3,2025-09-13
-MAGS,Magnificent Seven ETF,United States Treasury Bill 10/16/2025,912797QF7,53.49,2025-09-13
-MAGS,Magnificent Seven ETF,Nvidia Corp Swap,67066G104 TRS 071426 NM,8.32,2025-09-13
-MAGS,Magnificent Seven ETF,Alphabet Inc-cl A Swap,02079K305 TRS 071426 NM,8.15,2025-09-13
-MAGS,Magnificent Seven ETF,Tesla Inc Swap,88160R101 TRS 071426 NM,7.8,2025-09-13
-MAGS,Magnificent Seven ETF,Microsoft Corp Swap,594918104 TRS 071426 NM,7.37,2025-09-13
-MAGS,Magnificent Seven ETF,Alphabet Inc,GOOGL,6.82,2025-09-13
-MAGS,Magnificent Seven ETF,Meta Platforms Inc-class A Swap,30303M102 TRS 071426 NM,6.38,2025-09-13
-MAGS,Magnificent Seven ETF,Amazon.com Inc Swap,023135106 TRS 071426 NM,6.37,2025-09-13
-MAGS,Magnificent Seven ETF,Apple Inc Swap,037833100 TRS 071426 NM,6.02,2025-09-13
-MAGS,Magnificent Seven ETF,Apple Inc,AAPL,5.56,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Nomura,"""NaN""",60.78,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Curaleaf Holdings Inc Swap,CURLF,22.66,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Trulieve Cannabis Swap,TCNNF,22.02,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Green Thumb Industries Swap,GTBIF,22.01,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Blackrock Treasury Trust Instl 62,"""NaN""",14.36,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Nbc,"""NaN""",12.83,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Cf Secured,"""NaN""",7.72,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Cresco Labs Inc Swap,CRLBF,6.01,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Verano Holdings Corp Swap,VRNOF,6.0,2025-09-13
-MSOS,AdvisorShares Pure US Cannabis ETF,Glass House Brands Swap,GLASF,5.95,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Cameco Corp,CCJ,10.23,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Constellation Energy,CEG,8.02,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Centrus Energy Corp-class A,LEU,4.08,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Oklo Inc,OKLO,3.96,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Ge Vernova Inc,GEV,3.84,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Nuscale Power Corp,SMR,2.93,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Rolls-royce Holdings Plc,RR/ LN,2.93,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Asp Isotopes Inc,ASPI,2.81,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Vistra Corp,VST,2.67,2025-09-13
-NUKZ,Range Nuclear Renaissance Index ETF,Samsung C&t Corp,028260 KS,2.64,2025-09-13
-OIH,VanEck Oil Services ETF,Schlumberger Nv,SLB US,22.56,2025-09-13
-OIH,VanEck Oil Services ETF,Baker Hughes Co,BKR US,15.37,2025-09-13
-OIH,VanEck Oil Services ETF,Halliburton Co,HAL US,6.88,2025-09-13
-OIH,VanEck Oil Services ETF,Technipfmc Plc,FTI US,5.67,2025-09-13
-OIH,VanEck Oil Services ETF,Tenaris Sa,TS US,4.61,2025-09-13
-OIH,VanEck Oil Services ETF,Weatherford International Plc,WFRD US,4.43,2025-09-13
-OIH,VanEck Oil Services ETF,Noble Corp Plc,NE US,4.4,2025-09-13
-OIH,VanEck Oil Services ETF,Nov Inc,NOV US,4.14,2025-09-13
-OIH,VanEck Oil Services ETF,Valaris Ltd,VAL US,4.08,2025-09-13
-OIH,VanEck Oil Services ETF,Tidewater Inc,TDW US,3.63,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Applovin Corp-class A,APP,1.68,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Warner Bros Discovery Inc,WBD,1.47,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Broadcom Inc,AVGO,1.37,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Shopify Inc - Class A,SHOP,1.3,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Lam Research Corp,LRCX,1.22,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Pdd Holdings Inc,PDD,1.19,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Idexx Laboratories Inc,IDXX,1.18,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Nvidia Corp,NVDA,1.18,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Advanced Micro Devices,AMD,1.16,2025-09-13
-QQQE,NASDAQ-100 Equal Weighted Index Shares,Micron Technology Inc,MU,1.16,2025-09-13
-QTUM,Defiance Quantum ETF,Mongodb Inc,MDB,1.86,2025-09-13
-QTUM,Defiance Quantum ETF,Tower Semiconductor Ltd,TSEM,1.85,2025-09-13
-QTUM,Defiance Quantum ETF,Synopsys Inc,SNPS,1.81,2025-09-13
-QTUM,Defiance Quantum ETF,Teradyne Inc,TER,1.67,2025-09-13
-QTUM,Defiance Quantum ETF,Alchip Technologies Ltd,3661 TT,1.63,2025-09-13
-QTUM,Defiance Quantum ETF,Rigetti Computing Inc,RGTI,1.61,2025-09-13
-QTUM,Defiance Quantum ETF,Alphabet Inc,GOOGL,1.6,2025-09-13
-QTUM,Defiance Quantum ETF,Broadcom Inc,AVGO,1.6,2025-09-13
-QTUM,Defiance Quantum ETF,Oracle Corp,ORCL,1.59,2025-09-13
-QTUM,Defiance Quantum ETF,Hewlett Packard Enterprise Co,HPE,1.56,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,China Northern Rare Earth Group High-te,600111 C1,10.66,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Mp Materials Corp,MP US,9.97,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Lynas Rare Earths Ltd,LYC AU,8.04,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Albemarle Corp,ALB US,6.15,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Sociedad Quimica Y Minera De Chile Sa,SQM US,5.46,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Pilbara Minerals Ltd,PLS AU,5.31,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Shenghe Resources Holding Co Ltd,600392 C1,5.0,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Ganfeng Lithium Group Co Ltd,1772 HK,4.92,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Jinduicheng Molybdenum Co Ltd,601958 C1,4.9,2025-09-13
-REMX,VanEck Rare Earth and Strategic Metals ETF,Iperionx Ltd,IPX AU,4.72,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Oracle Corp,ORCL ,0.33,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Western Digital Corp,WDC ,0.33,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Arista Networks Inc,ANET ,0.31,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Seagate Technology Holdings Plc,STX ,0.29,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Warner Bros Discovery Inc,WBD ,0.29,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Corning Inc,GLW ,0.28,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Invesco Ltd,IVZ ,0.28,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Newmont Corp,NEM ,0.28,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Broadcom Inc,AVGO ,0.27,2025-09-13
-RSP,Invesco S&P 500 Equal Weight ETF,Dr Horton Inc,DHI ,0.27,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Warner Bros Discovery Inc,WBD ,6.19,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Paramount Skydance Corp,PSKY ,5.74,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Tko Group Holdings Inc,TKO ,4.93,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Live Nation Entertainment Inc,LYV ,4.88,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Match Group Inc,MTCH ,4.85,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Electronic Arts Inc,EA ,4.63,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Interpublic Group Of Cos Inc/the,IPG ,4.52,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Meta Platforms Inc,META ,4.35,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Omnicom Group Inc,OMC ,4.27,2025-09-13
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,New York Times Co/the,NYT ,4.23,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Dr Horton Inc,DHI ,2.51,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Wynn Resorts Ltd,WYNN ,2.45,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Norwegian Cruise Line Holdings Ltd,NCLH ,2.44,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Carnival Corp,CCL ,2.35,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Pultegroup Inc,PHM ,2.32,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Mohawk Industries Inc,MHK ,2.31,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Las Vegas Sands Corp,LVS ,2.26,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Royal Caribbean Cruises Ltd,RCL ,2.26,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tapestry Inc,TPR ,2.26,2025-09-13
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Williams-sonoma Inc,WSM ,2.26,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Invesco Ltd,IVZ ,1.86,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Blackstone Inc,BX ,1.62,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Coinbase Global Inc,COIN ,1.61,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Citigroup Inc,C ,1.57,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Goldman Sachs Group Inc/the,GS ,1.56,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Citizens Financial Group Inc,CFG ,1.55,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Synchrony Financial,SYF ,1.53,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Regions Financial Corp,RF ,1.51,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Globe Life Inc,GL ,1.48,2025-09-13
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Morgan Stanley,MS ,1.48,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Baker Hughes Co,BKR ,5.61,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Valero Energy Corp,VLO ,5.48,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Apa Corp,APA ,5.46,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Marathon Petroleum Corp,MPC ,5.16,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Phillips 66,PSX ,5.1,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Chevron Corp,CVX ,5.09,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Occidental Petroleum Corp,OXY ,4.78,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Devon Energy Corp,DVN ,4.77,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Exxon Mobil Corp,XOM ,4.77,2025-09-13
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Conocophillips,COP ,4.7,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Incyte Corp,INCY ,2.04,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Idexx Laboratories Inc,IDXX ,2.01,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Humana Inc,HUM ,1.97,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Iqvia Holdings Inc,IQV ,1.96,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Thermo Fisher Scientific Inc,TMO ,1.94,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,West Pharmaceutical Services Inc,WST ,1.93,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbvie Inc,ABBV ,1.88,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Johnson & Johnson,JNJ ,1.88,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Cvs Health Corp,CVS ,1.86,2025-09-13
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Unitedhealth Group Inc,UNH ,1.86,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Newmont Corp,NEM ,5.56,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Nucor Corp,NUE ,4.57,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Martin Marietta Materials Inc,MLM ,4.3,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Vulcan Materials Co,VMC ,4.3,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Albemarle Corp,ALB ,4.27,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Dupont De Nemours Inc,DD ,4.18,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Packaging Corp Of America,PKG ,4.18,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Freeport-mcmoran Inc,FCX ,4.17,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Smurfit Westrock Plc,SW ,3.92,2025-09-13
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Air Products And Chemicals Inc,APD ,3.89,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Generac Holdings Inc,GNRC ,1.73,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Ch Robinson Worldwide Inc,CHRW ,1.66,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,United Airlines Holdings Inc,UAL ,1.66,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,United Rentals Inc,URI ,1.59,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Ge Vernova Inc,GEV ,1.57,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Allegion Plc,ALLE ,1.53,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Builders Firstsource Inc,BLDR ,1.53,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Cummins Inc,CMI ,1.52,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Leidos Holdings Inc,LDOS ,1.52,2025-09-13
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Delta Air Lines Inc,DAL ,1.47,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Cbre Group Inc,CBRE ,3.94,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Alexandria Real Estate Equities Inc,ARE ,3.68,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Simon Property Group Inc,SPG ,3.66,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Welltower Inc,WELL ,3.57,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Host Hotels & Resorts Inc,HST ,3.52,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Ventas Inc,VTR ,3.48,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Kimco Realty Corp,KIM ,3.4,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Costar Group Inc,CSGP ,3.39,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Prologis Inc,PLD ,3.37,2025-09-13
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Federal Realty Investment Trust,FRT ,3.36,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Archer-daniels-midland Co,ADM ,3.43,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Estee Lauder Cos Inc/the,EL ,3.37,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,J M Smucker Co/the,SJM ,3.14,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Altria Group Inc,MO ,3.01,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Pepsico Inc,PEP ,3.01,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Hershey Co/the,HSY ,3.0,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Bunge Global Sa,BG ,2.95,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Sysco Corp,SYY ,2.94,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Walmart Inc,WMT ,2.91,2025-09-13
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Dollar Tree Inc,DLTR ,2.86,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Oracle Corp,ORCL ,2.35,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Western Digital Corp,WDC ,2.32,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Arista Networks Inc,ANET ,2.18,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Seagate Technology Holdings Plc,STX ,2.09,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Corning Inc,GLW ,2.01,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Broadcom Inc,AVGO ,1.91,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Hewlett Packard Enterprise Co,HPE ,1.83,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Teradyne Inc,TER ,1.79,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Micron Technology Inc,MU ,1.74,2025-09-13
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Advanced Micro Devices Inc,AMD ,1.73,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Vistra Corp,VST ,3.73,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Edison International,EIX ,3.45,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Aes Corp/the,AES ,3.41,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Sempra,SRE ,3.35,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Atmos Energy Corp,ATO ,3.33,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Entergy Corp,ETR ,3.33,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Pg&e Corp,PCG ,3.33,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Constellation Energy Corp,CEG ,3.32,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Firstenergy Corp,FE ,3.31,2025-09-13
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Dominion Energy Inc,D ,3.29,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Prologis Reit Inc,PLD,7.76,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Welltower Inc,WELL,7.62,2025-09-13
-SCHH,Schwab U.S. REIT ETF,American Tower Reit Corp,AMT,6.7,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Simon Property Group Reit Inc,SPG,4.23,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Digital Realty Trust Reit Inc,DLR,4.15,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Realty Income Reit Corp,O,4.08,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Equinix Reit Inc,EQIX,3.84,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Public Storage Reit,PSA,3.49,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Crown Castle Inc,CCI,3.12,2025-09-13
-SCHH,Schwab U.S. REIT ETF,Vici Pptys Inc,VICI,2.63,2025-09-13
-SIL,Silver Miners ETF,Wheaton Precious,WPM,19.73,2025-09-13
-SIL,Silver Miners ETF,Pan American Silver Corp,PAAS,12.72,2025-09-13
-SIL,Silver Miners ETF,Coeur Mining Inc,CDE,7.92,2025-09-13
-SIL,Silver Miners ETF,Or Royalties Inc,OR CN,6.52,2025-09-13
-SIL,Silver Miners ETF,Industrias Penol,PE&OLES* MM,6.14,2025-09-13
-SIL,Silver Miners ETF,Fresnillo Plc,FRES LN,5.62,2025-09-13
-SIL,Silver Miners ETF,Hecla Mining Co,HL,5.1,2025-09-13
-SIL,Silver Miners ETF,Ssr Mining Inc,SSRM,4.7,2025-09-13
-SIL,Silver Miners ETF,Korea Zinc Co Ltd,010130 KS,4.54,2025-09-13
-SIL,Silver Miners ETF,First Majestic S,AG CN,4.44,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Nvidia Corp,NVDA,7.72,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Microsoft Corp,MSFT,6.65,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Apple Inc,AAPL,6.14,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Amazon.com Inc,AMZN,3.88,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Broadcom Inc,AVGO,3.02,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Meta Platforms Inc Class A,META,2.91,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl A,GOOGL,2.5,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl C,GOOG,2.02,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Tesla Inc,TSLA,1.85,2025-09-13
-SPY,SPDR S&P 500 ETF Trust,Berkshire Hathaway Inc Cl B,BRK.B,1.63,2025-09-13
-TAN,Invesco Solar ETF,First Solar Inc,FSLR ,9.66,2025-09-13
-TAN,Invesco Solar ETF,Nextracker Inc,NXT ,9.25,2025-09-13
-TAN,Invesco Solar ETF,Gcl Technology Holdings Ltd,3800 HK,7.9,2025-09-13
-TAN,Invesco Solar ETF,Enphase Energy Inc,ENPH ,6.81,2025-09-13
-TAN,Invesco Solar ETF,Sunrun Inc,RUN ,6.44,2025-09-13
-TAN,Invesco Solar ETF,Xinyi Solar Holdings Ltd,968 HK,5.22,2025-09-13
-TAN,Invesco Solar ETF,Enlight Renewable Energy Ltd,ENLT ,5.03,2025-09-13
-TAN,Invesco Solar ETF,Ha Sustainable Infrastructure Capital Inc,HASI ,3.97,2025-09-13
-TAN,Invesco Solar ETF,Daqo New Energy Corp Adr,DQ ,3.81,2025-09-13
-TAN,Invesco Solar ETF,Solaredge Technologies Inc,SEDG ,3.62,2025-09-13
-URNM,Sprott Uranium Miners ETF,Cameco Corp.,CCJ,17.59,2025-09-13
-URNM,Sprott Uranium Miners ETF,Nac Kazatomprom Jsc,KAP LI,13.14,2025-09-13
-URNM,Sprott Uranium Miners ETF,Sprott Physical Uranium Trust,U-U CN,10.33,2025-09-13
-URNM,Sprott Uranium Miners ETF,Energy Fuels Inc.,UUUU,8.39,2025-09-13
-URNM,Sprott Uranium Miners ETF,Uranium Energy Corp.,UEC,6.58,2025-09-13
-URNM,Sprott Uranium Miners ETF,Cgn Mining Co. Ltd.,1164 HK,5.32,2025-09-13
-URNM,Sprott Uranium Miners ETF,Denison Mines Corp.,DNN,4.98,2025-09-13
-URNM,Sprott Uranium Miners ETF,Deep Yellow Ltd.,DYL AU,4.95,2025-09-13
-URNM,Sprott Uranium Miners ETF,Nexgen Energy Ltd.,NXE,4.84,2025-09-13
-URNM,Sprott Uranium Miners ETF,Paladin Energy Ltd.,PDN AU,3.68,2025-09-13
-VNM,VanEck Vietnam ETF,Vinhomes Jsc,VHM VN,7.98,2025-09-13
-VNM,VanEck Vietnam ETF,Vingroup Jsc,VIC VN,7.81,2025-09-13
-VNM,VanEck Vietnam ETF,Ssi Securities Corp,SSI VN,6.97,2025-09-13
-VNM,VanEck Vietnam ETF,Hoa Phat Group Jsc,HPG VN,6.76,2025-09-13
-VNM,VanEck Vietnam ETF,Vix Securities Jsc,VIX VN,6.71,2025-09-13
-VNM,VanEck Vietnam ETF,Bank For Foreign Trade Of Vietnam Jsc,VCB VN,5.22,2025-09-13
-VNM,VanEck Vietnam ETF,Vietnam Dairy Products Jsc,VNM VN,5.11,2025-09-13
-VNM,VanEck Vietnam ETF,Masan Group Corp,MSN VN,4.1,2025-09-13
-VNM,VanEck Vietnam ETF,Vndirect Securities Corp,VND VN,3.91,2025-09-13
-VNM,VanEck Vietnam ETF,Vietcap Securities Jsc,VCI VN,3.14,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Iren Ltd,IREN,20.96,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Cipher Mining Inc,CIFR,13.96,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Terawulf Inc,WULF,7.43,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Riot Platforms Inc,RIOT,7.39,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Bitfarms Ltd/canada,BITF,6.52,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Applied Digital Corp,APLD,4.94,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Hut 8 Corp,HUT,4.94,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Hive Digital Technologies Ltd,HIVE,4.82,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Core Scientific Inc,CORZ,4.77,2025-09-13
-WGMI,CoinShares Bitcoin Mining ETF,Cleanspark Inc,CLSK,4.41,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Rocket Lab Corp,RKLB,5.56,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Kratos Defense + Security,KTOS,5.26,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Aerovironment Inc,AVAV,4.01,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Bwx Technologies Inc,BWXT,3.93,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Huntington Ingalls Industrie,HII,3.83,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,General Dynamics Corp,GD,3.75,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Northrop Grumman Corp,NOC,3.75,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,General Electric,GE,3.6,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,L3harris Technologies Inc,LHX,3.57,2025-09-13
-XAR,SPDR S&P Aerospace & Defense ETF,Hexcel Corp,HXL,3.49,2025-09-13
-XBI,SPDR S&P Biotech ETF,Alnylam Pharmaceuticals Inc,ALNY,3.43,2025-09-13
-XBI,SPDR S&P Biotech ETF,Insmed Inc,INSM,3.25,2025-09-13
-XBI,SPDR S&P Biotech ETF,United Therapeutics Corp,UTHR,3.2,2025-09-13
-XBI,SPDR S&P Biotech ETF,Halozyme Therapeutics Inc,HALO,3.14,2025-09-13
-XBI,SPDR S&P Biotech ETF,Incyte Corp,INCY,2.73,2025-09-13
-XBI,SPDR S&P Biotech ETF,Neurocrine Biosciences Inc,NBIX,2.53,2025-09-13
-XBI,SPDR S&P Biotech ETF,Abbvie Inc,ABBV,2.51,2025-09-13
-XBI,SPDR S&P Biotech ETF,Madrigal Pharmaceuticals Inc,MDGL,2.45,2025-09-13
-XBI,SPDR S&P Biotech ETF,Biogen Inc,BIIB,2.44,2025-09-13
-XBI,SPDR S&P Biotech ETF,Regeneron Pharmaceuticals,REGN,2.39,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Installed Building Products,IBP,4.38,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Dr Horton Inc,DHI,3.99,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Topbuild Corp,BLD,3.85,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Toll Brothers Inc,TOL,3.69,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Pultegroup Inc,PHM,3.68,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Somnigroup International Inc,SGI,3.63,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Williams Sonoma Inc,WSM,3.59,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Allegion Plc,ALLE,3.53,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Builders Firstsource Inc,BLDR,3.52,2025-09-13
-XHB,SPDR S&P Homebuilders ETF,Kb Home,KBH,3.47,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Hf Sinclair Corp,DINO,3.96,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Valero Energy Corp,VLO,3.48,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Apa Corp,APA,3.47,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Marathon Petroleum Corp,MPC,3.27,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Phillips 66,PSX,3.24,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Chevron Corp,CVX,3.23,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Ovintiv Inc,OVV,3.09,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Chord Energy Corp,CHRD,3.05,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Occidental Petroleum Corp,OXY,3.04,2025-09-13
-XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Devon Energy Corp,DVN,3.03,2025-09-13
-XRT,SPDR S&P Retail ETF,American Eagle Outfitters,AEO,2.41,2025-09-13
-XRT,SPDR S&P Retail ETF,Kohls Corp,KSS,2.28,2025-09-13
-XRT,SPDR S&P Retail ETF,Sally Beauty Holdings Inc,SBH,2.07,2025-09-13
-XRT,SPDR S&P Retail ETF,Realreal Inc/the,REAL,1.93,2025-09-13
-XRT,SPDR S&P Retail ETF,Build A Bear Workshop Inc,BBW,1.88,2025-09-13
-XRT,SPDR S&P Retail ETF,Dillards Inc Cl A,DDS,1.81,2025-09-13
-XRT,SPDR S&P Retail ETF,Macy S Inc,M,1.78,2025-09-13
-XRT,SPDR S&P Retail ETF,Buckle Inc/the,BKE,1.75,2025-09-13
-XRT,SPDR S&P Retail ETF,Grocery Outlet Holding Corp,GO,1.66,2025-09-13
-XRT,SPDR S&P Retail ETF,Victoria S Secret + Co,VSCO,1.6,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Astera Labs Inc,ALAB,5.85,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Credo Technology Group Holdi,CRDO,5.28,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Impinj Inc,PI,3.92,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Ambarella Inc,AMBA,3.65,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Semtech Corp,SMTC,3.45,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Rambus Inc,RMBS,3.43,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Broadcom Inc,AVGO,3.38,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Rigetti Computing Inc,RGTI,3.16,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Micron Technology Inc,MU,3.08,2025-09-13
-XSD,SPDR S&P Semiconductor ETF,Lattice Semiconductor Corp,LSCC,3.07,2025-09-13
+ARKF,ARK Fintech innovation ETF,Shopify Inc - Class A,SHOP,10.07,2025-09-23
+ARKF,ARK Fintech innovation ETF,Coinbase Global Inc -class A,COIN,6.38,2025-09-23
+ARKF,ARK Fintech innovation ETF,Robinhood Markets Inc - A,HOOD,5.12,2025-09-23
+ARKF,ARK Fintech innovation ETF,Sofi Technologies Inc,SOFI,4.54,2025-09-23
+ARKF,ARK Fintech innovation ETF,Roblox Corp -class A,RBLX,4.38,2025-09-23
+ARKF,ARK Fintech innovation ETF,Palantir Technologies Inc-a,PLTR,4.26,2025-09-23
+ARKF,ARK Fintech innovation ETF,Ark Bitcoin Etf Holdco (arkf),"""NaN""",4.24,2025-09-23
+ARKF,ARK Fintech innovation ETF,Toast Inc-class A,TOST,3.96,2025-09-23
+ARKF,ARK Fintech innovation ETF,Circle Internet Group Inc,CRCL,3.68,2025-09-23
+ARKF,ARK Fintech innovation ETF,Bitmine Immersion Technologi,BMNR,3.04,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Tempus Ai Inc,TEM,11.2,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Crispr Therapeutics Ag,CRSP,9.53,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Twist Bioscience Corp,TWST,5.02,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Recursion Pharmaceuticals-a,RXRX,4.88,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Natera Inc,NTRA,4.38,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Personalis Inc,PSNL,4.26,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Guardant Health Inc,GH,4.18,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Beam Therapeutics Inc,BEAM,4.13,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Intellia Therapeutics Inc,NTLA,4.12,2025-09-23
+ARKG,ARK Genomic Revolution ETF,Adaptive Biotechnologies,ADPT,3.87,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Kratos Defense & Security,KTOS,10.43,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Rocket Lab,RKLB UQ,9.18,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Aerovironment Inc,AVAV,7.91,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Teradyne Inc,TER,6.4,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,L3harris Technologies Inc,LHX,6.32,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Palantir Technologies Inc-a,PLTR,5.72,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Archer Aviation Inc-a,ACHR,5.5,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Trimble Inc,TRMB,4.49,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Iridium Communications Inc,IRDM,4.45,2025-09-23
+ARKX,ARK Space Exploration & Innovation ETF,Amazon.com Inc,AMZN,3.46,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Nvidia Corp,NVDA,11.06,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Abb Ltd-reg,ABBN SW,8.84,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Fanuc Corp,6954 JP,6.68,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Keyence Corp,6861 JP,6.32,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Intuitive Surgical Inc,ISRG,5.64,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Daifuku Co Ltd,6383 JP,4.47,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Pegasystems Inc,PEGA,3.8,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Dynatrace Inc,DT,3.51,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Smc Corp,6273 JP,3.15,2025-09-23
+BOTZ,Robotics & Artificial Intelligence ETF,Cognex Corp,CGNX,2.93,2025-09-23
+COPX,Copper Miners ETF,Zijin Mining-h,2899 HK,5.46,2025-09-23
+COPX,Copper Miners ETF,First Quantum,FM CN,5.25,2025-09-23
+COPX,Copper Miners ETF,Hudbay Minerals Inc,HBM CN,5.25,2025-09-23
+COPX,Copper Miners ETF,Lundin Mining Corp,LUN CN,5.1,2025-09-23
+COPX,Copper Miners ETF,Antofagasta Plc,ANTO LN,4.91,2025-09-23
+COPX,Copper Miners ETF,Sumitomo Met Min,5713 JP,4.61,2025-09-23
+COPX,Copper Miners ETF,Freeport-mcmoran Inc,FCX,4.35,2025-09-23
+COPX,Copper Miners ETF,Southern Copper Corp,SCCO,4.2,2025-09-23
+COPX,Copper Miners ETF,Boliden Ab,BOL SS,4.04,2025-09-23
+COPX,Copper Miners ETF,Glencore Plc,GLEN LN,4.0,2025-09-23
+EWJ,iShares MSCI Japan ETF,Toyota Motor Corp,7203,4.28,2025-09-23
+EWJ,iShares MSCI Japan ETF,Mitsubishi Ufj Financial Group Inc,8306,4.15,2025-09-23
+EWJ,iShares MSCI Japan ETF,Sony Group Corp,6758,4.1,2025-09-23
+EWJ,iShares MSCI Japan ETF,Hitachi Ltd,6501,2.73,2025-09-23
+EWJ,iShares MSCI Japan ETF,Softbank Group Corp,9984,2.71,2025-09-23
+EWJ,iShares MSCI Japan ETF,Sumitomo Mitsui Financial Group In,8316,2.36,2025-09-23
+EWJ,iShares MSCI Japan ETF,Nintendo Ltd,7974,2.18,2025-09-23
+EWJ,iShares MSCI Japan ETF,Mizuho Financial Group Inc,8411,1.88,2025-09-23
+EWJ,iShares MSCI Japan ETF,Mitsubishi Heavy Industries Ltd,7011,1.83,2025-09-23
+EWJ,iShares MSCI Japan ETF,Tokio Marine Holdings Inc,8766,1.79,2025-09-23
+EWY,iShares MSCI South Korea ETF,Samsung Electronics Ltd,005930,22.38,2025-09-23
+EWY,iShares MSCI South Korea ETF,Sk Hynix Inc,000660,13.18,2025-09-23
+EWY,iShares MSCI South Korea ETF,Kb Financial Group Inc,105560,3.03,2025-09-23
+EWY,iShares MSCI South Korea ETF,Hanwha Aerospace Ltd,012450,2.48,2025-09-23
+EWY,iShares MSCI South Korea ETF,Naver Corp,035420,2.32,2025-09-23
+EWY,iShares MSCI South Korea ETF,Shinhan Financial Group Ltd,055550,2.11,2025-09-23
+EWY,iShares MSCI South Korea ETF,Hyundai Motor,005380,2.04,2025-09-23
+EWY,iShares MSCI South Korea ETF,Doosan Enerbility Ltd,034020,1.96,2025-09-23
+EWY,iShares MSCI South Korea ETF,Celltrion Inc,068270,1.95,2025-09-23
+EWY,iShares MSCI South Korea ETF,Hana Financial Group Inc,086790,1.85,2025-09-23
+FXI,iShares China Large-Cap ETF,Alibaba Group Holding Ltd,9988,9.34,2025-09-23
+FXI,iShares China Large-Cap ETF,Tencent Holdings Ltd,700,8.85,2025-09-23
+FXI,iShares China Large-Cap ETF,Xiaomi Corp,1810,8.66,2025-09-23
+FXI,iShares China Large-Cap ETF,China Construction Bank Corp H,939,6.49,2025-09-23
+FXI,iShares China Large-Cap ETF,Meituan,3690,5.02,2025-09-23
+FXI,iShares China Large-Cap ETF,Industrial And Commercial Bank Of,1398,4.35,2025-09-23
+FXI,iShares China Large-Cap ETF,Byd Company-100 Ltd H,1211,4.11,2025-09-23
+FXI,iShares China Large-Cap ETF,Netease Inc,9999,4.1,2025-09-23
+FXI,iShares China Large-Cap ETF,Trip.com Group Ltd,9961,3.79,2025-09-23
+FXI,iShares China Large-Cap ETF,Jd.com Class A Inc,9618,3.62,2025-09-23
+GDX,VanEck Gold Miners ETF,Newmont Corp,NEM US,13.07,2025-09-23
+GDX,VanEck Gold Miners ETF,Agnico Eagle Mines Ltd,AEM US,11.56,2025-09-23
+GDX,VanEck Gold Miners ETF,Barrick Mining Corp,B US,7.59,2025-09-23
+GDX,VanEck Gold Miners ETF,Wheaton Precious Metals Corp,WPM US,7.16,2025-09-23
+GDX,VanEck Gold Miners ETF,Franco-nevada Corp,FNV US,5.72,2025-09-23
+GDX,VanEck Gold Miners ETF,Gold Fields Ltd,GFI US,4.95,2025-09-23
+GDX,VanEck Gold Miners ETF,Anglogold Ashanti Plc,AU US,4.55,2025-09-23
+GDX,VanEck Gold Miners ETF,Kinross Gold Corp,KGC US,4.21,2025-09-23
+GDX,VanEck Gold Miners ETF,Zijin Mining Group Co Ltd,2899 HK,3.32,2025-09-23
+GDX,VanEck Gold Miners ETF,Northern Star Resources Ltd,NST AU,2.86,2025-09-23
+HACK,Amplify Cybersecurity ETF,Broadcom Inc,AVGO,9.27,2025-09-23
+HACK,Amplify Cybersecurity ETF,Crowdstrike Holdings Inc,CRWD,6.05,2025-09-23
+HACK,Amplify Cybersecurity ETF,Cisco Systems Inc,CSCO,6.0,2025-09-23
+HACK,Amplify Cybersecurity ETF,Palo Alto Networks Inc,PANW,5.86,2025-09-23
+HACK,Amplify Cybersecurity ETF,Cloudflare Inc,NET,5.04,2025-09-23
+HACK,Amplify Cybersecurity ETF,General Dynamics Corp,GD,4.95,2025-09-23
+HACK,Amplify Cybersecurity ETF,Fortinet Inc,FTNT,4.89,2025-09-23
+HACK,Amplify Cybersecurity ETF,Northrop Grumman Corp,NOC,4.79,2025-09-23
+HACK,Amplify Cybersecurity ETF,Cyberark Software Ltd,CYBR,4.43,2025-09-23
+HACK,Amplify Cybersecurity ETF,Zscaler Inc,ZS,4.39,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Palantir Technologies Inc Class A,PLTR,8.86,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Microsoft Corp,MSFT,8.38,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Oracle Corp,ORCL,7.61,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Salesforce Inc,CRM,7.11,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Servicenow Inc,NOW,6.02,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Intuit Inc,INTU,5.77,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Applovin Corp Class A,APP,4.87,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Adobe Inc,ADBE,4.48,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Palo Alto Networks Inc,PANW,4.23,2025-09-23
+IGV,iShares Expanded Tech-Software Sector ETF,Crowdstrike Holdings Inc Class A,CRWD,3.81,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Unitedhealth Group Inc,UNH,21.84,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Cvs Health Corp,CVS,12.11,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Cigna,CI,9.88,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Elevance Health Inc,ELV,4.6,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Hca Healthcare Inc,HCA,4.59,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Veeva Systems Inc Class A,VEEV,4.55,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Humana Inc,HUM,4.16,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Labcorp Holdings Inc,LH,3.81,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Quest Diagnostics Inc,DGX,3.39,2025-09-23
+IHF,iShares U.S. Healthcare Providers ETF,Tenet Healthcare Corp,THC,2.78,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Abbott Laboratories,ABT,19.51,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Intuitive Surgical Inc,ISRG,12.96,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Boston Scientific Corp,BSX,11.95,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Idexx Laboratories Inc,IDXX,4.67,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Medtronic Plc,MDT,4.67,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Resmed Inc,RMD,4.58,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Becton Dickinson,BDX,4.5,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Stryker Corp,SYK,4.46,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Edwards Lifesciences Corp,EW,4.31,2025-09-23
+IHI,iShares U.S. Medical Devices ETF,Ge Healthcare Technologies Inc,GEHC,4.11,2025-09-23
+INDA,iShares MSCI India ETF,Hdfc Bank Ltd,HDFCBANK,8.1,2025-09-23
+INDA,iShares MSCI India ETF,Reliance Industries Ltd,RELIANCE,6.33,2025-09-23
+INDA,iShares MSCI India ETF,Icici Bank Ltd,ICICIBANK,5.47,2025-09-23
+INDA,iShares MSCI India ETF,Infosys Ltd,INFY,3.78,2025-09-23
+INDA,iShares MSCI India ETF,Bharti Airtel Ltd,BHARTIARTL,3.72,2025-09-23
+INDA,iShares MSCI India ETF,Blk Csh Fnd Treasury Sl Agency,XTSLA,3.01,2025-09-23
+INDA,iShares MSCI India ETF,Mahindra And Mahindra Ltd,M&M,2.47,2025-09-23
+INDA,iShares MSCI India ETF,Tata Consultancy Services Ltd,TCS,2.12,2025-09-23
+INDA,iShares MSCI India ETF,Bajaj Finance Ltd,BAJFINANCE,2.05,2025-09-23
+INDA,iShares MSCI India ETF,Axis Bank Ltd,AXISBANK,1.92,2025-09-23
+IWM,iShares Russell 2000 ETF,Credo Technology Group Holding Ltd,CRDO,0.88,2025-09-23
+IWM,iShares Russell 2000 ETF,Ionq Inc,IONQ,0.68,2025-09-23
+IWM,iShares Russell 2000 ETF,Bloom Energy Class A Corp,BE,0.64,2025-09-23
+IWM,iShares Russell 2000 ETF,Oklo Inc Class A,OKLO,0.51,2025-09-23
+IWM,iShares Russell 2000 ETF,Fabrinet,FN,0.48,2025-09-23
+IWM,iShares Russell 2000 ETF,Kratos Defense And Security Soluti,KTOS,0.47,2025-09-23
+IWM,iShares Russell 2000 ETF,Coeur Mining Inc,CDE,0.39,2025-09-23
+IWM,iShares Russell 2000 ETF,Hims Hers Health Inc Class A,HIMS,0.39,2025-09-23
+IWM,iShares Russell 2000 ETF,Rambus Inc,RMBS,0.39,2025-09-23
+IWM,iShares Russell 2000 ETF,Sterling Infrastructure Inc,STRL,0.38,2025-09-23
+JETS,U.S. Global Jets ETF,Southwest Airlines Co,LUV,10.78,2025-09-23
+JETS,U.S. Global Jets ETF,American Airlines Group Inc,AAL,10.76,2025-09-23
+JETS,U.S. Global Jets ETF,Delta Air Lines Inc,DAL,10.69,2025-09-23
+JETS,U.S. Global Jets ETF,United Airlines Holdings Inc,UAL,10.53,2025-09-23
+JETS,U.S. Global Jets ETF,Sun Country Airlines Holdings Inc,SNCY,3.02,2025-09-23
+JETS,U.S. Global Jets ETF,Air Canada,AC CN,3.01,2025-09-23
+JETS,U.S. Global Jets ETF,Allegiant Travel Co,ALGT,3.01,2025-09-23
+JETS,U.S. Global Jets ETF,Alaska Air Group Inc,ALK,2.99,2025-09-23
+JETS,U.S. Global Jets ETF,Skywest Inc,SKYW,2.97,2025-09-23
+JETS,U.S. Global Jets ETF,Jetblue Airways Corp,JBLU,2.93,2025-09-23
+KIE,SPDR S&P Insurance ETF,Lemonade Inc,LMND,2.31,2025-09-23
+KIE,SPDR S&P Insurance ETF,Brighthouse Financial Inc,BHF,2.2,2025-09-23
+KIE,SPDR S&P Insurance ETF,Genworth Financial Inc,GNW,1.97,2025-09-23
+KIE,SPDR S&P Insurance ETF,Globe Life Inc,GL,1.95,2025-09-23
+KIE,SPDR S&P Insurance ETF,Ryan Specialty Holdings Inc,RYAN,1.95,2025-09-23
+KIE,SPDR S&P Insurance ETF,Unum Group,UNM,1.93,2025-09-23
+KIE,SPDR S&P Insurance ETF,Allstate Corp,ALL,1.92,2025-09-23
+KIE,SPDR S&P Insurance ETF,American Financial Group Inc,AFG,1.92,2025-09-23
+KIE,SPDR S&P Insurance ETF,Assured Guaranty Ltd,AGO,1.91,2025-09-23
+KIE,SPDR S&P Insurance ETF,Arthur J Gallagher + Co,AJG,1.9,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Citizens Financial Group,CFG,2.01,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Popular Inc,BPOP,1.99,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Valley National Bancorp,VLY,1.99,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Western Alliance Bancorp,WAL,1.99,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,First Horizon Corp,FHN,1.98,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,M + T Bank Corp,MTB,1.98,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Truist Financial Corp,TFC,1.98,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Columbia Banking System Inc,COLB,1.97,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,Zions Bancorp Na,ZION,1.97,2025-09-23
+KRE,SPDR S&P Regional Banking ETF,East West Bancorp Inc,EWBC,1.96,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Tencent Holdings Ltd,700,10.69,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Alibaba Group Holding Ltd,9988,9.72,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Pdd Holdings Inc,PDD,7.47,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Jd Health,6618,5.14,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Jd.com Inc-class A,9618,5.13,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Tencent Musi-adr,TME,4.73,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Kanzhun Ltd - Adr,BZ,4.61,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Meituan-class B,3690,4.61,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Baidu Inc-class A,9888,4.34,2025-09-23
+KWEB,KraneShares CSI China Internet ETF,Kuaishou Technology,1024,4.3,2025-09-23
+LIT,Lithium & Battery Tech ETF,Albemarle Corp,ALB,7.62,2025-09-23
+LIT,Lithium & Battery Tech ETF,Wuxi Lead Inte-a,300450 C2,5.92,2025-09-23
+LIT,Lithium & Battery Tech ETF,Quimica Y-sp Adr,SQM,4.91,2025-09-23
+LIT,Lithium & Battery Tech ETF,Eve Energy Co Ltd-a,300014 C2,4.85,2025-09-23
+LIT,Lithium & Battery Tech ETF,Ganfeng Lithiu-a,002460 C2,4.7,2025-09-23
+LIT,Lithium & Battery Tech ETF,Tesla Inc,TSLA,4.69,2025-09-23
+LIT,Lithium & Battery Tech ETF,Contemporary A-a,300750 C2,4.49,2025-09-23
+LIT,Lithium & Battery Tech ETF,Tianqi Lithium Corp-a,002466 C2,4.46,2025-09-23
+LIT,Lithium & Battery Tech ETF,Sunwoda Electr-a,300207 C2,4.33,2025-09-23
+LIT,Lithium & Battery Tech ETF,Tdk Corp,6762 JP,3.95,2025-09-23
+MAGS,Magnificent Seven ETF,United States Treasury Bill 10/16/2025,912797QF7,53.49,2025-09-23
+MAGS,Magnificent Seven ETF,Nvidia Corp Swap,67066G104 TRS 071426 NM,8.32,2025-09-23
+MAGS,Magnificent Seven ETF,Alphabet Inc-cl A Swap,02079K305 TRS 071426 NM,8.15,2025-09-23
+MAGS,Magnificent Seven ETF,Tesla Inc Swap,88160R101 TRS 071426 NM,7.8,2025-09-23
+MAGS,Magnificent Seven ETF,Microsoft Corp Swap,594918104 TRS 071426 NM,7.37,2025-09-23
+MAGS,Magnificent Seven ETF,Alphabet Inc,GOOGL,6.82,2025-09-23
+MAGS,Magnificent Seven ETF,Meta Platforms Inc-class A Swap,30303M102 TRS 071426 NM,6.38,2025-09-23
+MAGS,Magnificent Seven ETF,Amazon.com Inc Swap,023135106 TRS 071426 NM,6.37,2025-09-23
+MAGS,Magnificent Seven ETF,Apple Inc Swap,037833100 TRS 071426 NM,6.02,2025-09-23
+MAGS,Magnificent Seven ETF,Apple Inc,AAPL,5.56,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Nomura,"""NaN""",60.66,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Curaleaf Holdings Inc Swap,CURLF,22.89,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Trulieve Cannabis Swap,TCNNF,22.43,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Green Thumb Industries Swap,GTBIF,21.93,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Nbc,"""NaN""",12.44,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Blackrock Treasury Trust Instl 62,"""NaN""",10.24,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Derivatives Collateral Cf Secured,"""NaN""",7.49,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Cresco Labs Inc Swap,CRLBF,6.64,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Verano Holdings Corp Swap,VRNOF,5.84,2025-09-23
+MSOS,AdvisorShares Pure US Cannabis ETF,Terrascend Corp Swap,TSNDF,5.64,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Cameco Corp,CCJ,10.23,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Constellation Energy,CEG,8.02,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Centrus Energy Corp-class A,LEU,4.08,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Oklo Inc,OKLO,3.96,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Ge Vernova Inc,GEV,3.84,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Nuscale Power Corp,SMR,2.93,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Rolls-royce Holdings Plc,RR/ LN,2.93,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Asp Isotopes Inc,ASPI,2.81,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Vistra Corp,VST,2.67,2025-09-23
+NUKZ,Range Nuclear Renaissance Index ETF,Samsung C&t Corp,028260 KS,2.64,2025-09-23
+OIH,VanEck Oil Services ETF,Schlumberger Nv,SLB US,22.56,2025-09-23
+OIH,VanEck Oil Services ETF,Baker Hughes Co,BKR US,15.37,2025-09-23
+OIH,VanEck Oil Services ETF,Halliburton Co,HAL US,6.88,2025-09-23
+OIH,VanEck Oil Services ETF,Technipfmc Plc,FTI US,5.67,2025-09-23
+OIH,VanEck Oil Services ETF,Tenaris Sa,TS US,4.61,2025-09-23
+OIH,VanEck Oil Services ETF,Weatherford International Plc,WFRD US,4.43,2025-09-23
+OIH,VanEck Oil Services ETF,Noble Corp Plc,NE US,4.4,2025-09-23
+OIH,VanEck Oil Services ETF,Nov Inc,NOV US,4.14,2025-09-23
+OIH,VanEck Oil Services ETF,Valaris Ltd,VAL US,4.08,2025-09-23
+OIH,VanEck Oil Services ETF,Tidewater Inc,TDW US,3.63,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Applovin Corp-class A,APP,1.04,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Fortinet Inc,FTNT,1.04,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Amgen Inc,AMGN,1.03,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Apple Inc,AAPL,1.03,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Palantir Technologies Inc-a,PLTR,1.03,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Synopsys Inc,SNPS,1.03,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Warner Bros Discovery Inc,WBD,1.03,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Cadence Design Sys Inc,CDNS,1.02,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Constellation Energy,CEG,1.02,2025-09-23
+QQQE,NASDAQ-100 Equal Weighted Index Shares,Intuit Inc,INTU,1.02,2025-09-23
+QTUM,Defiance Quantum ETF,Mongodb Inc,MDB,1.86,2025-09-23
+QTUM,Defiance Quantum ETF,Tower Semiconductor Ltd,TSEM,1.85,2025-09-23
+QTUM,Defiance Quantum ETF,Synopsys Inc,SNPS,1.81,2025-09-23
+QTUM,Defiance Quantum ETF,Teradyne Inc,TER,1.67,2025-09-23
+QTUM,Defiance Quantum ETF,Alchip Technologies Ltd,3661 TT,1.63,2025-09-23
+QTUM,Defiance Quantum ETF,Rigetti Computing Inc,RGTI,1.61,2025-09-23
+QTUM,Defiance Quantum ETF,Alphabet Inc,GOOGL,1.6,2025-09-23
+QTUM,Defiance Quantum ETF,Broadcom Inc,AVGO,1.6,2025-09-23
+QTUM,Defiance Quantum ETF,Oracle Corp,ORCL,1.59,2025-09-23
+QTUM,Defiance Quantum ETF,Hewlett Packard Enterprise Co,HPE,1.56,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,China Northern Rare Earth Group High-te,600111 C1,10.66,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Mp Materials Corp,MP US,9.97,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Lynas Rare Earths Ltd,LYC AU,8.04,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Albemarle Corp,ALB US,6.15,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Sociedad Quimica Y Minera De Chile Sa,SQM US,5.46,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Pilbara Minerals Ltd,PLS AU,5.31,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Shenghe Resources Holding Co Ltd,600392 C1,5.0,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Ganfeng Lithium Group Co Ltd,1772 HK,4.92,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Jinduicheng Molybdenum Co Ltd,601958 C1,4.9,2025-09-23
+REMX,VanEck Rare Earth and Strategic Metals ETF,Iperionx Ltd,IPX AU,4.72,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Warner Bros Discovery Inc,WBD ,0.31,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Paramount Skydance Corp,PSKY ,0.25,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Synopsys Inc,SNPS ,0.25,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Intel Corp,INTC ,0.24,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Tesla Inc,TSLA ,0.24,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Applied Materials Inc,AMAT ,0.23,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Applovin Corp,APP ,0.23,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Crowdstrike Holdings Inc,CRWD ,0.23,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Lam Research Corp,LRCX ,0.23,2025-09-23
+RSP,Invesco S&P 500 Equal Weight ETF,Micron Technology Inc,MU ,0.23,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Warner Bros Discovery Inc,WBD ,6.69,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Paramount Skydance Corp,PSKY ,5.44,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Meta Platforms Inc,META ,4.49,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Tko Group Holdings Inc,TKO ,4.48,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Take-two Interactive Software Inc,TTWO ,4.46,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Electronic Arts Inc,EA ,4.42,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Match Group Inc,MTCH ,4.41,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Verizon Communications Inc,VZ ,4.34,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Charter Communications Inc,CHTR ,4.33,2025-09-23
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Frontier Communications Parent Inc,FYBR ,4.33,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tesla Inc,TSLA ,2.45,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tapestry Inc,TPR ,2.17,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Wynn Resorts Ltd,WYNN ,2.11,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Aptiv Plc,APTV ,2.09,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Expedia Group Inc,EXPE ,2.07,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Lululemon Athletica Inc,LULU ,2.07,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Airbnb Inc,ABNB ,2.06,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Doordash Inc,DASH ,2.06,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,General Motors Co,GM ,2.06,2025-09-23
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Marriott International Inc/md,MAR ,2.05,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Apollo Global Management Inc,APO ,1.43,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Coinbase Global Inc,COIN ,1.43,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Kkr & Co Inc,KKR ,1.41,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Robinhood Markets Inc,HOOD ,1.4,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,American Express Co,AXP ,1.39,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Blackstone Inc,BX ,1.39,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Citigroup Inc,C ,1.39,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Wells Fargo & Co,WFC ,1.39,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Bank Of New York Mellon Corp/the,BK ,1.38,2025-09-23
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Block Inc,XYZ ,1.38,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Valero Energy Corp,VLO ,4.72,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Williams Cos Inc/the,WMB ,4.7,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Expand Energy Corp,EXE ,4.69,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Marathon Petroleum Corp,MPC ,4.69,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Baker Hughes Co,BKR ,4.64,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Apa Corp,APA ,4.63,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Targa Resources Corp,TRGP ,4.63,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Exxon Mobil Corp,XOM ,4.61,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Diamondback Energy Inc,FANG ,4.6,2025-09-23
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Kinder Morgan Inc,KMI ,4.6,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Regeneron Pharmaceuticals Inc,REGN ,1.78,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbott Laboratories,ABT ,1.75,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbvie Inc,ABBV ,1.75,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Revvity Inc,RVTY ,1.75,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Bio-techne Corp,TECH ,1.74,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Moderna Inc,MRNA ,1.73,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Solventum Corp,SOLV ,1.73,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Idexx Laboratories Inc,IDXX ,1.72,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Medtronic Plc,MDT ,1.72,2025-09-23
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Amgen Inc,AMGN ,1.71,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Albemarle Corp,ALB ,4.28,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Steel Dynamics Inc,STLD ,4.02,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Newmont Corp,NEM ,3.99,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Dupont De Nemours Inc,DD ,3.93,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Mosaic Co/the,MOS ,3.9,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Linde Plc,LIN ,3.88,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Vulcan Materials Co,VMC ,3.88,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Air Products And Chemicals Inc,APD ,3.87,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Amcor Plc,AMCR ,3.85,2025-09-23
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Ppg Industries Inc,PPG ,3.85,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Caterpillar Inc,CAT ,1.39,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Ch Robinson Worldwide Inc,CHRW ,1.34,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,General Electric Co,GE ,1.34,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Allegion Plc,ALLE ,1.32,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Equifax Inc,EFX ,1.32,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Uber Technologies Inc,UBER ,1.32,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Cummins Inc,CMI ,1.31,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Leidos Holdings Inc,LDOS ,1.31,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Norfolk Southern Corp,NSC ,1.31,2025-09-23
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Snap-on Inc,SNA ,1.31,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Bxp Inc,BXP ,3.35,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Healthpeak Properties Inc,DOC ,3.33,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Sba Communications Corp,SBAC ,3.33,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Alexandria Real Estate Equities Inc,ARE ,3.32,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Iron Mountain Inc,IRM ,3.32,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Prologis Inc,PLD ,3.31,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Equinix Inc,EQIX ,3.28,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Essex Property Trust Inc,ESS ,3.28,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Cbre Group Inc,CBRE ,3.27,2025-09-23
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Costar Group Inc,CSGP ,3.27,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Hershey Co/the,HSY ,2.81,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Sysco Corp,SYY ,2.81,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Mondelez International Inc,MDLZ ,2.8,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Monster Beverage Corp,MNST ,2.8,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Walmart Inc,WMT ,2.79,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Brown-forman Corp,BF/B ,2.76,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,General Mills Inc,GIS ,2.76,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Archer-daniels-midland Co,ADM ,2.75,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Estee Lauder Cos Inc/the,EL ,2.75,2025-09-23
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Campbell's Company/the,CPB ,2.73,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Synopsys Inc,SNPS ,1.8,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Intel Corp,INTC ,1.68,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Crowdstrike Holdings Inc,CRWD ,1.67,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Lam Research Corp,LRCX ,1.67,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applied Materials Inc,AMAT ,1.64,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Micron Technology Inc,MU ,1.64,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Seagate Technology Holdings Plc,STX ,1.62,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applovin Corp,APP ,1.61,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Kla Corp,KLAC ,1.58,2025-09-23
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Western Digital Corp,WDC ,1.58,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Constellation Energy Corp,CEG ,3.32,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Eversource Energy,ES ,3.32,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Aes Corp/the,AES ,3.29,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nrg Energy Inc,NRG ,3.27,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Sempra,SRE ,3.26,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Evergy Inc,EVRG ,3.24,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Vistra Corp,VST ,3.24,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Centerpoint Energy Inc,CNP ,3.23,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Dominion Energy Inc,D ,3.23,2025-09-23
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Wec Energy Group Inc,WEC ,3.23,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Prologis Reit Inc,PLD,7.76,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Welltower Inc,WELL,7.62,2025-09-23
+SCHH,Schwab U.S. REIT ETF,American Tower Reit Corp,AMT,6.7,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Simon Property Group Reit Inc,SPG,4.23,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Digital Realty Trust Reit Inc,DLR,4.15,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Realty Income Reit Corp,O,4.08,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Equinix Reit Inc,EQIX,3.84,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Public Storage Reit,PSA,3.49,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Crown Castle Inc,CCI,3.12,2025-09-23
+SCHH,Schwab U.S. REIT ETF,Vici Pptys Inc,VICI,2.63,2025-09-23
+SIL,Silver Miners ETF,Wheaton Precious,WPM,18.91,2025-09-23
+SIL,Silver Miners ETF,Pan American Silver Corp,PAAS,12.45,2025-09-23
+SIL,Silver Miners ETF,Coeur Mining Inc,CDE,8.73,2025-09-23
+SIL,Silver Miners ETF,Or Royalties Inc,OR CN,6.55,2025-09-23
+SIL,Silver Miners ETF,Industrias Penol,PE&OLES* MM,5.94,2025-09-23
+SIL,Silver Miners ETF,Hecla Mining Co,HL,5.75,2025-09-23
+SIL,Silver Miners ETF,Fresnillo Plc,FRES LN,5.59,2025-09-23
+SIL,Silver Miners ETF,First Majestic S,AG CN,4.78,2025-09-23
+SIL,Silver Miners ETF,Ssr Mining Inc,SSRM,4.72,2025-09-23
+SIL,Silver Miners ETF,Korea Zinc Co Ltd,010130 KS,4.38,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Nvidia Corp,NVDA,7.58,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Microsoft Corp,MSFT,6.77,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Apple Inc,AAPL,6.41,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Amazon.com Inc,AMZN,3.95,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Meta Platforms Inc Class A,META,2.97,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Broadcom Inc,AVGO,2.85,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl A,GOOGL,2.61,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl C,GOOG,2.1,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Tesla Inc,TSLA,2.1,2025-09-23
+SPY,SPDR S&P 500 ETF Trust,Berkshire Hathaway Inc Cl B,BRK.B,1.59,2025-09-23
+TAN,Invesco Solar ETF,Nextracker Inc,NXT ,10.31,2025-09-23
+TAN,Invesco Solar ETF,First Solar Inc,FSLR ,10.16,2025-09-23
+TAN,Invesco Solar ETF,Enphase Energy Inc,ENPH ,7.5,2025-09-23
+TAN,Invesco Solar ETF,Gcl Technology Holdings Ltd,3800 HK,6.33,2025-09-23
+TAN,Invesco Solar ETF,Sunrun Inc,RUN ,6.29,2025-09-23
+TAN,Invesco Solar ETF,Solaredge Technologies Inc,SEDG ,5.25,2025-09-23
+TAN,Invesco Solar ETF,Xinyi Solar Holdings Ltd,968 HK,4.23,2025-09-23
+TAN,Invesco Solar ETF,Ha Sustainable Infrastructure Capital Inc,HASI ,4.01,2025-09-23
+TAN,Invesco Solar ETF,Enlight Renewable Energy Ltd,ENLT ,4.0,2025-09-23
+TAN,Invesco Solar ETF,Array Technologies Inc,ARRY ,3.46,2025-09-23
+URNM,Sprott Uranium Miners ETF,Cameco Corp.,CCJ,17.59,2025-09-23
+URNM,Sprott Uranium Miners ETF,Nac Kazatomprom Jsc,KAP LI,13.14,2025-09-23
+URNM,Sprott Uranium Miners ETF,Sprott Physical Uranium Trust,U-U CN,10.33,2025-09-23
+URNM,Sprott Uranium Miners ETF,Energy Fuels Inc.,UUUU,8.39,2025-09-23
+URNM,Sprott Uranium Miners ETF,Uranium Energy Corp.,UEC,6.58,2025-09-23
+URNM,Sprott Uranium Miners ETF,Cgn Mining Co. Ltd.,1164 HK,5.32,2025-09-23
+URNM,Sprott Uranium Miners ETF,Denison Mines Corp.,DNN,4.98,2025-09-23
+URNM,Sprott Uranium Miners ETF,Deep Yellow Ltd.,DYL AU,4.95,2025-09-23
+URNM,Sprott Uranium Miners ETF,Nexgen Energy Ltd.,NXE,4.84,2025-09-23
+URNM,Sprott Uranium Miners ETF,Paladin Energy Ltd.,PDN AU,3.68,2025-09-23
+VNM,VanEck Vietnam ETF,Vinhomes Jsc,VHM VN,7.98,2025-09-23
+VNM,VanEck Vietnam ETF,Vingroup Jsc,VIC VN,7.81,2025-09-23
+VNM,VanEck Vietnam ETF,Ssi Securities Corp,SSI VN,6.97,2025-09-23
+VNM,VanEck Vietnam ETF,Hoa Phat Group Jsc,HPG VN,6.76,2025-09-23
+VNM,VanEck Vietnam ETF,Vix Securities Jsc,VIX VN,6.71,2025-09-23
+VNM,VanEck Vietnam ETF,Bank For Foreign Trade Of Vietnam Jsc,VCB VN,5.22,2025-09-23
+VNM,VanEck Vietnam ETF,Vietnam Dairy Products Jsc,VNM VN,5.11,2025-09-23
+VNM,VanEck Vietnam ETF,Masan Group Corp,MSN VN,4.1,2025-09-23
+VNM,VanEck Vietnam ETF,Vndirect Securities Corp,VND VN,3.91,2025-09-23
+VNM,VanEck Vietnam ETF,Vietcap Securities Jsc,VCI VN,3.14,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Iren Ltd,IREN,20.96,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Cipher Mining Inc,CIFR,13.96,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Terawulf Inc,WULF,7.43,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Riot Platforms Inc,RIOT,7.39,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Bitfarms Ltd/canada,BITF,6.52,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Applied Digital Corp,APLD,4.94,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Hut 8 Corp,HUT,4.94,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Hive Digital Technologies Ltd,HIVE,4.82,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Core Scientific Inc,CORZ,4.77,2025-09-23
+WGMI,CoinShares Bitcoin Mining ETF,Cleanspark Inc,CLSK,4.41,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Kratos Defense + Security,KTOS,4.11,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Archer Aviation Inc A,ACHR,3.99,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Aerovironment Inc,AVAV,3.77,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,General Electric,GE,3.55,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Ati Inc,ATI,3.53,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Bwx Technologies Inc,BWXT,3.51,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Curtiss Wright Corp,CW,3.47,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Axon Enterprise Inc,AXON,3.46,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Howmet Aerospace Inc,HWM,3.46,2025-09-23
+XAR,SPDR S&P Aerospace & Defense ETF,Rocket Lab Corp,RKLB,3.46,2025-09-23
+XBI,SPDR S&P Biotech ETF,Crispr Therapeutics Ag,CRSP,2.27,2025-09-23
+XBI,SPDR S&P Biotech ETF,Exelixis Inc,EXEL,2.02,2025-09-23
+XBI,SPDR S&P Biotech ETF,Natera Inc,NTRA,2.02,2025-09-23
+XBI,SPDR S&P Biotech ETF,Regeneron Pharmaceuticals,REGN,2.02,2025-09-23
+XBI,SPDR S&P Biotech ETF,United Therapeutics Corp,UTHR,2.0,2025-09-23
+XBI,SPDR S&P Biotech ETF,Abbvie Inc,ABBV,1.99,2025-09-23
+XBI,SPDR S&P Biotech ETF,Moderna Inc,MRNA,1.97,2025-09-23
+XBI,SPDR S&P Biotech ETF,Halozyme Therapeutics Inc,HALO,1.95,2025-09-23
+XBI,SPDR S&P Biotech ETF,Neurocrine Biosciences Inc,NBIX,1.95,2025-09-23
+XBI,SPDR S&P Biotech ETF,Amgen Inc,AMGN,1.94,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Allegion Plc,ALLE,3.55,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Cavco Industries Inc,CVCO,3.48,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Advanced Drainage Systems In,WMS,3.43,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Home Depot Inc,HD,3.4,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Somnigroup International Inc,SGI,3.4,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Champion Homes Inc,SKY,3.39,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Johnson Controls Internation,JCI,3.39,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Lowe S Cos Inc,LOW,3.36,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Topbuild Corp,BLD,3.35,2025-09-23
+XHB,SPDR S&P Homebuilders ETF,Masco Corp,MAS,3.33,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Cnx Resources Corp,CNX,2.73,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Hf Sinclair Corp,DINO,2.7,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Valero Energy Corp,VLO,2.7,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Expand Energy Corp,EXE,2.68,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Marathon Petroleum Corp,MPC,2.68,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Murphy Oil Corp,MUR,2.68,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Apa Corp,APA,2.65,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Exxon Mobil Corp,XOM,2.64,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Diamondback Energy Inc,FANG,2.63,2025-09-23
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Occidental Petroleum Corp,OXY,2.62,2025-09-23
+XRT,SPDR S&P Retail ETF,Realreal Inc/the,REAL,1.65,2025-09-23
+XRT,SPDR S&P Retail ETF,National Vision Holdings Inc,EYE,1.6,2025-09-23
+XRT,SPDR S&P Retail ETF,Etsy Inc,ETSY,1.51,2025-09-23
+XRT,SPDR S&P Retail ETF,Chewy Inc   Class A,CHWY,1.47,2025-09-23
+XRT,SPDR S&P Retail ETF,Kohls Corp,KSS,1.45,2025-09-23
+XRT,SPDR S&P Retail ETF,Carvana Co,CVNA,1.44,2025-09-23
+XRT,SPDR S&P Retail ETF,Gamestop Corp Class A,GME,1.44,2025-09-23
+XRT,SPDR S&P Retail ETF,Ollie S Bargain Outlet Holdi,OLLI,1.43,2025-09-23
+XRT,SPDR S&P Retail ETF,Sally Beauty Holdings Inc,SBH,1.43,2025-09-23
+XRT,SPDR S&P Retail ETF,Dillards Inc Cl A,DDS,1.42,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Rigetti Computing Inc,RGTI,4.63,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Rambus Inc,RMBS,3.49,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Sitime Corp,SITM,3.35,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Intel Corp,INTC,3.14,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Micron Technology Inc,MU,3.06,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Marvell Technology Inc,MRVL,2.91,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Lattice Semiconductor Corp,LSCC,2.87,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Monolithic Power Systems Inc,MPWR,2.82,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Skyworks Solutions Inc,SWKS,2.82,2025-09-23
+XSD,SPDR S&P Semiconductor ETF,Cirrus Logic Inc,CRUS,2.81,2025-09-23
