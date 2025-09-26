@@ -6,7 +6,8 @@ import altair as alt
 import io
 import base64
 import re
-from typing import List, Dict, Tuple
+import html
+from typing import List, Dict, Tuple, Optional
 
 # ---------------------------------
 # Configuration
@@ -21,17 +22,17 @@ DATA_URLS = {
     "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
 }
 LOOKBACK_DAYS = 21
-GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
+GROUP_ORDER = ["Market", "Sector", "Commodity", "Crypto", "Country", "Theme", "Leader"]
 
 # Palette per group (base, darker)
 GROUP_PALETTE = {
-    "Market":   ("#0284c7", "#075985"),  # cyan
-    "Sector":   ("#16a34a", "#166534"),  # green
-    "Commodity":("#b45309", "#7c2d12"),  # amber/brown
-    "Crypto":   ("#7c3aed", "#4c1d95"),  # purple
-    "Country":  ("#ea580c", "#9a3412"),  # orange
-    "Theme":    ("#2563eb", "#1e40af"),  # blue
-    "Leader":   ("#db2777", "#9d174d"),  # pink
+    "Market":   ("#0284c7", "#075985"),
+    "Sector":   ("#16a34a", "#166534"),
+    "Commodity":("#b45309", "#7c2d12"),
+    "Crypto":   ("#7c3aed", "#4c1d95"),
+    "Country":  ("#ea580c", "#9a3412"),
+    "Theme":    ("#2563eb", "#1e40af"),
+    "Leader":   ("#db2777", "#9d174d"),
 }
 
 # --- settings (no sidebar) ---
@@ -52,6 +53,7 @@ def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
         s = s.str.title()
     return s
 
+
 def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
     """Preserve CSV case but normalize common acronyms (ETF, USD, USA, REIT, AI, S&P, US)."""
     s = s.astype(str)
@@ -64,6 +66,7 @@ def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
     s = s.str.replace(r"\bS\s*(?:&|and|-)\s*P\b", "S&P", regex=True, flags=re.IGNORECASE)
     return s
 
+
 def _clean_ticker_series(s: pd.Series) -> pd.Series:
     return (
         s.astype(str)
@@ -72,18 +75,21 @@ def _clean_ticker_series(s: pd.Series) -> pd.Series:
          .str.strip()
     )
 
+
 def _escape(s) -> str:
-    import html
     return html.escape("" if pd.isna(s) else str(s))
+
 
 # ---------------------------------
 # Data Loading
 # ---------------------------------
 @st.cache_data(ttl=900)
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Load ETF price and RS CSVs, basic validation + normalization."""
     df_etf = pd.read_csv(DATA_URLS["etf"])
     df_rs = pd.read_csv(DATA_URLS["rs"])
 
+    # Basic column checks
     if "date" not in df_etf.columns or "ticker" not in df_etf.columns:
         raise ValueError("ETF price CSV must include 'date' and 'ticker'.")
     if "date" not in df_rs.columns or "ticker" not in df_rs.columns or "rs_to_spy" not in df_rs.columns:
@@ -92,16 +98,17 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_etf["date"] = pd.to_datetime(df_etf["date"], errors="coerce")
     df_rs["date"] = pd.to_datetime(df_rs["date"], errors="coerce")
 
-    if "ticker" in df_etf.columns:
-        df_etf["ticker"] = _clean_ticker_series(df_etf["ticker"])
+    # Normalize ticker and group text if present
+    df_etf["ticker"] = _clean_ticker_series(df_etf["ticker"])
     if "group" in df_etf.columns:
         df_etf["group"] = _clean_text_series(df_etf["group"])
-    if "ticker" in df_rs.columns:
-        df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
+
+    df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
     if "group" in df_rs.columns:
         df_rs["group"] = _clean_text_series(df_rs["group"])
-    
+
     return df_etf, df_rs
+
 
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
@@ -110,7 +117,7 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
       fund_ticker, fund_name, security_name, security_ticker, security_weight, ingest_date
     """
     df = pd.read_csv(url)
-    need = {"fund_ticker","fund_name","security_name","security_ticker","security_weight","ingest_date"}
+    need = {"fund_ticker", "fund_name", "security_name", "security_ticker", "security_weight", "ingest_date"}
     missing = need - set(df.columns)
     if missing:
         raise ValueError(f"[holdings] Missing columns: {sorted(missing)}")
@@ -126,35 +133,49 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
     return df
 
+
 @st.cache_data(ttl=900)
-def load_chart_data():
+def load_chart_data() -> pd.DataFrame:
+    """Load OHLCV + precomputed MAs for charting tooltips."""
     df_chart = pd.read_csv(DATA_URLS["chart"])
-    df_chart["date"] = pd.to_datetime(df_chart["date"], errors="coerce")
-    df_chart["ticker"] = df_chart["ticker"].str.upper().str.strip()
-    return df
+    if "date" in df_chart.columns:
+        df_chart["date"] = pd.to_datetime(df_chart["date"], errors="coerce")
+    if "ticker" in df_chart.columns:
+        df_chart["ticker"] = df_chart["ticker"].astype(str).str.upper().str.strip()
+    return df_chart
+
 
 # ---------------------------------
 # Data Processing
 # ---------------------------------
 def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Returns:
+      latest: DataFrame indexed by ticker containing the most recent row per ticker
+      rs_last_n: last N rows per ticker for sparkline creation
+    """
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
-    rs_last_n = df_rs.sort_values(["ticker","date"]).groupby("ticker").tail(LOOKBACK_DAYS)
+    rs_last_n = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK_DAYS)
     return latest, rs_last_n
 
+
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
+    """Compute recent daily counts of threshold metrics for breadth charts (last 21 dates)."""
     if "count_over_85" not in df_etf.columns or "count_under_50" not in df_etf.columns:
-        return pd.DataFrame(columns=["date","count_over_85","count_under_50","date_str"])
-    daily = df_etf[["date","count_over_85","count_under_50"]].drop_duplicates().sort_values("date")
-    daily = daily.dropna(subset=["count_over_85","count_under_50"])
+        return pd.DataFrame(columns=["date", "count_over_85", "count_under_50", "date_str"])
+    daily = df_etf[["date", "count_over_85", "count_under_50"]].drop_duplicates().sort_values("date")
+    daily = daily.dropna(subset=["count_over_85", "count_under_50"])
     last_21_dates = daily["date"].tail(21)
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
 
+
 # ---------------------------------
 # Chips + Tooltip (HTML/CSS)
 # ---------------------------------
 def make_chart_tooltip(chart_df: pd.DataFrame, ticker: str) -> str:
+    """Return an HTML snippet embedding a Plotly candlestick + MA + volume chart for the ticker."""
     df = chart_df[chart_df["ticker"] == ticker].sort_values("date")
     if df.empty:
         return ""
@@ -163,14 +184,12 @@ def make_chart_tooltip(chart_df: pd.DataFrame, ticker: str) -> str:
 
     # Candlestick
     fig.add_trace(go.Candlestick(
-        x=df["date"],
-        open=df["open"], high=df["high"], low=df["low"], close=df["close"],
+        x=df["date"], open=df.get("open"), high=df.get("high"), low=df.get("low"), close=df.get("close"),
         name="Candles"
     ))
 
-    # Pre-calculated SMA lines
-    for col, color in [("sma5", "purple"), ("sma10", "green"),
-                       ("sma20", "yellow"), ("sma50", "red")]:
+    # Pre-calculated SMA lines (if present)
+    for col, color in [("sma5", "purple"), ("sma10", "green"), ("sma20", "yellow"), ("sma50", "red")]:
         if col in df.columns:
             fig.add_trace(go.Scatter(
                 x=df["date"], y=df[col],
@@ -178,12 +197,13 @@ def make_chart_tooltip(chart_df: pd.DataFrame, ticker: str) -> str:
                 line=dict(color=color, width=1)
             ))
 
-    # Volume (separate subplot, aligned with candlestick)
-    fig.add_trace(go.Bar(
-        x=df["date"], y=df["volume"],
-        name="Volume", marker_color="lightgray", opacity=0.5,
-        yaxis="y2"
-    ))
+    # Volume (secondary y-axis)
+    if "volume" in df.columns:
+        fig.add_trace(go.Bar(
+            x=df["date"], y=df["volume"],
+            name="Volume", marker_color="lightgray", opacity=0.5,
+            yaxis="y2"
+        ))
 
     fig.update_layout(
         height=400, width=600,
@@ -194,14 +214,18 @@ def make_chart_tooltip(chart_df: pd.DataFrame, ticker: str) -> str:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
 
-    # Return as HTML snippet for tooltip
     return (
         '<div class="tt-card">'
         f'{fig.to_html(include_plotlyjs="cdn", full_html=False)}'
         '</div>'
     )
 
+
 def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int) -> str:
+    """
+    Build an HTML tooltip card containing top holdings for the given fund ticker.
+    Expects holdings_df to contain fund_ticker, fund_name, security_name, security_ticker, security_weight, ingest_date.
+    """
     sub = holdings_df[holdings_df["fund_ticker"] == ticker]
     if sub.empty:
         return ""
@@ -209,11 +233,11 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     if pd.notna(last_date):
         sub = sub[sub["ingest_date"] == last_date]
 
-    fund_name = _escape(sub["fund_name"].iloc[0])  # uses fixed casing (ETF not Etf)
-    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")  # Changed to show only date
+    fund_name = _escape(sub["fund_name"].iloc[0])
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")
 
     topn = (
-        sub[["security_name","security_ticker","security_weight"]]
+        sub[["security_name", "security_ticker", "security_weight"]]
         .dropna(subset=["security_name"])
         .sort_values("security_weight", ascending=False)
         .head(max_rows)
@@ -222,8 +246,8 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
     rows = []
     for _, r in topn.iterrows():
         sec = _escape(r["security_name"])
-        tk  = _escape(r.get("security_ticker", ""))
-        wt  = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
+        tk = _escape(r.get("security_ticker", ""))
+        wt = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
         rows.append(
             "<tr>"
             f"<td class='tt-sec' title='{sec}'>{sec}</td>"
@@ -243,15 +267,20 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         f'{table_html}</div>'
     )
 
-def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
+
+def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: Optional[str]) -> str:
+    """Return HTML for a ticker 'chip' with tooltip card (card_html may be empty)."""
     t = _escape(ticker)
     group_class = ""
     if use_group_colors and group_name:
         group_slug = re.sub(r'[^a-z0-9]+', '-', group_name.lower()).strip('-')
         group_class = f" chip--{group_slug}"
+    # If card_html is present it will be shown on hover due to CSS rules (tt-card inside chip)
     return f'<span class="tt-chip{group_class}">{t}{card_html}</span>'
 
+
 def build_chip_css() -> str:
+    """Return stylesheet for chips and tooltip cards, including per-group colors when enabled."""
     base_css = """
 /* Chip base */
 .tt-chip {
@@ -314,7 +343,7 @@ def build_chip_css() -> str:
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: auto;       /* let browser auto-size columns based on content */
+  table-layout: auto;
 }
 .tt-table thead th {
   text-align: left;
@@ -325,14 +354,10 @@ def build_chip_css() -> str:
   padding: 6px 6px;
   border-bottom: 1px dashed #f0f0f0;
   vertical-align: top;
-  word-break: break-word;   /* wrap long security names nicely */
+  word-break: break-word;
 }
 .tt-table tbody tr:last-child td { border-bottom: none; }
 
-/* Column behaviors:
-   - Security flexes and wraps
-   - Ticker and Weight stay compact (width:1% trick) and don't wrap
-*/
 .tt-sec { width: auto; }
 .tt-tk  {
   width: 1%;
@@ -380,10 +405,12 @@ def build_chip_css() -> str:
 """)
     return "<style>" + base_css + "\n".join(group_css_parts) + "</style>"
 
+
 # ---------------------------------
 # Visualization Helpers
 # ---------------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
+    """Return an inline PNG data URI for a small sparkline image."""
     if not values:
         return ""
     fig = plt.figure(figsize=(width / 96, height / 96), dpi=96)
@@ -399,6 +426,7 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
+
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     df = df.copy()
     df["date_label"] = df["date"].dt.strftime("%b %d")
@@ -413,6 +441,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         )
         .properties(height=320)
     )
+
 
 # ---------------------------------
 # Formatting Helpers
@@ -430,10 +459,12 @@ def format_rank(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct}%</span>')
 
+
 def format_performance(value: float) -> str:
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     return f'<span style="display:block; text-align:right;">{value:.1f}%</span>'
+
 
 def format_performance_intraday(value: float) -> str:
     if pd.isna(value):
@@ -448,11 +479,13 @@ def format_performance_intraday(value: float) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>')
 
+
 def format_indicator(value: str) -> str:
     value = str(value).strip().lower()
     if value == "yes": return '<span style="color:green; display:block; text-align:center;">✅</span>'
     if value == "no":  return '<span style="color:red; display:block; text-align:center;">❌</span>'
     return '<span style="display:block; text-align:center;">-</span>'
+
 
 def format_volume_alert(value: str, rs_rank_252d) -> str:
     if not isinstance(value, str):
@@ -471,6 +504,7 @@ def format_volume_alert(value: str, rs_rank_252d) -> str:
     else:
         return '<span style="display:block; text-align:center;">-</span>'
 
+
 def format_multiple(value) -> str:
     """Render numeric multiple like 1.75 with a subtle badge."""
     try:
@@ -479,25 +513,31 @@ def format_multiple(value) -> str:
         return '<span style="display:block; text-align:right;">-</span>'
     txt = f"{v:.2f}"
     if v >= 10:
-        bg, border = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"   # red
+        bg, border = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"
     elif v >= 4:
-        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"   # yellow/amber
+        bg, border = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"
     elif v > 0:
-        bg, border = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)" # green
+        bg, border = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)"
     else:
-        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)" # grey
+        bg, border = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)"
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>')
 
+
 def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
+
 
 # ---------------------------------
 # Table Rendering
 # ---------------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
+    """
+    Render a simple HTML table for a group using Pandas' to_html (escape disabled) and a bit of CSS.
+    rows: list of dicts with same keys used as columns.
+    """
     table_id = f"tbl-{slugify(group_name)}"
-    html = pd.DataFrame(rows).to_html(escape=False, index=False)
+    html_tbl = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
         #{table_id} table {{
@@ -537,7 +577,8 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         /* Keep Ticker column tight and on one line */
         #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
     """
-    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html_tbl}</div>', unsafe_allow_html=True)
+
 
 # ---------------------------------
 # Dashboard Rendering
@@ -549,7 +590,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.markdown(build_chip_css(), unsafe_allow_html=True)
 
     latest, rs_last_n = process_data(df_etf, df_rs)
-    if "date" in latest.columns:
+
+    # Latest update caption (scan original df_etf if index changed)
+    if "date" in df_etf.columns:
+        st.caption(f"Latest Update: {pd.to_datetime(df_etf['date']).max().date()}")
+    elif "date" in latest.columns:
         st.caption(f"Latest Update: {pd.to_datetime(latest['date']).max().date()}")
     else:
         st.caption("Latest Update: N/A")
@@ -564,40 +609,40 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
         return
 
-    chart_df = load_chart_data()    
-    chip = make_ticker_chip_with_tooltip(
-        ticker,
-        make_chart_tooltip(chart_df, ticker),
-        group_name
-    )
-    
+    chart_df = load_chart_data()
+
+    # Build mapping of groups -> tickers (latest is indexed by ticker)
     group_tickers = latest.groupby("group").groups
+
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
         st.header(f"📌 {group_name}")
-        tickers_in_group = group_tickers[group_name]
+        tickers_in_group = list(group_tickers[group_name])
 
+        # If RS rank available sort within group
         if "rs_rank_21d" in latest.columns:
-            tickers_in_group = sorted(
-                tickers_in_group,
-                key=lambda t: latest.loc[t, "rs_rank_21d"] if not pd.isna(latest.loc[t, "rs_rank_21d"]) else -1,
-                reverse=True,
-            )
+            def _key_fn(t):
+                v = latest.loc[t].get("rs_rank_21d", None)
+                return -1 if pd.isna(v) else float(v)
+            tickers_in_group = sorted(tickers_in_group, key=_key_fn, reverse=True)
 
         rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
+
+            # sparkline values from rs_last_n
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
-            chip = ticker
+            # Tooltip from holdings (if available)
+            chip_html = _escape(ticker)
             if not df_holdings.empty:
                 card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
                 if card_html:
-                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
+                    chip_html = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
             rows.append({
-                "Ticker": chip,
+                "Ticker": chip_html,
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
@@ -633,6 +678,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                             use_container_width=True)
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
+
 
 # ---------------------------------
 # Main
