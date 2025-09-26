@@ -564,6 +564,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
         return
 
+    chart_df = load_chart_data()    
+    chip = make_ticker_chip_with_tooltip(
+        ticker,
+        make_chart_tooltip(chart_df, ticker),
+        group_name
+    )
+    
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
