@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import altair as alt
 import io
 import base64
@@ -17,6 +18,7 @@ DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
+    "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
@@ -124,6 +126,13 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
     return df
 
+@st.cache_data(ttl=900)
+def load_chart_data():
+    df_chart = pd.read_csv(DATA_URLS["chart"])
+    df_chart["date"] = pd.to_datetime(df_chart["date"], errors="coerce")
+    df_chart["ticker"] = df_chart["ticker"].str.upper().str.strip()
+    return df
+
 # ---------------------------------
 # Data Processing
 # ---------------------------------
@@ -145,6 +154,53 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------
 # Chips + Tooltip (HTML/CSS)
 # ---------------------------------
+def make_chart_tooltip(chart_df: pd.DataFrame, ticker: str) -> str:
+    df = chart_df[chart_df["ticker"] == ticker].sort_values("date")
+    if df.empty:
+        return ""
+
+    fig = go.Figure()
+
+    # Candlestick
+    fig.add_trace(go.Candlestick(
+        x=df["date"],
+        open=df["open"], high=df["high"], low=df["low"], close=df["close"],
+        name="Candles"
+    ))
+
+    # Pre-calculated SMA lines
+    for col, color in [("sma5", "purple"), ("sma10", "green"),
+                       ("sma20", "yellow"), ("sma50", "red")]:
+        if col in df.columns:
+            fig.add_trace(go.Scatter(
+                x=df["date"], y=df[col],
+                mode="lines", name=col.upper(),
+                line=dict(color=color, width=1)
+            ))
+
+    # Volume (separate subplot, aligned with candlestick)
+    fig.add_trace(go.Bar(
+        x=df["date"], y=df["volume"],
+        name="Volume", marker_color="lightgray", opacity=0.5,
+        yaxis="y2"
+    ))
+
+    fig.update_layout(
+        height=400, width=600,
+        margin=dict(l=20, r=20, t=30, b=30),
+        xaxis=dict(domain=[0, 1], rangeslider=dict(visible=False)),
+        yaxis=dict(title="Price"),
+        yaxis2=dict(title="Volume", overlaying="y", side="right", showgrid=False),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+
+    # Return as HTML snippet for tooltip
+    return (
+        '<div class="tt-card">'
+        f'{fig.to_html(include_plotlyjs="cdn", full_html=False)}'
+        '</div>'
+    )
+
 def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int) -> str:
     sub = holdings_df[holdings_df["fund_ticker"] == ticker]
     if sub.empty:
