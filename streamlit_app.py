@@ -555,7 +555,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Layout
     fig.update_layout(
         autosize=True,
-        height=650,
+        height=550,
         margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
         legend=dict(
