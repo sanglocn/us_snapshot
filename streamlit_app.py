@@ -8,6 +8,7 @@ import io
 import base64
 import re
 from typing import List, Dict, Tuple
+import streamlit.components.v1 as components
 
 # ---------------------------------
 # Configuration
@@ -155,32 +156,45 @@ def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
     return df
 
 def inject_scroll_memory(storage_key: str = "ums_scroll_y"):
-    st.markdown(
+    components.html(
         f"""
         <script>
-        (function() {{
+        (function () {{
           const KEY = "{storage_key}";
-          // Restore on load
-          const y = localStorage.getItem(KEY);
-          if (y !== null) {{
-            // Defer to ensure DOM is laid out
-            window.requestAnimationFrame(() => {{
-              window.scrollTo(0, parseInt(y, 10));
+          try {{
+            if ('scrollRestoration' in history) {{
+              history.scrollRestoration = 'manual';
+            }}
+            // Restore on load (try a few times while layout settles)
+            const val = localStorage.getItem(KEY);
+            if (val !== null) {{
+              const y = parseInt(val, 10) || 0;
+              const go = () => window.scrollTo(0, y);
+              requestAnimationFrame(go);
+              setTimeout(go, 0);
+              setTimeout(go, 80);
+              setTimeout(go, 160);
+            }}
+
+            // Save before page unload
+            window.addEventListener('beforeunload', () => {{
+              try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
             }});
+
+            // Save when clicking any link marked with data-save-scroll
+            document.addEventListener('click', (e) => {{
+              const a = e.target.closest('a[data-save-scroll]');
+              if (a) {{
+                try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
+              }}
+            }}, true);
+          }} catch (e) {{
+            console.warn('scroll-memory error', e);
           }}
-          // Save on navigation / refresh
-          window.addEventListener("beforeunload", function() {{
-            try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
-          }});
-          // Also save when Streamlit triggers soft-reruns (clicks etc.)
-          document.addEventListener("click", function(e) {{
-            // Only store if the click is inside the app area (cheap heuristic)
-            try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
-          }}, true);
         }})();
         </script>
         """,
-        unsafe_allow_html=True,
+        height=0,
     )
 
 # ---------------------------------
@@ -420,8 +434,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 def format_chart_link(ticker: str) -> str:
     t = _escape(ticker)
     return (
-        f'<a href="?chart={t}" target="_self" '
-        f'onclick="try{{localStorage.setItem(\'ums_scroll_y\', String(window.scrollY));}}catch(e){{}};" '
+        f'<a href="?chart={t}" target="_self" data-save-scroll="1" '
         f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
         f'title="Open chart for {t}">📈</a>'
     )
