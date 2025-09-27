@@ -504,7 +504,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     sub["session"] = sub.index  # 0..N-1
     # Prettier tick labels (e.g., show ~10 evenly spaced date labels)
     n = len(sub)
-    tick every = max(1, n // 10)
+    tick_every = max(1, n // 10)
     tickvals = list(range(0, n, tick every))
     ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
 
