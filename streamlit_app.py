@@ -392,7 +392,7 @@ def format_chart_link(ticker: str) -> str:
     """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
     t = _escape(ticker)
     return (
-        f'<a href="?chart={t}" '
+        f'<a href="?chart={t}" target="_self" '
         f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
         f'title="Open chart for {t}">📈</a>'
     )
