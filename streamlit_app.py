@@ -534,6 +534,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
+        width=1200,
         template="plotly_white"
     )
 
@@ -580,7 +581,7 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
             st.header(f"Chart — {ticker}")
             if sma_missing:
                 st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=False)
 
 # ---------------------------------
 # Table Rendering
