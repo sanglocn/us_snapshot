@@ -8,7 +8,6 @@ import io
 import base64
 import re
 from typing import List, Dict, Tuple
-import streamlit.components.v1 as components
 
 # ---------------------------------
 # Configuration
@@ -154,48 +153,6 @@ def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
             df[c] = pd.to_numeric(df[c], errors="coerce")
     df.attrs["sma_missing"] = sorted(list(soft_missing))
     return df
-
-def inject_scroll_memory(storage_key: str = "ums_scroll_y"):
-    components.html(
-        f"""
-        <script>
-        (function () {{
-          const KEY = "{storage_key}";
-          try {{
-            if ('scrollRestoration' in history) {{
-              history.scrollRestoration = 'manual';
-            }}
-            // Restore on load (try a few times while layout settles)
-            const val = localStorage.getItem(KEY);
-            if (val !== null) {{
-              const y = parseInt(val, 10) || 0;
-              const go = () => window.scrollTo(0, y);
-              requestAnimationFrame(go);
-              setTimeout(go, 0);
-              setTimeout(go, 80);
-              setTimeout(go, 160);
-            }}
-
-            // Save before page unload
-            window.addEventListener('beforeunload', () => {{
-              try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
-            }});
-
-            // Save when clicking any link marked with data-save-scroll
-            document.addEventListener('click', (e) => {{
-              const a = e.target.closest('a[data-save-scroll]');
-              if (a) {{
-                try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
-              }}
-            }}, true);
-          }} catch (e) {{
-            console.warn('scroll-memory error', e);
-          }}
-        }})();
-        </script>
-        """,
-        height=0,
-    )
 
 # ---------------------------------
 # Data Processing
@@ -432,9 +389,10 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
     )
 
 def format_chart_link(ticker: str) -> str:
+    """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
     t = _escape(ticker)
     return (
-        f'<a href="?chart={t}" target="_self" data-save-scroll="1" '
+        f'<a href="?chart={t}" target="_self" '
         f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
         f'title="Open chart for {t}">📈</a>'
     )
@@ -723,7 +681,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
-    inject_scroll_memory()
 
     # Inject CSS for chips/tooltips
     st.markdown(build_chip_css(), unsafe_allow_html=True)
