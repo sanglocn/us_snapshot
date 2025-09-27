@@ -527,8 +527,8 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
         legend=dict(
             orientation="h",
-            yanchor="bottom", y=1.02,         # just under the title area
-            xanchor="left",   x=0,
+            yanchor="top", y=-0.25,         # just under the title area
+            xanchor="center", x=0.5,
             bgcolor="rgba(255,255,255,0.6)"
         ),
         xaxis_rangeslider_visible=False,
