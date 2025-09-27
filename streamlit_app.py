@@ -492,14 +492,21 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         sub["adj_close"].notna()
     ].copy()
 
-    # (Optional) You can skip this now; we’ll also add rangebreaks below
-    sub = sub[sub["date"].dt.dayofweek < 5].copy()
-
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
     sub = sub.reset_index(drop=True)
     date_str = sub["date"].dt.strftime("%Y-%m-%d")
+
+    # --- detect market holidays (weekdays with no trading) ---
+    trading_days = pd.to_datetime(sub["date"].dt.normalize().unique())
+    all_weekdays = pd.bdate_range(
+        start=sub["date"].min().normalize(),
+        end=sub["date"].max().normalize(),
+        freq="B"
+    )
+    closed_days = sorted(set(all_weekdays) - set(trading_days))
+    closed_days_str = [d.strftime("%Y-%m-%d") for d in closed_days]
 
     # ----- traces: use real dates on x -----
     fig = make_subplots(
@@ -507,6 +514,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row_heights=[0.72, 0.28]
     )
 
+    # Candles
     fig.add_trace(
         go.Candlestick(
             x=sub["date"],
@@ -522,6 +530,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row=1, col=1
     )
 
+    # SMAs
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
@@ -534,6 +543,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
                 row=1, col=1
             )
 
+    # Volume
     fig.add_trace(
         go.Bar(
             x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9,
@@ -553,23 +563,20 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         template="plotly_white",
-        bargap=0.3  # spacing between bars in the volume pane; candles use date spacing
+        bargap=0.3
     )
 
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # ----- AUTO major date ticks + hide weekends/holidays -----
-    # dtick="M1" => monthly ticks; ticklabelmode="period" aligns label to the period
-    # rangebreaks hide non-business days even if they slip in
+    # ----- AUTO monthly ticks + hide weekends + holidays -----
     fig.update_xaxes(
         dtick="M1",
         tickformat="%b-%Y",
         ticklabelmode="period",
         rangebreaks=[
-            dict(bounds=["sat", "mon"]),  # hide weekends
-            # Optionally hide holidays (add your market holidays as strings "YYYY-MM-DD")
-            # dict(values=["2025-01-01","2025-07-04", ...])
+            dict(bounds=["sat", "mon"]),    # weekends
+            dict(values=closed_days_str),   # holidays
         ],
         showgrid=True,
         row=1, col=1
@@ -578,7 +585,10 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         dtick="M1",
         tickformat="%b-%Y",
         ticklabelmode="period",
-        rangebreaks=[dict(bounds=["sat","mon"])],
+        rangebreaks=[
+            dict(bounds=["sat", "mon"]),
+            dict(values=closed_days_str),
+        ],
         showgrid=True,
         row=2, col=1
     )
