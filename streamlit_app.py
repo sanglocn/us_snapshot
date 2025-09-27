@@ -516,11 +516,16 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Candles
     fig.add_trace(
         go.Candlestick(
-            x=sub["session"],
-            open=sub["adj_open"], high=sub["adj_high"],
-            low=sub["adj_low"], close=sub["adj_close"],
+            x=sub["date"],
+            open=sub["adj_open"],
+            high=sub["adj_high"],
+            low=sub["adj_low"],
+            close=sub["adj_close"],
             name="Price",
-            hovertext=candle_hover, hoverinfo="text"
+            # 🔻 Filled bodies
+            increasing=dict(fillcolor="#16a34a", line=dict(color="#166534", width=1)),
+            decreasing=dict(fillcolor="#ef4444", line=dict(color="#991b1b", width=1)),
+            opacity=0.95
         ),
         row=1, col=1
     )
