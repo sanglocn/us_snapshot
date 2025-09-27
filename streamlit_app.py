@@ -555,7 +555,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Layout
     fig.update_layout(
         autosize=True,
-        height=600,
+        height=550,
         margin=dict(l=20, r=20, t=50, b=90),     
         legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
