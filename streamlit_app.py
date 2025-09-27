@@ -484,18 +484,24 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # keep only rows with valid OHLC data
+    # Keep only rows with valid OHLC (actual sessions) and drop weekends
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
         sub["adj_low"].notna() &
         sub["adj_close"].notna()
     ].copy()
+    sub = sub[sub["date"].dt.dayofweek < 5].copy()
+
+    # Optional: detect “holiday” rows to collapse (zero volume or obviously bad bars)
+    holiday_dates = sub.loc[
+        (sub["adj_volume"].fillna(0) == 0)
+    , "date"].dt.normalize().drop_duplicates().tolist()
 
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
-    # standard hover text
+    # Hover text
     candle_hover = [
         f"Date: {d:%Y-%m-%d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
         for d, o, h, l, c in zip(sub["date"], sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
@@ -507,25 +513,24 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row_heights=[0.72, 0.28]
     )
 
-    # Candlestick
+    # Price candles
     fig.add_trace(
         go.Candlestick(
             x=sub["date"],
             open=sub["adj_open"], high=sub["adj_high"],
-            low=sub["adj_low"], close=sub["adj_close"],
+            low=sub["adj_low"],  close=sub["adj_close"],
             name="Price",
             hovertext=candle_hover, hoverinfo="text"
         ),
         row=1, col=1
     )
 
-    # SMAs
+    # SMAs (if present)
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
                 go.Scatter(
-                    x=sub["date"], y=sub[sma_col],
-                    mode="lines", name=name, line=dict(width=1.2)
+                    x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)
                 ),
                 row=1, col=1
             )
@@ -539,9 +544,9 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row=2, col=1
     )
 
-    # Layout — let Plotly auto-handle ticks
+    # Layout: legend at bottom
     fig.update_layout(
-        margin=dict(l=20, r=20, t=50, b=60),
+        margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
         legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
@@ -552,10 +557,22 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # Auto major ticks in month-year format
+    # ✅ Auto major date ticks + collapse weekends/holidays (apply to BOTH x-axes)
+    rb = [dict(bounds=["sat", "mon"])]
+    if holiday_dates:
+        rb.append(dict(values=[d.strftime("%Y-%m-%d") for d in holiday_dates]))
+
     fig.update_xaxes(
-        tickformat="%b-%Y",  # Jan-2025, Feb-2025...
-        dtick="M1"           # one major tick per month
+        tickformat="%b-%Y",   # MMM-YYYY
+        dtick="M1",           # 1 major tick per month
+        rangebreaks=rb,
+        row=1, col=1
+    )
+    fig.update_xaxes(
+        tickformat="%b-%Y",
+        dtick="M1",
+        rangebreaks=rb,
+        row=2, col=1
     )
 
     return fig
