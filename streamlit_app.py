@@ -484,98 +484,49 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # ✅ keep only valid trading sessions
-    sub = sub[
-        sub["adj_open"].notna() &
-        sub["adj_high"].notna() &
-        sub["adj_low"].notna() &
-        sub["adj_close"].notna()
-    ].copy()
-
-    # drop weekends if any remain
-    sub = sub[sub["date"].dt.dayofweek < 5].copy()
-
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
-    # Build a trading-session index (no holidays/weekends possible)
-    sub = sub.reset_index(drop=True)
-    sub["session"] = sub.index
-    # Prettier tick labels
-    n = len(sub)
-    tick_every = max(1, n // 10)   # ✅ FIXED spelling
-    tickvals = list(range(0, n, tick_every))
-    ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
-
-    hover_date = sub["date"].dt.strftime("%Y-%m-%d")
-
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
-        row_heights=[0.72, 0.28]
+        row_heights=[0.72, 0.28], specs=[[{"secondary_y": False}], [{"secondary_y": False}]]
     )
 
-    # Candlestick
     fig.add_trace(
         go.Candlestick(
-            x=sub["session"],
+            x=sub["date"],
             open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
-            name="Price",
-            hovertext=hover_date,
-            hovertemplate=(
-                "Date: %{hovertext}<br>"
-                "Open: %{open:.2f}<br>High: %{high:.2f}<br>"
-                "Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
-            )
+            name="Price"
         ),
         row=1, col=1
     )
 
-    # SMAs
+    # Add SMAs if present
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
-        if sma_col in sub.columns and sub[sma_col].notna().any():
+        if sma_col in sub.columns:
             fig.add_trace(
-                go.Scatter(
-                    x=sub["session"], y=sub[sma_col],
-                    mode="lines", name=name, line=dict(width=1.2),
-                    hovertext=hover_date,
-                    hovertemplate="Date: %{hovertext}<br>"+name+": %{y:.2f}<extra></extra>"
-                ),
+                go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)),
                 row=1, col=1
             )
 
-    # Volume
+    # Volume bars
     fig.add_trace(
-        go.Bar(
-            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
-            hovertext=hover_date,
-            hovertemplate="Date: %{hovertext}<br>Volume: %{y:.0f}<extra></extra>"
-        ),
+        go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
         row=2, col=1
     )
 
-    # Layout
     fig.update_layout(
-        margin=dict(l=20, r=20, t=50, b=90),
-        title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5),
+        margin=dict(l=20, r=20, t=30, b=20),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
-        template="plotly_white"
+        template="plotly_white",
+        title=f"{ticker} — Candlestick with SMA & Volume"
     )
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
-
-    # Custom x-axis ticks: only real trading sessions
-    fig.update_xaxes(
-        tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1
-    )
-    fig.update_xaxes(
-        tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1
-    )
-
     return fig
-
 
 # --- ADDED ---
 def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
@@ -609,7 +560,7 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
             st.header(f"Chart — {ticker}")
             if sma_missing:
                 st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
-            st.plotly_chart(fig, use_container_width=False)
+            st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------------------
 # Table Rendering
