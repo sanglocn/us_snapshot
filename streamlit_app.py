@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import altair as alt
 import io
 import base64
@@ -123,6 +125,33 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     # Security name can be title-cased but also fix acronyms
     df["security_name"]   = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
+    return df
+
+@st.cache_data(ttl=900, show_spinner=False)
+def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
+    """
+    Expected columns:
+      ticker, group, date, adj_open, adj_close, adj_volume, adj_high, adj_low, sma5, sma10, sma20, sma50
+    """
+    df = pd.read_csv(url)
+    need = {
+        "ticker","group","date","adj_open","adj_close","adj_volume","adj_high","adj_low",
+        "sma5","sma10","sma20","sma50"
+    }
+    missing = need - set(df.columns)
+    # Soft requirement for SMA cols: allow chart without them
+    soft_missing = {"sma5","sma10","sma20","sma50"} - set(df.columns)
+    if missing - {"sma5","sma10","sma20","sma50"}:
+        raise ValueError(f"[chart] Missing columns: {sorted(missing)}")
+
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df["ticker"] = _clean_ticker_series(df["ticker"])
+    df["group"] = _clean_text_series(df["group"])
+    # Coerce numerics
+    for c in ["adj_open","adj_close","adj_high","adj_low","adj_volume","sma5","sma10","sma20","sma50"]:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+    df.attrs["sma_missing"] = sorted(list(soft_missing))
     return df
 
 # ---------------------------------
@@ -359,6 +388,15 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         .properties(height=320)
     )
 
+def format_chart_link(ticker: str) -> str:
+    """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
+    t = _escape(ticker)
+    return (
+        f'<a href="?chart={t}" '
+        f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
+        f'title="Open chart for {t}">📈</a>'
+    )
+
 # ---------------------------------
 # Formatting Helpers
 # ---------------------------------
@@ -438,6 +476,93 @@ def slugify(text: str) -> str:
     return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 # ---------------------------------
+# Plotly Chart Builder
+# ---------------------------------
+# --- ADDED ---
+def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180) -> go.Figure:
+    sub = df_chart[df_chart["ticker"] == ticker].sort_values("date")
+    if sub.empty:
+        raise ValueError(f"No chart data for {ticker}.")
+
+    if len(sub) > max_bars:
+        sub = sub.tail(max_bars)
+
+    fig = make_subplots(
+        rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
+        row_heights=[0.72, 0.28], specs=[[{"secondary_y": False}], [{"secondary_y": False}]]
+    )
+
+    fig.add_trace(
+        go.Candlestick(
+            x=sub["date"],
+            open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
+            name="Price"
+        ),
+        row=1, col=1
+    )
+
+    # Add SMAs if present
+    for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
+        if sma_col in sub.columns:
+            fig.add_trace(
+                go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)),
+                row=1, col=1
+            )
+
+    # Volume bars
+    fig.add_trace(
+        go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
+        row=2, col=1
+    )
+
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        xaxis_rangeslider_visible=False,
+        hovermode="x unified",
+        height=650,
+        template="plotly_white",
+        title=f"{ticker} — Candlestick with SMA & Volume"
+    )
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    return fig
+
+# --- ADDED ---
+def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
+    """Opens a modal if available; falls back to sidebar."""
+    try:
+        fig = make_ticker_figure(df_chart, ticker)
+    except Exception as e:
+        if hasattr(st, "dialog"):
+            @st.dialog(f"Chart — {ticker}")
+            def _dlg():
+                st.error(str(e))
+            _dlg()
+        else:
+            with st.sidebar:
+                st.header(f"Chart — {ticker}")
+                st.error(str(e))
+        return
+
+    if hasattr(st, "dialog"):
+        @st.dialog(f"Chart — {ticker}")
+        def _dlg():
+            # Soft notice if SMA columns were missing
+            sma_missing = df_chart.attrs.get("sma_missing", [])
+            if sma_missing:
+                st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
+            st.plotly_chart(fig, use_container_width=True)
+        _dlg()
+    else:
+        with st.sidebar:
+            sma_missing = df_chart.attrs.get("sma_missing", [])
+            st.header(f"Chart — {ticker}")
+            if sma_missing:
+                st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
+            st.plotly_chart(fig, use_container_width=True)
+
+# ---------------------------------
 # Table Rendering
 # ---------------------------------
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
@@ -505,6 +630,32 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         df_holdings = pd.DataFrame()
         st.warning(f"Holdings tooltips disabled — {e}")
 
+    # --- ADDED ---
+    # Load chart data once; used by modal/sidebar when user clicks 📈
+    try:
+        df_chart = load_chart_csv(DATA_URLS["chart"])
+    except Exception as e:
+        df_chart = pd.DataFrame()
+        st.warning(f"Chart data unavailable — {e}")
+
+    if "group" not in latest.columns:
+        st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
+        return
+
+    # --- ADDED ---
+    # Detect URL param ?chart=TICKER (works with our link-based 📈 cells)
+    qp = st.query_params if hasattr(st, "query_params") else {}
+    selected_chart_ticker = None
+    if qp:
+        # Streamlit may return str or list; handle both
+        val = qp.get("chart", None)
+        if isinstance(val, list):
+            selected_chart_ticker = (val[0] if val else None)
+        else:
+            selected_chart_ticker = val
+        if selected_chart_ticker:
+            selected_chart_ticker = str(selected_chart_ticker).upper().strip()
+
     if "group" not in latest.columns:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
         return
@@ -550,6 +701,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
+                "  ": "",
+                "Chart": format_chart_link(ticker),
             })
 
         render_group_table(group_name, rows)
@@ -571,6 +724,14 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                             use_container_width=True)
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
+
+    # --- ADDED ---
+    # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
+    if selected_chart_ticker:
+        if df_chart.empty:
+            st.warning("Chart data not available.")
+        else:
+            open_chart_ui(selected_chart_ticker, df_chart)
 
 # ---------------------------------
 # Main
