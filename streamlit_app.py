@@ -484,75 +484,66 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # Only keep actual trading sessions
+    # Keep valid sessions only
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
         sub["adj_low"].notna() &
         sub["adj_close"].notna()
     ].copy()
+
+    # (Optional) You can skip this now; we’ll also add rangebreaks below
     sub = sub[sub["date"].dt.dayofweek < 5].copy()
 
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
-    # Use session index
     sub = sub.reset_index(drop=True)
-    sub["session"] = sub.index.astype(str)
     date_str = sub["date"].dt.strftime("%Y-%m-%d")
 
-    # Hover text
-    candle_hover = [
-        f"Date: {d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
-        for d, o, h, l, c in zip(date_str, sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
-    ]
-    vol_hover = [f"Date: {d}<br>Volume: {int(v):,}" for d, v in zip(date_str, sub["adj_volume"].fillna(0))]
-
+    # ----- traces: use real dates on x -----
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
         row_heights=[0.72, 0.28]
     )
 
-    # Candles
     fig.add_trace(
         go.Candlestick(
-            x=sub["session"],
+            x=sub["date"],
             open=sub["adj_open"], high=sub["adj_high"],
-            low=sub["adj_low"], close=sub["adj_close"],
+            low=sub["adj_low"],  close=sub["adj_close"],
             name="Price",
-            hovertext=candle_hover, hoverinfo="text"
+            hovertext=[
+                f"Date: {d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
+                for d, o, h, l, c in zip(date_str, sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
+            ],
+            hoverinfo="text"
         ),
         row=1, col=1
     )
 
-    # SMAs
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
-            sma_hover = [f"Date: {d}<br>{name}: {y:.2f}" for d, y in zip(date_str, sub[sma_col])]
             fig.add_trace(
                 go.Scatter(
-                    x=sub["session"], y=sub[sma_col],
+                    x=sub["date"], y=sub[sma_col],
                     mode="lines", name=name, line=dict(width=1.2),
-                    hovertext=sma_hover, hoverinfo="text"
+                    hovertext=[f"Date: {d}<br>{name}: {y:.2f}" for d, y in zip(date_str, sub[sma_col])],
+                    hoverinfo="text"
                 ),
                 row=1, col=1
             )
 
-    # Volume
     fig.add_trace(
         go.Bar(
-            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
-            hovertext=vol_hover, hoverinfo="text"
+            x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9,
+            hovertext=[f"Date: {d}<br>Volume: {int(v):,}" for d, v in zip(date_str, sub["adj_volume"].fillna(0))],
+            hoverinfo="text"
         ),
         row=2, col=1
     )
 
-    # --- Build monthly tick labels ---
-    monthly = sub.groupby([sub["date"].dt.to_period("M")]).head(1)
-    tickvals = monthly["session"].tolist()
-    ticktext = monthly["date"].dt.strftime("%b-%Y").tolist()
-
-    # Layout
+    # ----- layout -----
     fig.update_layout(
         autosize=True,
         height=600,
@@ -562,15 +553,35 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         template="plotly_white",
-        bargap=0.3   # 👈 controls space between candles (0 = no gap, 0.2 = nice spacing)
+        bargap=0.3  # spacing between bars in the volume pane; candles use date spacing
     )
 
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # Apply monthly ticks
-    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1)
-    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1)
+    # ----- AUTO major date ticks + hide weekends/holidays -----
+    # dtick="M1" => monthly ticks; ticklabelmode="period" aligns label to the period
+    # rangebreaks hide non-business days even if they slip in
+    fig.update_xaxes(
+        dtick="M1",
+        tickformat="%b-%Y",
+        ticklabelmode="period",
+        rangebreaks=[
+            dict(bounds=["sat", "mon"]),  # hide weekends
+            # Optionally hide holidays (add your market holidays as strings "YYYY-MM-DD")
+            # dict(values=["2025-01-01","2025-07-04", ...])
+        ],
+        showgrid=True,
+        row=1, col=1
+    )
+    fig.update_xaxes(
+        dtick="M1",
+        tickformat="%b-%Y",
+        ticklabelmode="period",
+        rangebreaks=[dict(bounds=["sat","mon"])],
+        showgrid=True,
+        row=2, col=1
+    )
 
     return fig
 
