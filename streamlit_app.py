@@ -562,7 +562,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         template="plotly_white",
-        bargap=0.2   # 👈 controls space between candles (0 = no gap, 0.2 = nice spacing)
+        bargap=0.4   # 👈 controls space between candles (0 = no gap, 0.2 = nice spacing)
     )
 
     fig.update_yaxes(title_text="Price", row=1, col=1)
