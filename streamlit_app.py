@@ -7,9 +7,9 @@ import base64
 import re
 from typing import List, Dict, Tuple
 
-# (Plotly Python is not required for the JS popup, but keep if you want.)
-# import plotly.graph_objects as go
-# from plotly.subplots import make_subplots
+# --- ADDED ---
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 # ---------------------------------
 # Configuration
@@ -28,18 +28,18 @@ GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"
 
 # Palette per group (base, darker)
 GROUP_PALETTE = {
-    "Market":   ("#0284c7", "#075985"),  # cyan
-    "Sector":   ("#16a34a", "#166534"),  # green
-    "Commodity":("#b45309", "#7c2d12"),  # amber/brown
-    "Crypto":   ("#7c3aed", "#4c1d95"),  # purple
-    "Country":  ("#ea580c", "#9a3412"),  # orange
-    "Theme":    ("#2563eb", "#1e40af"),  # blue
-    "Leader":   ("#db2777", "#9d174d"),  # pink
+    "Market":   ("#0284c7", "#075985"),
+    "Sector":   ("#16a34a", "#166534"),
+    "Commodity":("#b45309", "#7c2d12"),
+    "Crypto":   ("#7c3aed", "#4c1d95"),
+    "Country":  ("#ea580c", "#9a3412"),
+    "Theme":    ("#2563eb", "#1e40af"),
+    "Leader":   ("#db2777", "#9d174d"),
 }
 
 # --- settings (no sidebar) ---
-use_group_colors = True        # color-code ticker chips by group
-max_holdings_rows = 10         # rows shown in tooltip table
+use_group_colors = True
+max_holdings_rows = 10
 
 # ---------------------------------
 # Small helpers
@@ -56,7 +56,6 @@ def _clean_text_series(s: pd.Series, title_case: bool = False) -> pd.Series:
     return s
 
 def _fix_acronyms_in_name(s: pd.Series) -> pd.Series:
-    """Preserve CSV case but normalize common acronyms (ETF, USD, USA, REIT, AI, S&P, US)."""
     s = s.astype(str)
     s = s.str.replace(r"\betf\b", "ETF", regex=True, flags=re.IGNORECASE)
     s = s.str.replace(r"\busd\b", "USD", regex=True, flags=re.IGNORECASE)
@@ -78,6 +77,9 @@ def _clean_ticker_series(s: pd.Series) -> pd.Series:
 def _escape(s) -> str:
     import html
     return html.escape("" if pd.isna(s) else str(s))
+
+def slugify(text: str) -> str:
+    return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
 
 # ---------------------------------
 # Data Loading
@@ -103,15 +105,10 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
         df_rs["ticker"] = _clean_ticker_series(df_rs["ticker"])
     if "group" in df_rs.columns:
         df_rs["group"] = _clean_text_series(df_rs["group"])
-    
     return df_etf, df_rs
 
 @st.cache_data(ttl=900, show_spinner=False)
 def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
-    """
-    Expected columns:
-      fund_ticker, fund_name, security_name, security_ticker, security_weight, ingest_date
-    """
     df = pd.read_csv(url)
     need = {"fund_ticker","fund_name","security_name","security_ticker","security_weight","ingest_date"}
     missing = need - set(df.columns)
@@ -125,6 +122,27 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["fund_name"]       = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
     df["security_name"]   = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
+    return df
+
+# --- ADDED ---
+@st.cache_data(ttl=900, show_spinner=False)
+def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
+    """
+    Expected columns:
+      ticker, group, date, adj_open, adj_close, adj_volume, adj_high, adj_low, sma5, sma10, sma20, sma50
+    """
+    df = pd.read_csv(url)
+    base_need = {"ticker","group","date","adj_open","adj_close","adj_volume","adj_high","adj_low"}
+    missing = base_need - set(df.columns)
+    if missing:
+        raise ValueError(f"[chart] Missing columns: {sorted(missing)}")
+
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df["ticker"] = _clean_ticker_series(df["ticker"])
+    df["group"]  = _clean_text_series(df["group"])
+    for c in ["adj_open","adj_close","adj_high","adj_low","adj_volume","sma5","sma10","sma20","sma50"]:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
     return df
 
 # ---------------------------------
@@ -200,113 +218,21 @@ def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str |
 
 def build_chip_css() -> str:
     base_css = """
-/* Chip base */
-.tt-chip {
-  position: relative;
-  display: inline-block;
-  padding: 6px 12px;
-  margin: 2px;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, #2563eb22, #07598522);
-  border: 1px solid #2563eb55;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e3a8a;
-  cursor: default;
-  white-space: nowrap;
-  transition: all .2s ease-in-out;
-  box-shadow: 0 1px 2px rgba(0,0,0,.05);
-}
-.tt-chip:hover {
-  background: linear-gradient(135deg, #2563eb33, #1d4ed833);
-  border-color: #2563eb88;
-  color: #1e40af;
-  box-shadow: 0 2px 8px rgba(37,99,235,.28);
-}
-
-/* Tooltip card to the RIGHT; scroll if tall */
-.tt-chip .tt-card {
-  position: absolute;
-  left: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%) translateX(6px);
-  z-index: 999999;
-  width: min(520px, 90vw);
-  max-height: 60vh;
-  overflow: auto;
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
-  border-radius: 12px;
-  padding: 12px 12px 8px 12px;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .18s ease, transform .18s ease;
-  pointer-events: none;
-}
-.tt-chip:hover .tt-card {
-  visibility: visible;
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-}
-
-/* Card text */
-.tt-card .tt-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-.tt-card .tt-sub   { color: #667085; font-size: 12px; margin-bottom: 8px; }
-.tt-card .tt-date  { font-variant-numeric: tabular-nums; }
-
-/* Tooltip table */
-.tt-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  table-layout: auto;
-}
-.tt-table thead th {
-  text-align: left;
-  padding: 6px 6px;
-  border-bottom: 1px solid #eee;
-}
-.tt-table tbody td {
-  padding: 6px 6px;
-  border-bottom: 1px dashed #f0f0f0;
-  vertical-align: top;
-  word-break: break-word;
-}
-.tt-table tbody tr:last-child td { border-bottom: none; }
-
-/* Column behaviors */
-.tt-sec { width: auto; }
-.tt-tk  { width: 1%; white-space: nowrap; font-family: ui-monospace, Menlo, Consolas, monospace; }
-.tt-wt  { width: 1%; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
-
-/* Mobile fallback */
-@media (max-width: 768px) {
-  .tt-chip .tt-card {
-    left: 0; top: auto; bottom: calc(100% + 8px);
-    transform: translateY(6px); max-height: 50vh;
-  }
-  .tt-chip:hover .tt-card { visibility: visible; transform: translateY(0); }
-}
+/* (same CSS as before for chips/tooltips) */
+.tt-chip{position:relative;display:inline-block;padding:6px 12px;margin:2px;border-radius:9999px;background:linear-gradient(135deg,#2563eb22,#07598522);border:1px solid #2563eb55;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;color:#1e3a8a;cursor:default;white-space:nowrap;transition:all .2s ease-in-out;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.tt-chip:hover{background:linear-gradient(135deg,#2563eb33,#1d4ed833);border-color:#2563eb88;color:#1e40af;box-shadow:0 2px 8px rgba(37,99,235,.28)}
+.tt-chip .tt-card{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%) translateX(6px);z-index:999999;width:min(520px,90vw);max-height:60vh;overflow:auto;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:0 12px 28px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.06);border-radius:12px;padding:12px 12px 8px 12px;visibility:hidden;opacity:0;transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+.tt-chip:hover .tt-card{visibility:visible;opacity:1;transform:translateY(-50%) translateX(0)}
+.tt-card .tt-title{font-weight:700;font-size:14px;margin-bottom:4px}.tt-card .tt-sub{color:#667085;font-size:12px;margin-bottom:8px}.tt-card .tt-date{font-variant-numeric:tabular-nums}
+.tt-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}.tt-table thead th{text-align:left;padding:6px 6px;border-bottom:1px solid #eee}.tt-table tbody td{padding:6px 6px;border-bottom:1px dashed #f0f0f0;vertical-align:top;word-break:break-word}.tt-table tbody tr:last-child td{border-bottom:none}
+.tt-sec{width:auto}.tt-tk{width:1%;white-space:nowrap;font-family:ui-monospace,Menlo,Consolas,monospace}.tt-wt{width:1%;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:768px){.tt-chip .tt-card{left:0;top:auto;bottom:calc(100% + 8px);transform:translateY(6px);max-height:50vh}.tt-chip:hover .tt-card{visibility:visible;transform:translateY(0)}}
 """
     group_css_parts = []
     if use_group_colors:
         for g, (base, dark) in GROUP_PALETTE.items():
             slug = re.sub(r'[^a-z0-9]+', '-', g.lower()).strip('-')
-            group_css_parts.append(f"""
-.tt-chip.chip--{slug} {{
-  background: linear-gradient(135deg, {base}22, {dark}22);
-  border-color: {base}55;
-  color: {dark};
-}}
-.tt-chip.chip--{slug}:hover {{
-  background: linear-gradient(135deg, {base}33, {dark}33);
-  border-color: {base}88;
-  color: {dark};
-  box-shadow: 0 2px 8px {base}55;
-}}
-""")
+            group_css_parts.append(f".tt-chip.chip--{slug}{{background:linear-gradient(135deg,{base}22,{dark}22);border-color:{base}55;color:{dark}}}.tt-chip.chip--{slug}:hover{{background:linear-gradient(135deg,{base}33,{dark}33);border-color:{base}88;color:{dark};box-shadow:0 2px 8px {base}55}}")
     return "<style>" + base_css + "\n".join(group_css_parts) + "</style>"
 
 # ---------------------------------
@@ -341,16 +267,6 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
                      alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_"," ").title())]
         )
         .properties(height=320)
-    )
-
-# --- CHANGED ---
-def format_chart_link(ticker: str) -> str:
-    """Return an in-page button that opens a JS modal; no reload."""
-    t = _escape(ticker)
-    return (
-        f'<button class="chart-btn" data-ticker="{t}" '
-        f'style="cursor:pointer; background:none; border:none; display:block; '
-        f'text-align:center; font-size:18px;" title="Open chart for {t}">📈</button>'
     )
 
 # ---------------------------------
@@ -427,237 +343,125 @@ def format_multiple(value) -> str:
     return (f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
             f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>')
 
-def slugify(text: str) -> str:
-    return re.sub(r'[^a-z0-9]+', '-', str(text).lower()).strip('-')
-
 # ---------------------------------
-# JS Popup Injector
+# Plotly Chart Builder (Python-side)
 # ---------------------------------
 # --- ADDED ---
-def inject_chart_modal_js(chart_csv_url: str):
-    modal_css = """
-    <style>
-      .chart-modal-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,.45);
-        display: none; z-index: 999999;
-      }
-      .chart-modal {
-        position: fixed; inset: 5% 6%;
-        background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.25);
-        display: none; z-index: 1000000; padding: 12px 12px 8px 12px;
-      }
-      .chart-modal header {
-        display:flex; align-items:center; justify-content:space-between; gap:8px;
-        border-bottom: 1px solid #eee; padding-bottom:8px; margin-bottom:8px;
-      }
-      .chart-modal header .title { font-weight:700; font-size:16px; }
-      .chart-modal header button {
-        border:none; background:#f2f2f2; border-radius:8px; padding:6px 10px; cursor:pointer;
-      }
-      #chart-container { width:100%; height:72vh; }
-      @media (max-width: 768px) { .chart-modal { inset: 6% 4%; } #chart-container { height: 66vh; } }
-    </style>
-    """
-    modal_html = f"""
-    <div class="chart-modal-backdrop" id="chartBackdrop"></div>
-    <div class="chart-modal" id="chartModal">
-      <header>
-        <div class="title" id="chartTitle">Chart</div>
-        <div style="display:flex; gap:8px;">
-          <button id="days180">180d</button>
-          <button id="days365">1y</button>
-          <button id="closeModal">Close</button>
-        </div>
-      </header>
-      <div id="chart-container"></div>
-    </div>
+def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180) -> go.Figure:
+    sub = df_chart[df_chart["ticker"] == ticker].sort_values("date")
+    if sub.empty:
+        raise ValueError(f"No chart data for {ticker}.")
+    if len(sub) > max_bars:
+        sub = sub.tail(max_bars)
 
-    <script>
-    (function() {{
-      const CSV_URL = {chart_csv_url!r};
+    fig = make_subplots(
+        rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
+        row_heights=[0.72, 0.28]
+    )
+    fig.add_trace(
+        go.Candlestick(
+            x=sub["date"],
+            open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
+            name="Price"
+        ), row=1, col=1
+    )
+    for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
+        if sma_col in sub.columns:
+            fig.add_trace(go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)), row=1, col=1)
+    fig.add_trace(go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9), row=2, col=1)
 
-      function ensurePlotly(cb) {{
-        if (window.Plotly) return cb();
-        const s = document.createElement('script');
-        s.src = "https://cdn.plot.ly/plotly-2.35.2.min.js";
-        s.onload = cb;
-        document.head.appendChild(s);
-      }}
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        xaxis_rangeslider_visible=False,
+        hovermode="x unified",
+        height=650,
+        template="plotly_white",
+        title=f"{ticker} — Candlestick with SMA & Volume"
+    )
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    return fig
 
-      const modal = document.getElementById('chartModal');
-      const backdrop = document.getElementById('chartBackdrop');
-      const titleEl = document.getElementById('chartTitle');
-      const container = document.getElementById('chart-container');
-      const btnClose = document.getElementById('closeModal');
-      const btn180 = document.getElementById('days180');
-      const btn365 = document.getElementById('days365');
+# --- ADDED ---
+def open_chart_modal(ticker: str, df_chart: pd.DataFrame):
+    try:
+        fig = make_ticker_figure(df_chart, ticker)
+    except Exception as e:
+        if hasattr(st, "dialog"):
+            @st.dialog(f"Chart — {ticker}")
+            def _dlg():
+                st.error(str(e))
+            _dlg()
+        else:
+            with st.sidebar:
+                st.header(f"Chart — {ticker}")
+                st.error(str(e))
+        return
 
-      let currentTicker = null;
-      let allRows = null;  // cached CSV in-memory
-      let lastWindow = 180;
-
-      function openModal() {{ modal.style.display = 'block'; backdrop.style.display = 'block'; }}
-      function closeModal() {{ modal.style.display = 'none'; backdrop.style.display = 'none'; }}
-      btnClose.addEventListener('click', closeModal);
-      backdrop.addEventListener('click', closeModal);
-
-      function renderChart(ticker, windowSize) {{
-        const rows = allRows.filter(r => (r.ticker || '').toUpperCase() === ticker);
-        if (!rows.length) {{
-          container.innerHTML = "<div style='padding:8px;'>No chart data for " + ticker + ".</div>";
-          return;
-        }}
-        rows.sort((a,b)=> new Date(a.date) - new Date(b.date));
-        const sliced = rows.slice(Math.max(0, rows.length - windowSize));
-
-        const x = sliced.map(r => new Date(r.date));
-        function num(v) {{ const n = parseFloat(v); return isNaN(n)? null : n; }}
-
-        const tracePrice = {{
-          type: 'candlestick',
-          x: x,
-          open: sliced.map(r=>num(r.adj_open)),
-          high: sliced.map(r=>num(r.adj_high)),
-          low:  sliced.map(r=>num(r.adj_low)),
-          close:sliced.map(r=>num(r.adj_close)),
-          name: 'Price'
-        }};
-
-        const tracesSMA = [];
-        [['sma5','SMA 5'],['sma10','SMA 10'],['sma20','SMA 20'],['sma50','SMA 50']].forEach(([col,name]) => {{
-          if (col in sliced[0]) {{
-            const y = sliced.map(r=>num(r[col]));
-            if (y.some(v=>v!==null)) {{
-              tracesSMA.push({{ type:'scatter', mode:'lines', x:x, y:y, name:name, line:{{width:1.2}} }});
-            }}
-          }}
-        }});
-
-        const traceVol = {{
-          type: 'bar',
-          x: x,
-          y: sliced.map(r=>num(r.adj_volume)),
-          name: 'Volume',
-          opacity: 0.9,
-          yaxis: 'y2'
-        }};
-
-        const layout = {{
-          margin: {{l:20,r:20,t:30,b:20}},
-          legend: {{orientation:'h', y:1.08, x:0}},
-          hovermode: 'x unified',
-          xaxis: {{rangeslider: {{visible:false}}}},
-          yaxis: {{title:'Price', domain:[0.32, 1.0]}},
-          yaxis2: {{title:'Volume', overlaying:'y', side:'right', showgrid:false, domain:[0.0,0.28]}},
-          height: 650
-        }};
-
-        Plotly.react(container, [tracePrice, ...tracesSMA, traceVol], layout, {{displayModeBar: true}});
-      }}
-
-      function loadAndRender(ticker, windowSize) {{
-        ensurePlotly(() => {{
-          if (allRows) {{
-            currentTicker = ticker;
-            titleEl.textContent = ticker + ' — Candlestick with SMA & Volume';
-            renderChart(ticker, windowSize);
-            openModal();
-            return;
-          }}
-          Plotly.d3.csv(CSV_URL, function(err, rows) {{
-            if (err) {{
-              container.innerHTML = "<div style='padding:8px;color:#b91c1c;'>Failed to load chart data.</div>";
-              openModal();
-              return;
-            }}
-            allRows = rows.map(r=>({{
-              ticker: (r.ticker||'').toUpperCase().trim(),
-              group: r.group,
-              date: r.date,
-              adj_open: r.adj_open, adj_close: r.adj_close, adj_high: r.adj_high, adj_low: r.adj_low,
-              adj_volume: r.adj_volume,
-              sma5: r.sma5, sma10: r.sma10, sma20: r.sma20, sma50: r.sma50
-            }}));
-            currentTicker = ticker;
-            titleEl.textContent = ticker + ' — Candlestick with SMA & Volume';
-            renderChart(ticker, windowSize);
-            openModal();
-          }});
-        }});
-      }}
-
-      // Global click handler for dynamically created buttons in the HTML tables
-      document.addEventListener('click', function(e) {{
-        const btn = e.target.closest('.chart-btn');
-        if (!btn) return;
-        e.preventDefault();
-        const ticker = (btn.getAttribute('data-ticker') || '').toUpperCase();
-        lastWindow = 180;
-        loadAndRender(ticker, lastWindow);
-      }});
-
-      // Window toggle
-      document.getElementById('days180').addEventListener('click', function() {{
-        if (!currentTicker) return;
-        lastWindow = 180; renderChart(currentTicker, lastWindow);
-      }});
-      document.getElementById('days365').addEventListener('click', function() {{
-        if (!currentTicker) return;
-        lastWindow = 252; renderChart(currentTicker, lastWindow);
-      }});
-    }})();
-    </script>
-    """
-    st.markdown(modal_css + modal_html, unsafe_allow_html=True)
+    if hasattr(st, "dialog"):
+        @st.dialog(f"Chart — {ticker}")
+        def _dlg():
+            st.plotly_chart(fig, use_container_width=True)
+        _dlg()
+    else:
+        with st.sidebar:
+            st.header(f"Chart — {ticker}")
+            st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------------------
-# Table Rendering
+# STREAMLIT-NATIVE TABLE (with per-row 📈 button)
 # ---------------------------------
-def render_group_table(group_name: str, rows: List[Dict]) -> None:
-    table_id = f"tbl-{slugify(group_name)}"
-    html = pd.DataFrame(rows).to_html(escape=False, index=False)
+# --- ADDED ---
+def render_group_table_native(group_name: str, tickers_in_group, latest: pd.DataFrame, rs_last_n: pd.DataFrame, df_holdings: pd.DataFrame):
+    st.header(f"📌 {group_name}")
 
-    css = f"""
-        #{table_id} table {{
-            width: 100%; border-collapse: collapse; border-spacing: 0; border: none; border-radius: 8px;
-        }}
-        #{table_id} table thead th {{
-            text-align: center !important; border-bottom: 2px solid rgba(156, 163, 175, 0.6);
-            border-left: none !important; border-right: none !important; padding: 6px 8px;
-        }}
-        #{table_id} table tbody td {{
-            border-bottom: none; border-left: none !important; border-right: none !important;
-            padding: 6px 8px; position: relative;
-        }}
-        #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
-        /* Right align numeric-ish columns */
-        #{table_id} table td:nth-child(3),
-        #{table_id} table td:nth-child(4),
-        #{table_id} table td:nth-child(7),
-        #{table_id} table td:nth-child(8),
-        #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(10) {{ text-align: right !important; }}
-        #{table_id} table td:nth-child(5),
-        #{table_id} table td:nth-child(11),
-        #{table_id} table td:nth-child(12),
-        #{table_id} table td:nth-child(13),
-        #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
-        /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
-    """
-    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
+    # Header
+    col_widths = [1.4, 1.6, 0.9, 0.9, 0.8, 0.3, 0.9, 0.9, 0.9, 0.9, 0.3, 1.2, 0.8, 0.8, 0.8, 0.6]
+    cols = st.columns(col_widths, gap="small")
+    headers = ["Ticker","Relative Strength","RS Rank (1M)","RS Rank (1Y)","Volume","", "Intraday","1D","1W","1M","", "Ext Mult","SMA5","SMA10","SMA20","Chart"]
+    for c,h in zip(cols, headers):
+        c.markdown(f"**{h}**")
+
+    # Rows
+    for ticker in tickers_in_group:
+        row = latest.loc[ticker]
+        spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
+
+        chip = ticker
+        if not df_holdings.empty:
+            card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
+            if card_html:
+                chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
+
+        rcols = st.columns(col_widths, gap="small")
+        rcols[0].markdown(chip, unsafe_allow_html=True)
+        rcols[1].markdown(create_sparkline(spark_series), unsafe_allow_html=True)
+        rcols[2].markdown(format_rank(row.get("rs_rank_21d")), unsafe_allow_html=True)
+        rcols[3].markdown(format_rank(row.get("rs_rank_252d")), unsafe_allow_html=True)
+        rcols[4].markdown(format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")), unsafe_allow_html=True)
+        rcols[5].markdown("&nbsp;", unsafe_allow_html=True)
+        rcols[6].markdown(format_performance_intraday(row.get("ret_intraday")), unsafe_allow_html=True)
+        rcols[7].markdown(format_performance(row.get("ret_1d")), unsafe_allow_html=True)
+        rcols[8].markdown(format_performance(row.get("ret_1w")), unsafe_allow_html=True)
+        rcols[9].markdown(format_performance(row.get("ret_1m")), unsafe_allow_html=True)
+        rcols[10].markdown("&nbsp;", unsafe_allow_html=True)
+        rcols[11].markdown(format_multiple(row.get("ratio_pct_dist_to_atr_pct")), unsafe_allow_html=True)
+        rcols[12].markdown(format_indicator(row.get("above_sma5")), unsafe_allow_html=True)
+        rcols[13].markdown(format_indicator(row.get("above_sma10")), unsafe_allow_html=True)
+        rcols[14].markdown(format_indicator(row.get("above_sma20")), unsafe_allow_html=True)
+
+        # 📈 button (no navigation; triggers Python → modal)
+        if rcols[15].button("📈", key=f"chart_{group_name}_{ticker}", help=f"Open chart for {ticker}"):
+            st.session_state["chart_ticker"] = ticker
+            st.session_state["chart_trigger"] = True  # flag to open after rendering rows
 
 # ---------------------------------
 # Dashboard Rendering
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
-
-    # Inject CSS for chips/tooltips
     st.markdown(build_chip_css(), unsafe_allow_html=True)
-
-    # --- ADDED --- JS popup & loader for charts (once per page)
-    inject_chart_modal_js(DATA_URLS["chart"])
 
     latest, rs_last_n = process_data(df_etf, df_rs)
     if "date" in latest.columns:
@@ -671,6 +475,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         df_holdings = pd.DataFrame()
         st.warning(f"Holdings tooltips disabled — {e}")
 
+    # --- ADDED --- load chart data once
+    try:
+        df_chart = load_chart_csv(DATA_URLS["chart"])
+    except Exception as e:
+        df_chart = pd.DataFrame()
+        st.warning(f"Chart data unavailable — {e}")
+
     if "group" not in latest.columns:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
         return
@@ -679,8 +490,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        st.header(f"📌 {group_name}")
-        tickers_in_group = group_tickers[group_name]
+        tickers_in_group = list(group_tickers[group_name])
 
         if "rs_rank_21d" in latest.columns:
             tickers_in_group = sorted(
@@ -689,38 +499,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 reverse=True,
             )
 
-        rows = []
-        for ticker in tickers_in_group:
-            row = latest.loc[ticker]
-            spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
-
-            chip = ticker
-            if not df_holdings.empty:
-                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
-                if card_html:
-                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
-
-            rows.append({
-                "Ticker": chip,
-                "Relative Strength": create_sparkline(spark_series),
-                "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
-                "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
-                "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
-                " ": "",
-                "Intraday": format_performance_intraday(row.get("ret_intraday")),
-                "1D Return": format_performance(row.get("ret_1d")),
-                "1W Return": format_performance(row.get("ret_1w")),
-                "1M Return": format_performance(row.get("ret_1m")),
-                "  ": "",
-                "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
-                "Above SMA5": format_indicator(row.get("above_sma5")),
-                "Above SMA10": format_indicator(row.get("above_sma10")),
-                "Above SMA20": format_indicator(row.get("above_sma20")),
-                # --- ADDED --- Chart popup button (in-page)
-                "Chart": format_chart_link(ticker),
-            })
-
-        render_group_table(group_name, rows)
+        # --- CHANGED --- use Streamlit-native rows with a real button
+        render_group_table_native(group_name, tickers_in_group, latest, rs_last_n, df_holdings)
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
@@ -732,13 +512,20 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.caption(f"From {start_date} to {end_date}")
         c1, c2 = st.columns(2)
         with c1:
-            st.altair_chart(breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
-                            use_container_width=True)
+            st.altair_chart(breadth_column_chart(counts_21, "count_over_85", bar_color="green"), use_container_width=True)
         with c2:
-            st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"),
-                            use_container_width=True)
+            st.altair_chart(breadth_column_chart(counts_21, "count_under_50", bar_color="red"), use_container_width=True)
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
+
+    # --- ADDED --- open modal if a button was clicked this run
+    if st.session_state.get("chart_trigger") and st.session_state.get("chart_ticker"):
+        if df_chart.empty:
+            st.warning("Chart data not available.")
+        else:
+            open_chart_modal(st.session_state["chart_ticker"], df_chart)
+        # reset trigger to avoid re-opening on next rerun
+        st.session_state["chart_trigger"] = False
 
 # ---------------------------------
 # Main
