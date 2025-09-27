@@ -520,7 +520,8 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
             open=sub["adj_open"], high=sub["adj_high"],
             low=sub["adj_low"], close=sub["adj_close"],
             name="Price",
-            hovertext=candle_hover, hoverinfo="text"
+            hovertext=candle_hover, hoverinfo="text",
+            width=0.8   # 👈 adjust (0.6 = narrow, 0.8 = wider, 1.0 = very wide)
         ),
         row=1, col=1
     )
