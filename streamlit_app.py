@@ -154,6 +154,35 @@ def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
     df.attrs["sma_missing"] = sorted(list(soft_missing))
     return df
 
+def inject_scroll_memory(storage_key: str = "ums_scroll_y"):
+    st.markdown(
+        f"""
+        <script>
+        (function() {{
+          const KEY = "{storage_key}";
+          // Restore on load
+          const y = localStorage.getItem(KEY);
+          if (y !== null) {{
+            // Defer to ensure DOM is laid out
+            window.requestAnimationFrame(() => {{
+              window.scrollTo(0, parseInt(y, 10));
+            }});
+          }}
+          // Save on navigation / refresh
+          window.addEventListener("beforeunload", function() {{
+            try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
+          }});
+          // Also save when Streamlit triggers soft-reruns (clicks etc.)
+          document.addEventListener("click", function(e) {{
+            // Only store if the click is inside the app area (cheap heuristic)
+            try {{ localStorage.setItem(KEY, String(window.scrollY)); }} catch (e) {{}}
+          }}, true);
+        }})();
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
 # ---------------------------------
 # Data Processing
 # ---------------------------------
@@ -389,10 +418,10 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
     )
 
 def format_chart_link(ticker: str) -> str:
-    """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
     t = _escape(ticker)
     return (
         f'<a href="?chart={t}" target="_self" '
+        f'onclick="try{{localStorage.setItem(\'ums_scroll_y\', String(window.scrollY));}}catch(e){{}};" '
         f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
         f'title="Open chart for {t}">📈</a>'
     )
@@ -681,6 +710,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     st.title("US Market Daily Snapshot")
+    inject_scroll_memory()
 
     # Inject CSS for chips/tooltips
     st.markdown(build_chip_css(), unsafe_allow_html=True)
