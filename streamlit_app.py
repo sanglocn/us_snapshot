@@ -484,53 +484,65 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # Keep only rows with valid OHLC (actual sessions) and drop weekends
+    # Keep only real trading sessions (must have all OHLC)
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
         sub["adj_low"].notna() &
         sub["adj_close"].notna()
     ].copy()
-    sub = sub[sub["date"].dt.dayofweek < 5].copy()
 
-    # Optional: detect “holiday” rows to collapse (zero volume or obviously bad bars)
-    holiday_dates = sub.loc[
-        (sub["adj_volume"].fillna(0) == 0)
-    , "date"].dt.normalize().drop_duplicates().tolist()
-
+    # Limit bars (most recent)
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
+    # Session index: guarantees no non-trading days on x-axis
+    sub = sub.reset_index(drop=True)
+    sub["session"] = sub.index
+    sub["date_str"] = sub["date"].dt.strftime("%Y-%m-%d")
+
+    # ---- Build MAJOR ticks (first trading day of each month in view) ----
+    # group by year-month, take first row (i.e., first trading day in that month)
+    monthly_first = sub.groupby(sub["date"].dt.to_period("M")).head(1)
+    tickvals = monthly_first["session"].tolist()
+    ticktext = monthly_first["date"].dt.strftime("%b-%Y").tolist()
+
     # Hover text
     candle_hover = [
-        f"Date: {d:%Y-%m-%d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
-        for d, o, h, l, c in zip(sub["date"], sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
+        f"Date: {d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
+        for d, o, h, l, c in zip(sub["date_str"], sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
     ]
-    vol_hover = [f"Date: {d:%Y-%m-%d}<br>Volume: {int(v):,}" for d, v in zip(sub["date"], sub["adj_volume"].fillna(0))]
+    vol_hover = [f"Date: {d}<br>Volume: {int(v):,}" for d, v in zip(sub["date_str"], sub["adj_volume"].fillna(0))]
+
+    from plotly.subplots import make_subplots
+    import plotly.graph_objects as go
 
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
         row_heights=[0.72, 0.28]
     )
 
-    # Price candles
+    # Candles (session-indexed)
     fig.add_trace(
         go.Candlestick(
-            x=sub["date"],
+            x=sub["session"],
             open=sub["adj_open"], high=sub["adj_high"],
-            low=sub["adj_low"],  close=sub["adj_close"],
+            low=sub["adj_low"], close=sub["adj_close"],
             name="Price",
             hovertext=candle_hover, hoverinfo="text"
         ),
         row=1, col=1
     )
 
-    # SMAs (if present)
+    # SMAs (optional)
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
+            sma_hover = [f"Date: {d}<br>{name}: {y:.2f}" for d, y in zip(sub["date_str"], sub[sma_col])]
             fig.add_trace(
                 go.Scatter(
-                    x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)
+                    x=sub["session"], y=sub[sma_col],
+                    mode="lines", name=name, line=dict(width=1.2),
+                    hovertext=sma_hover, hoverinfo="text"
                 ),
                 row=1, col=1
             )
@@ -538,13 +550,13 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Volume
     fig.add_trace(
         go.Bar(
-            x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9,
+            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
             hovertext=vol_hover, hoverinfo="text"
         ),
         row=2, col=1
     )
 
-    # Layout: legend at bottom
+    # Layout + legend bottom
     fig.update_layout(
         margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
@@ -557,23 +569,9 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # ✅ Auto major date ticks + collapse weekends/holidays (apply to BOTH x-axes)
-    rb = [dict(bounds=["sat", "mon"])]
-    if holiday_dates:
-        rb.append(dict(values=[d.strftime("%Y-%m-%d") for d in holiday_dates]))
-
-    fig.update_xaxes(
-        tickformat="%b-%Y",   # MMM-YYYY
-        dtick="M1",           # 1 major tick per month
-        rangebreaks=rb,
-        row=1, col=1
-    )
-    fig.update_xaxes(
-        tickformat="%b-%Y",
-        dtick="M1",
-        rangebreaks=rb,
-        row=2, col=1
-    )
+    # Major ticks: first trading day of each month, labeled MMM-YYYY
+    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1)
+    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1)
 
     return fig
 
