@@ -517,7 +517,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
 
     fig.update_layout(
         margin=dict(l=20, r=20, t=30, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="left", x=0),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
