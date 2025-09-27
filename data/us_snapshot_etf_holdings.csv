@@ -101,6 +101,8 @@ HACK,Amplify Cybersecurity ETF,Fortinet Inc,FTNT,4.91,2025-09-27
 HACK,Amplify Cybersecurity ETF,Cloudflare Inc,NET,4.83,2025-09-27
 HACK,Amplify Cybersecurity ETF,Zscaler Inc,ZS,4.49,2025-09-27
 HACK,Amplify Cybersecurity ETF,Cyberark Software Ltd,CYBR,4.39,2025-09-27
+IAU,iShares Gold Trust,Jpm London Vault,London,0.85,2025-09-27
+IAU,iShares Gold Trust,Jpm New York Vault,Newyork,0.15,2025-09-27
 IBIT,iShares Bitcoin Trust ETF,Bitcoin,BTC,100.0,2025-09-27
 IBIT,iShares Bitcoin Trust ETF,Usd Cash,USD,0.0,2025-09-27
 IGV,iShares Expanded Tech-Software Sector ETF,Palantir Technologies Inc Class A,PLTR,8.96,2025-09-27
@@ -273,126 +275,126 @@ REMX,VanEck Rare Earth and Strategic Metals ETF,Shenghe Resources Holding Co Ltd
 REMX,VanEck Rare Earth and Strategic Metals ETF,Ganfeng Lithium Group Co Ltd,1772 HK,4.92,2025-09-27
 REMX,VanEck Rare Earth and Strategic Metals ETF,Jinduicheng Molybdenum Co Ltd,601958 C1,4.9,2025-09-27
 REMX,VanEck Rare Earth and Strategic Metals ETF,Iperionx Ltd,IPX AU,4.72,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Invesco Government & Agency Portfolio,AGPXX ,0.53,2025-09-27
 RSP,Invesco S&P 500 Equal Weight ETF,Warner Bros Discovery Inc,WBD ,0.31,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Intel Corp,INTC ,0.27,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Intel Corp,INTC ,0.28,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Applied Materials Inc,AMAT ,0.25,2025-09-27
 RSP,Invesco S&P 500 Equal Weight ETF,Paramount Skydance Corp,PSKY ,0.25,2025-09-27
 RSP,Invesco S&P 500 Equal Weight ETF,Synopsys Inc,SNPS ,0.25,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Applied Materials Inc,AMAT ,0.24,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Tesla Inc,TSLA ,0.25,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Albemarle Corp,ALB ,0.24,2025-09-27
 RSP,Invesco S&P 500 Equal Weight ETF,Lam Research Corp,LRCX ,0.24,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Tesla Inc,TSLA ,0.24,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Albemarle Corp,ALB ,0.23,2025-09-27
-RSP,Invesco S&P 500 Equal Weight ETF,Apple Inc,AAPL ,0.23,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Warner Bros Discovery Inc,WBD ,6.89,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Paramount Skydance Corp,PSKY ,5.47,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Charter Communications Inc,CHTR ,4.49,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Trade Desk Inc/the,TTD ,4.42,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Take-two Interactive Software Inc,TTWO ,4.39,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Tko Group Holdings Inc,TKO ,4.38,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Frontier Communications Parent Inc,FYBR ,4.36,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Interpublic Group Of Cos Inc/the,IPG ,4.36,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Omnicom Group Inc,OMC ,4.36,2025-09-27
-RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Meta Platforms Inc,META ,4.35,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tesla Inc,TSLA ,2.48,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Applovin Corp,APP ,0.23,2025-09-27
+RSP,Invesco S&P 500 Equal Weight ETF,Kla Corp,KLAC ,0.23,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Warner Bros Discovery Inc,WBD ,6.77,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Paramount Skydance Corp,PSKY ,5.45,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Electronic Arts Inc,EA ,4.94,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Take-two Interactive Software Inc,TTWO ,4.56,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Charter Communications Inc,CHTR ,4.52,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Tko Group Holdings Inc,TKO ,4.44,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Trade Desk Inc/the,TTD ,4.44,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Interpublic Group Of Cos Inc/the,IPG ,4.41,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Omnicom Group Inc,OMC ,4.41,2025-09-27
+RSPC,Invesco S&P 500 Equal Weight Communication Services ETF,Verizon Communications Inc,VZ ,4.36,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tesla Inc,TSLA ,2.55,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Lululemon Athletica Inc,LULU ,2.17,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Ulta Beauty Inc,ULTA ,2.16,2025-09-27
 RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,General Motors Co,GM ,2.15,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Lululemon Athletica Inc,LULU ,2.14,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Ulta Beauty Inc,ULTA ,2.13,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Aptiv Plc,APTV ,2.11,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Yum! Brands Inc,YUM ,2.1,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Ebay Inc,EBAY ,2.08,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tapestry Inc,TPR ,2.08,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Wynn Resorts Ltd,WYNN ,2.08,2025-09-27
-RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Booking Holdings Inc,BKNG ,2.07,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Aptiv Plc,APTV ,2.13,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Ford Motor Co,F ,2.12,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Wynn Resorts Ltd,WYNN ,2.11,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Yum! Brands Inc,YUM ,2.11,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Tapestry Inc,TPR ,2.09,2025-09-27
+RSPD,Invesco S&P 500 Equal Weight Consumer Discretionary ETF,Chipotle Mexican Grill Inc,CMG ,2.08,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Allstate Corp/the,ALL ,1.41,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Citigroup Inc,C ,1.41,2025-09-27
 RSPF,Invesco S&P 500 Equal Weight Financials ETF,American Express Co,AXP ,1.4,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Citigroup Inc,C ,1.4,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Interactive Brokers Group Inc,IBKR ,1.4,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Raymond James Financial Inc,RJF ,1.4,2025-09-27
 RSPF,Invesco S&P 500 Equal Weight Financials ETF,Wells Fargo & Co,WFC ,1.4,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Allstate Corp/the,ALL ,1.39,2025-09-27
 RSPF,Invesco S&P 500 Equal Weight Financials ETF,Bank Of New York Mellon Corp/the,BK ,1.39,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Blackrock Inc,BLK ,1.39,2025-09-27
 RSPF,Invesco S&P 500 Equal Weight Financials ETF,Jpmorgan Chase & Co,JPM ,1.39,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Robinhood Markets Inc,HOOD ,1.39,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Bank Of America Corp,BAC ,1.38,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Blackrock Inc,BLK ,1.38,2025-09-27
-RSPF,Invesco S&P 500 Equal Weight Financials ETF,Cboe Global Markets Inc,CBOE ,1.38,2025-09-27
+RSPF,Invesco S&P 500 Equal Weight Financials ETF,Northern Trust Corp,NTRS ,1.39,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Halliburton Co,HAL ,4.83,2025-09-27
 RSPG,Invesco S&P 500 Equal Weight Energy ETF,Valero Energy Corp,VLO ,4.81,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Halliburton Co,HAL ,4.77,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Expand Energy Corp,EXE ,4.73,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Marathon Petroleum Corp,MPC ,4.72,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Williams Cos Inc/the,WMB ,4.71,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Baker Hughes Co,BKR ,4.67,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Phillips 66,PSX ,4.62,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Eqt Corp,EQT ,4.61,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Targa Resources Corp,TRGP ,4.59,2025-09-27
-RSPG,Invesco S&P 500 Equal Weight Energy ETF,Apa Corp,APA ,4.57,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Expand Energy Corp,EXE ,4.76,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Marathon Petroleum Corp,MPC ,4.75,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Williams Cos Inc/the,WMB ,4.73,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Baker Hughes Co,BKR ,4.68,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Targa Resources Corp,TRGP ,4.63,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Apa Corp,APA ,4.61,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Diamondback Energy Inc,FANG ,4.61,2025-09-27
+RSPG,Invesco S&P 500 Equal Weight Energy ETF,Phillips 66,PSX ,4.61,2025-09-27
 RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Centene Corp,CNC ,1.87,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Universal Health Services Inc,UHS ,1.8,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Mckesson Corp,MCK ,1.81,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Universal Health Services Inc,UHS ,1.81,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Molina Healthcare Inc,MOH ,1.8,2025-09-27
 RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Hca Healthcare Inc,HCA ,1.79,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Molina Healthcare Inc,MOH ,1.79,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Mckesson Corp,MCK ,1.77,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbott Laboratories,ABT ,1.75,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Quest Diagnostics Inc,DGX ,1.76,2025-09-27
 RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbvie Inc,ABBV ,1.75,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Elevance Health Inc,ELV ,1.75,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Quest Diagnostics Inc,DGX ,1.75,2025-09-27
-RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Johnson & Johnson,JNJ ,1.72,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Albemarle Corp,ALB ,4.55,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Newmont Corp,NEM ,4.19,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Mosaic Co/the,MOS ,4.09,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Cf Industries Holdings Inc,CF ,4.06,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Steel Dynamics Inc,STLD ,4.03,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Linde Plc,LIN ,3.94,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Packaging Corp Of America,PKG ,3.93,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Vulcan Materials Co,VMC ,3.93,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Ecolab Inc,ECL ,3.9,2025-09-27
-RSPM,Invesco S&P 500 Equal Weight Materials ETF,Martin Marietta Materials Inc,MLM ,3.87,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Caterpillar Inc,CAT ,1.4,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Cencora Inc,COR ,1.74,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Elevance Health Inc,ELV ,1.74,2025-09-27
+RSPH,Invesco S&P 500 Equal Weight Health Care ETF,Abbott Laboratories,ABT ,1.73,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Albemarle Corp,ALB ,4.68,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Newmont Corp,NEM ,4.23,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Cf Industries Holdings Inc,CF ,4.13,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Mosaic Co/the,MOS ,4.12,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Steel Dynamics Inc,STLD ,4.1,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Vulcan Materials Co,VMC ,3.96,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Packaging Corp Of America,PKG ,3.95,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Ecolab Inc,ECL ,3.92,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Linde Plc,LIN ,3.91,2025-09-27
+RSPM,Invesco S&P 500 Equal Weight Materials ETF,Dupont De Nemours Inc,DD ,3.9,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Caterpillar Inc,CAT ,1.39,2025-09-27
 RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Norfolk Southern Corp,NSC ,1.38,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Union Pacific Corp,UNP ,1.37,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Ch Robinson Worldwide Inc,CHRW ,1.34,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Union Pacific Corp,UNP ,1.38,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,L3harris Technologies Inc,LHX ,1.35,2025-09-27
 RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Csx Corp,CSX ,1.34,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,General Electric Co,GE ,1.34,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,L3harris Technologies Inc,LHX ,1.34,2025-09-27
 RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Fedex Corp,FDX ,1.33,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Howmet Aerospace Inc,HWM ,1.33,2025-09-27
 RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Lockheed Martin Corp,LMT ,1.33,2025-09-27
-RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Howmet Aerospace Inc,HWM ,1.32,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Healthpeak Properties Inc,DOC ,3.36,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Rtx Corp,RTX ,1.33,2025-09-27
+RSPN,Invesco S&P 500 Equal Weight Industrials ETF,Snap-on Inc,SNA ,1.33,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Healthpeak Properties Inc,DOC ,3.42,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Welltower Inc,WELL ,3.37,2025-09-27
 RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Iron Mountain Inc,IRM ,3.36,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Bxp Inc,BXP ,3.32,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Prologis Inc,PLD ,3.32,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Welltower Inc,WELL ,3.32,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Simon Property Group Inc,SPG ,3.31,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Sba Communications Corp,SBAC ,3.28,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Realty Income Corp,O ,3.27,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Alexandria Real Estate Equities Inc,ARE ,3.26,2025-09-27
-RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Equinix Inc,EQIX ,3.26,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Monster Beverage Corp,MNST ,2.85,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Simon Property Group Inc,SPG ,3.35,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Prologis Inc,PLD ,3.33,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Essex Property Trust Inc,ESS ,3.29,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Realty Income Corp,O ,3.29,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Avalonbay Communities Inc,AVB ,3.28,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Bxp Inc,BXP ,3.28,2025-09-27
+RSPR,Invesco S&P 500 Equal Weight Real Estate ETF,Crown Castle Inc,CCI ,3.28,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Monster Beverage Corp,MNST ,2.88,2025-09-27
 RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Walmart Inc,WMT ,2.85,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Sysco Corp,SYY ,2.81,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Mondelez International Inc,MDLZ ,2.79,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Hershey Co/the,HSY ,2.77,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Archer-daniels-midland Co,ADM ,2.76,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Clorox Co/the,CLX ,2.76,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Philip Morris International Inc,PM ,2.75,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Costco Wholesale Corp,COST ,2.74,2025-09-27
-RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,General Mills Inc,GIS ,2.74,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Intel Corp,INTC ,1.95,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Sysco Corp,SYY ,2.83,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Mondelez International Inc,MDLZ ,2.82,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Hershey Co/the,HSY ,2.81,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Clorox Co/the,CLX ,2.8,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,General Mills Inc,GIS ,2.78,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Philip Morris International Inc,PM ,2.77,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Brown-forman Corp,BF/B ,2.76,2025-09-27
+RSPS,Invesco S&P 500 Equal Weight Consumer Staples ETF,Bunge Global Sa,BG ,2.76,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Intel Corp,INTC ,2.02,2025-09-27
 RSPT,Invesco S&P 500 Equal Weight Technology ETF,Synopsys Inc,SNPS ,1.78,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applied Materials Inc,AMAT ,1.73,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applied Materials Inc,AMAT ,1.76,2025-09-27
 RSPT,Invesco S&P 500 Equal Weight Technology ETF,Lam Research Corp,LRCX ,1.69,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Seagate Technology Holdings Plc,STX ,1.62,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Apple Inc,AAPL ,1.61,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applovin Corp,APP ,1.67,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Teradyne Inc,TER ,1.62,2025-09-27
 RSPT,Invesco S&P 500 Equal Weight Technology ETF,Kla Corp,KLAC ,1.61,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Applovin Corp,APP ,1.6,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Crowdstrike Holdings Inc,CRWD ,1.6,2025-09-27
 RSPT,Invesco S&P 500 Equal Weight Technology ETF,Gartner Inc,IT ,1.6,2025-09-27
-RSPT,Invesco S&P 500 Equal Weight Technology ETF,Teradyne Inc,TER ,1.6,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Eversource Energy,ES ,3.39,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Xcel Energy Inc,XEL ,3.39,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Sempra,SRE ,3.34,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nextera Energy Inc,NEE ,3.33,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Evergy Inc,EVRG ,3.25,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nisource Inc,NI ,3.25,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Aes Corp/the,AES ,3.24,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Entergy Corp,ETR ,3.24,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Firstenergy Corp,FE ,3.24,2025-09-27
-RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Southern Co/the,SO ,3.24,2025-09-27
+RSPT,Invesco S&P 500 Equal Weight Technology ETF,Apple Inc,AAPL ,1.59,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Xcel Energy Inc,XEL ,3.44,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Eversource Energy,ES ,3.42,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Sempra,SRE ,3.39,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nextera Energy Inc,NEE ,3.35,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Firstenergy Corp,FE ,3.3,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nisource Inc,NI ,3.28,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Nrg Energy Inc,NRG ,3.28,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Entergy Corp,ETR ,3.27,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Aes Corp/the,AES ,3.26,2025-09-27
+RSPU,Invesco S&P 500 Equal Weight Utilities ETF,Constellation Energy Corp,CEG ,3.25,2025-09-27
 SCHH,Schwab U.S. REIT ETF,Prologis Reit Inc,PLD,7.76,2025-09-27
 SCHH,Schwab U.S. REIT ETF,Welltower Inc,WELL,7.62,2025-09-27
 SCHH,Schwab U.S. REIT ETF,American Tower Reit Corp,AMT,6.7,2025-09-27
@@ -413,6 +415,8 @@ SIL,Silver Miners ETF,Fresnillo Plc,FRES LN,5.59,2025-09-27
 SIL,Silver Miners ETF,First Majestic S,AG CN,4.78,2025-09-27
 SIL,Silver Miners ETF,Ssr Mining Inc,SSRM,4.72,2025-09-27
 SIL,Silver Miners ETF,Korea Zinc Co Ltd,010130 KS,4.38,2025-09-27
+SLV,iShares Silver Trust,Jpm London B (vltb),London,0.79,2025-09-27
+SLV,iShares Silver Trust,Jpm New York (vln),Newyork,0.21,2025-09-27
 SOLZ,Solana ETF,Cash & Other,Cash&Other,100.0,2025-09-27
 SOLZ,Solana ETF,Sol Futures       Oct25,QSOV5 Curncy,99.98,2025-09-27
 SPY,SPDR S&P 500 ETF Trust,Nvidia Corp,NVDA,7.7,2025-09-27
@@ -425,16 +429,23 @@ SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl A,GOOGL,2.54,2025-09-27
 SPY,SPDR S&P 500 ETF Trust,Tesla Inc,TSLA,2.11,2025-09-27
 SPY,SPDR S&P 500 ETF Trust,Alphabet Inc Cl C,GOOG,2.04,2025-09-27
 SPY,SPDR S&P 500 ETF Trust,Berkshire Hathaway Inc Cl B,BRK.B,1.61,2025-09-27
-TAN,Invesco Solar ETF,First Solar Inc,FSLR ,10.5,2025-09-27
-TAN,Invesco Solar ETF,Nextracker Inc,NXT ,10.46,2025-09-27
-TAN,Invesco Solar ETF,Enphase Energy Inc,ENPH ,7.13,2025-09-27
-TAN,Invesco Solar ETF,Sunrun Inc,RUN ,6.32,2025-09-27
-TAN,Invesco Solar ETF,Gcl Technology Holdings Ltd,3800 HK,5.98,2025-09-27
-TAN,Invesco Solar ETF,Solaredge Technologies Inc,SEDG ,5.52,2025-09-27
-TAN,Invesco Solar ETF,Xinyi Solar Holdings Ltd,968 HK,4.19,2025-09-27
-TAN,Invesco Solar ETF,Ha Sustainable Infrastructure Capital Inc,HASI ,4.06,2025-09-27
-TAN,Invesco Solar ETF,Enlight Renewable Energy Ltd,ENLT ,3.83,2025-09-27
-TAN,Invesco Solar ETF,Daqo New Energy Corp Adr,DQ ,3.72,2025-09-27
+TAN,Invesco Solar ETF,Nextracker Inc,NXT ,10.48,2025-09-27
+TAN,Invesco Solar ETF,First Solar Inc,FSLR ,10.43,2025-09-27
+TAN,Invesco Solar ETF,Enphase Energy Inc,ENPH ,7.07,2025-09-27
+TAN,Invesco Solar ETF,Sunrun Inc,RUN ,6.65,2025-09-27
+TAN,Invesco Solar ETF,Gcl Technology Holdings Ltd,3800 HK,5.95,2025-09-27
+TAN,Invesco Solar ETF,Solaredge Technologies Inc,SEDG ,5.79,2025-09-27
+TAN,Invesco Solar ETF,Ha Sustainable Infrastructure Capital Inc,HASI ,4.2,2025-09-27
+TAN,Invesco Solar ETF,Xinyi Solar Holdings Ltd,968 HK,4.12,2025-09-27
+TAN,Invesco Solar ETF,Enlight Renewable Energy Ltd,ENLT ,3.86,2025-09-27
+TAN,Invesco Solar ETF,Array Technologies Inc,ARRY ,3.51,2025-09-27
+UNG,United States Natural Gas Fund,Natural Gas Futr Nov25,NGX25,0.42,2025-09-27
+UNG,United States Natural Gas Fund,Morgan Stanley Liq Govt Inst 8302,MVRXX,0.14,2025-09-27
+UNG,United States Natural Gas Fund,Us Dollars,"""NaN""",0.13,2025-09-27
+UNG,United States Natural Gas Fund,Bny Cash Reserve,USD,0.11,2025-09-27
+UNG,United States Natural Gas Fund,Drey Inst Pref Gov Mm Inst 6546,DSVXX,0.11,2025-09-27
+UNG,United States Natural Gas Fund,Trs Scotia Snovng1 08292025,SNOVNG1T,0.05,2025-09-27
+UNG,United States Natural Gas Fund,Trs Soc Gen Sgixcng1 03272025,SGIXCNG1T,0.05,2025-09-27
 URNM,Sprott Uranium Miners ETF,Cameco Corp.,CCJ,17.59,2025-09-27
 URNM,Sprott Uranium Miners ETF,Nac Kazatomprom Jsc,KAP LI,13.14,2025-09-27
 URNM,Sprott Uranium Miners ETF,Sprott Physical Uranium Trust,U-U CN,10.33,2025-09-27
@@ -445,6 +456,13 @@ URNM,Sprott Uranium Miners ETF,Denison Mines Corp.,DNN,4.98,2025-09-27
 URNM,Sprott Uranium Miners ETF,Deep Yellow Ltd.,DYL AU,4.95,2025-09-27
 URNM,Sprott Uranium Miners ETF,Nexgen Energy Ltd.,NXE,4.84,2025-09-27
 URNM,Sprott Uranium Miners ETF,Paladin Energy Ltd.,PDN AU,3.68,2025-09-27
+USO,United States Oil Fund,Wti Crude Future Nov25,CLX5,0.43,2025-09-27
+USO,United States Oil Fund,Drey Inst Pref Gov Mm Inst 6546,DSVXX,0.2,2025-09-27
+USO,United States Oil Fund,Morgan Stanley Liq Govt Inst 8302,MVRXX,0.16,2025-09-27
+USO,United States Oil Fund,Us Dollars,"""NaN""",0.11,2025-09-27
+USO,United States Oil Fund,Trs Macquarie Mqcp361e 07212025,MQCP361ET,0.04,2025-09-27
+USO,United States Oil Fund,Trs Soc Gen Sgixcwti 06202025,SGIXCWTIT,0.04,2025-09-27
+USO,United States Oil Fund,Bny Cash Reserve,USD,0.01,2025-09-27
 VNM,VanEck Vietnam ETF,Vinhomes Jsc,VHM VN,7.98,2025-09-27
 VNM,VanEck Vietnam ETF,Vingroup Jsc,VIC VN,7.81,2025-09-27
 VNM,VanEck Vietnam ETF,Ssi Securities Corp,SSI VN,6.97,2025-09-27
