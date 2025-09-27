@@ -534,7 +534,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
-        width=1200,
+        width=2000,
         template="plotly_white"
     )
 
