@@ -481,11 +481,10 @@ def slugify(text: str) -> str:
 # --- ADDED ---
 def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180) -> go.Figure:
     sub = df_chart[df_chart["ticker"] == ticker].sort_values("date")
-
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # ✅ keep only valid trading rows
+    # Keep only rows that have all OHLC values (i.e., actual trading sessions)
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
@@ -493,40 +492,80 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         sub["adj_close"].notna()
     ].copy()
 
-    # drop weekends
-    sub = sub[sub["date"].dt.dayofweek < 5]
+    # (Optional) also drop weekends if any slipped through the CSV
+    sub = sub[sub["date"].dt.dayofweek < 5].copy()
 
-    # optional holiday breaks
-    holiday_dates = sub.loc[sub["adj_volume"].fillna(0) == 0, "date"].dt.strftime("%Y-%m-%d").tolist()
-
+    # Limit to last N sessions
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
+
+    # Build a trading-session index so the x-axis has NO calendar dates at all
+    sub = sub.reset_index(drop=True)
+    sub["session"] = sub.index  # 0..N-1
+    # Prettier tick labels (e.g., show ~10 evenly spaced date labels)
+    n = len(sub)
+    tick every = max(1, n // 10)
+    tickvals = list(range(0, n, tick every))
+    ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
+
+    # Hover text that shows real date
+    hover_date = sub["date"].dt.strftime("%Y-%m-%d")
 
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
         row_heights=[0.72, 0.28]
     )
 
-    fig.add_trace(go.Candlestick(
-        x=sub["date"],
-        open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
-        name="Price"
-    ), row=1, col=1)
+    # Price (candles)
+    fig.add_trace(
+        go.Candlestick(
+            x=sub["session"],
+            open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
+            name="Price",
+            hovertext=hover_date,
+            hovertemplate=(
+                "Date: %{hovertext}<br>" +
+                "Open: %{open:.2f}<br>High: %{high:.2f}<br>Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
+            )
+        ),
+        row=1, col=1
+    )
 
+    # SMAs (if present)
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
-            fig.add_trace(go.Scatter(
-                x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)
-            ), row=1, col=1)
+            fig.add_trace(
+                go.Scatter(
+                    x=sub["session"], y=sub[sma_col],
+                    mode="lines", name=name, line=dict(width=1.2),
+                    hovertext=hover_date,
+                    hovertemplate="Date: %{hovertext}<br>"+name+": %{y:.2f}<extra></extra>"
+                ),
+                row=1, col=1
+            )
 
-    fig.add_trace(go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
-                  row=2, col=1)
+    # Volume
+    fig.add_trace(
+        go.Bar(
+            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
+            hovertext=hover_date,
+            hovertemplate="Date: %{hovertext}<br>Volume: %{y:.0f}<extra></extra>"
+        ),
+        row=2, col=1
+    )
 
-    # Layout
+    # Layout: legend at the bottom; no date axis, just session index with custom labels
     fig.update_layout(
-        margin=dict(l=20, r=20, t=50, b=88),
+        margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.25,          # below bottom axis
+            xanchor="center",
+            x=0.5,
+            bgcolor="rgba(255,255,255,0.7)"
+        ),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
@@ -535,12 +574,19 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # ✅ collapse weekends & holidays
-    rb = [dict(bounds=["sat", "mon"])]
-    if holiday_dates:
-        rb.append(dict(values=holiday_dates))
-    fig.update_xaxes(type="date", rangebreaks=rb, row=1, col=1)
-    fig.update_xaxes(type="date", rangebreaks=rb, row=2, col=1)
+    # Use categorical-like axis with our own ticks (no weekends/holidays possible)
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=ticktext,
+        row=1, col=1
+    )
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=ticktext,
+        row=2, col=1
+    )
 
     return fig
 
