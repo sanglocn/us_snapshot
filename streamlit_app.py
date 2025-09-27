@@ -484,48 +484,90 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
+    # ✅ Only plot actual trading sessions (all OHLC present)
+    sub = sub[
+        sub["adj_open"].notna() &
+        sub["adj_high"].notna() &
+        sub["adj_low"].notna() &
+        sub["adj_close"].notna()
+    ].copy()
+
+    # Extra safety: drop weekends if any slipped through
+    sub = sub[sub["date"].dt.dayofweek < 5].copy()
+
+    # Limit bars
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
+    # Use a trading-session index so weekends/holidays can't appear
+    sub = sub.reset_index(drop=True)
+    sub["session"] = sub.index
+    n = len(sub)
+    tick_every = max(1, n // 10)
+    tickvals = list(range(0, n, tick_every))
+    ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
+    hover_date = sub["date"].dt.strftime("%Y-%m-%d")
+
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
-        row_heights=[0.72, 0.28], specs=[[{"secondary_y": False}], [{"secondary_y": False}]]
+        row_heights=[0.72, 0.28]
     )
 
+    # Candles
     fig.add_trace(
         go.Candlestick(
-            x=sub["date"],
+            x=sub["session"],
             open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
-            name="Price"
+            name="Price",
+            hovertext=hover_date,
+            hovertemplate=(
+                "Date: %{hovertext}<br>"
+                "Open: %{open:.2f}<br>High: %{high:.2f}<br>"
+                "Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
+            )
         ),
         row=1, col=1
     )
 
-    # Add SMAs if present
+    # SMAs if present
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
-        if sma_col in sub.columns:
+        if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
-                go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)),
+                go.Scatter(
+                    x=sub["session"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2),
+                    hovertext=hover_date,
+                    hovertemplate=f"Date: %{{hovertext}}<br>{name}: %{{y:.2f}}<extra></extra>"
+                ),
                 row=1, col=1
             )
 
-    # Volume bars
+    # Volume
     fig.add_trace(
-        go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
+        go.Bar(
+            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
+            hovertext=hover_date,
+            hovertemplate="Date: %{hovertext}<br>Volume: %{y:.0f}<extra></extra>"
+        ),
         row=2, col=1
     )
 
+    # Layout: legend at bottom, no date axis (we label sessions with real dates)
     fig.update_layout(
-        margin=dict(l=20, r=20, t=30, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="left", x=0),
+        margin=dict(l=20, r=20, t=50, b=90),
+        title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
+        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
-        template="plotly_white",
-        title=f"{ticker} — Candlestick with SMA & Volume"
+        template="plotly_white"
     )
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
+
+    # Custom ticks: only real trading sessions are labeled
+    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1)
+    fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1)
+
     return fig
 
 # --- ADDED ---
