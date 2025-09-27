@@ -481,17 +481,23 @@ def slugify(text: str) -> str:
 # --- ADDED ---
 def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180) -> go.Figure:
     sub = df_chart[df_chart["ticker"] == ticker].sort_values("date")
+
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # Keep only trading days (Mon–Fri) and valid closes
-    sub = sub[(sub["date"].dt.dayofweek < 5) & sub["adj_close"].notna()].copy()
+    # ✅ keep only valid trading rows
+    sub = sub[
+        sub["adj_open"].notna() &
+        sub["adj_high"].notna() &
+        sub["adj_low"].notna() &
+        sub["adj_close"].notna()
+    ].copy()
 
-    # Optional: treat zero-volume / NaN-open days as breaks (holidays)
-    holiday_breaks = sub.loc[
-        (sub["adj_volume"].fillna(0) == 0) | (sub["adj_open"].isna()),
-        "date"
-    ].dt.strftime("%Y-%m-%d").unique().tolist()
+    # drop weekends
+    sub = sub[sub["date"].dt.dayofweek < 5]
+
+    # optional holiday breaks
+    holiday_dates = sub.loc[sub["adj_volume"].fillna(0) == 0, "date"].dt.strftime("%Y-%m-%d").tolist()
 
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
@@ -501,53 +507,43 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row_heights=[0.72, 0.28]
     )
 
-    fig.add_trace(
-        go.Candlestick(
-            x=sub["date"],
-            open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
-            name="Price"
-        ), row=1, col=1
-    )
+    fig.add_trace(go.Candlestick(
+        x=sub["date"],
+        open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
+        name="Price"
+    ), row=1, col=1)
 
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
-            fig.add_trace(
-                go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)),
-                row=1, col=1
-            )
+            fig.add_trace(go.Scatter(
+                x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)
+            ), row=1, col=1)
 
-    fig.add_trace(
-        go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
-        row=2, col=1
-    )
+    fig.add_trace(go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
+                  row=2, col=1)
 
-    # --- KEY LAYOUT TWEAKS ---
+    # Layout
     fig.update_layout(
-        margin=dict(l=20, r=20, t=70, b=20),   # more top space so title never collides
+        margin=dict(l=20, r=20, t=50, b=88),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(
-            orientation="h",
-            yanchor="top", y=-0.25,         # just under the title area
-            xanchor="center", x=0.5,
-            bgcolor="rgba(255,255,255,0.6)"
-        ),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
-        width=2000,
         template="plotly_white"
     )
-
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # Hide weekends + (optionally) holidays from the axis
-    rangebreaks = [dict(bounds=["sat", "mon"])]
-    if len(holiday_breaks) > 0:
-        rangebreaks.append(dict(values=holiday_breaks))
-    fig.update_xaxes(rangebreaks=rangebreaks)
+    # ✅ collapse weekends & holidays
+    rb = [dict(bounds=["sat", "mon"])]
+    if holiday_dates:
+        rb.append(dict(values=holiday_dates))
+    fig.update_xaxes(type="date", rangebreaks=rb, row=1, col=1)
+    fig.update_xaxes(type="date", rangebreaks=rb, row=2, col=1)
 
     return fig
+
 
 # --- ADDED ---
 def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
