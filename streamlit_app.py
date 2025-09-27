@@ -484,59 +484,62 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # ✅ Only plot actual trading sessions (all OHLC present)
+    # ✅ Only keep rows with OHLC present (drop weekends/holidays)
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
         sub["adj_low"].notna() &
         sub["adj_close"].notna()
     ].copy()
-
-    # Extra safety: drop weekends if any slipped through
     sub = sub[sub["date"].dt.dayofweek < 5].copy()
 
-    # Limit bars
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
-    # Use a trading-session index so weekends/holidays can't appear
+    # Use session index (avoids phantom gaps)
     sub = sub.reset_index(drop=True)
     sub["session"] = sub.index
     n = len(sub)
     tick_every = max(1, n // 10)
     tickvals = list(range(0, n, tick_every))
     ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
-    hover_date = sub["date"].dt.strftime("%Y-%m-%d")
+
+    # Extra data for hover
+    sub["date_str"] = sub["date"].dt.strftime("%Y-%m-%d")
 
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
         row_heights=[0.72, 0.28]
     )
 
-    # Candles
+    # Candlesticks
     fig.add_trace(
         go.Candlestick(
             x=sub["session"],
-            open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
+            open=sub["adj_open"], high=sub["adj_high"],
+            low=sub["adj_low"], close=sub["adj_close"],
             name="Price",
-            hovertext=hover_date,
-            hovertemplate=(
-                "Date: %{hovertext}<br>"
-                "Open: %{open:.2f}<br>High: %{high:.2f}<br>"
-                "Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
-            )
+            customdata=sub["date_str"],
+            hovertext=sub["date_str"],  # fallback
+            # ✅ hovertemplate now works because we provide customdata
+            hovertemplate=("Date: %{customdata}<br>"
+                           "Open: %{open:.2f}<br>"
+                           "High: %{high:.2f}<br>"
+                           "Low: %{low:.2f}<br>"
+                           "Close: %{close:.2f}<extra></extra>")
         ),
         row=1, col=1
     )
 
-    # SMAs if present
+    # SMAs
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
                 go.Scatter(
-                    x=sub["session"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2),
-                    hovertext=hover_date,
-                    hovertemplate=f"Date: %{{hovertext}}<br>{name}: %{{y:.2f}}<extra></extra>"
+                    x=sub["session"], y=sub[sma_col],
+                    mode="lines", name=name, line=dict(width=1.2),
+                    customdata=sub["date_str"],
+                    hovertemplate=f"Date: %{{customdata}}<br>{name}: %{{y:.2f}}<extra></extra>"
                 ),
                 row=1, col=1
             )
@@ -544,14 +547,15 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Volume
     fig.add_trace(
         go.Bar(
-            x=sub["session"], y=sub["adj_volume"], name="Volume", opacity=0.9,
-            hovertext=hover_date,
-            hovertemplate="Date: %{hovertext}<br>Volume: %{y:.0f}<extra></extra>"
+            x=sub["session"], y=sub["adj_volume"],
+            name="Volume", opacity=0.9,
+            customdata=sub["date_str"],
+            hovertemplate="Date: %{customdata}<br>Volume: %{y:.0f}<extra></extra>"
         ),
         row=2, col=1
     )
 
-    # Layout: legend at bottom, no date axis (we label sessions with real dates)
+    # Layout
     fig.update_layout(
         margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
@@ -564,11 +568,12 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # Custom ticks: only real trading sessions are labeled
+    # Only real sessions get tick labels
     fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1)
     fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1)
 
     return fig
+
 
 # --- ADDED ---
 def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
