@@ -484,7 +484,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
-    # Keep only rows that have all OHLC values (i.e., actual trading sessions)
+    # ✅ keep only valid trading sessions
     sub = sub[
         sub["adj_open"].notna() &
         sub["adj_high"].notna() &
@@ -492,23 +492,21 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         sub["adj_close"].notna()
     ].copy()
 
-    # (Optional) also drop weekends if any slipped through the CSV
+    # drop weekends if any remain
     sub = sub[sub["date"].dt.dayofweek < 5].copy()
 
-    # Limit to last N sessions
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
-    # Build a trading-session index so the x-axis has NO calendar dates at all
+    # Build a trading-session index (no holidays/weekends possible)
     sub = sub.reset_index(drop=True)
-    sub["session"] = sub.index  # 0..N-1
-    # Prettier tick labels (e.g., show ~10 evenly spaced date labels)
+    sub["session"] = sub.index
+    # Prettier tick labels
     n = len(sub)
-    tick_every = max(1, n // 10)
-    tickvals = list(range(0, n, tick every))
+    tick_every = max(1, n // 10)   # ✅ FIXED spelling
+    tickvals = list(range(0, n, tick_every))
     ticktext = [sub.loc[i, "date"].strftime("%Y-%m-%d") for i in tickvals]
 
-    # Hover text that shows real date
     hover_date = sub["date"].dt.strftime("%Y-%m-%d")
 
     fig = make_subplots(
@@ -516,7 +514,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row_heights=[0.72, 0.28]
     )
 
-    # Price (candles)
+    # Candlestick
     fig.add_trace(
         go.Candlestick(
             x=sub["session"],
@@ -524,14 +522,15 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
             name="Price",
             hovertext=hover_date,
             hovertemplate=(
-                "Date: %{hovertext}<br>" +
-                "Open: %{open:.2f}<br>High: %{high:.2f}<br>Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
+                "Date: %{hovertext}<br>"
+                "Open: %{open:.2f}<br>High: %{high:.2f}<br>"
+                "Low: %{low:.2f}<br>Close: %{close:.2f}<extra></extra>"
             )
         ),
         row=1, col=1
     )
 
-    # SMAs (if present)
+    # SMAs
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
         if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
@@ -554,18 +553,11 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         row=2, col=1
     )
 
-    # Layout: legend at the bottom; no date axis, just session index with custom labels
+    # Layout
     fig.update_layout(
         margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.25,          # below bottom axis
-            xanchor="center",
-            x=0.5,
-            bgcolor="rgba(255,255,255,0.7)"
-        ),
+        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
@@ -574,18 +566,12 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
-    # Use categorical-like axis with our own ticks (no weekends/holidays possible)
+    # Custom x-axis ticks: only real trading sessions
     fig.update_xaxes(
-        tickmode="array",
-        tickvals=tickvals,
-        ticktext=ticktext,
-        row=1, col=1
+        tickmode="array", tickvals=tickvals, ticktext=ticktext, row=1, col=1
     )
     fig.update_xaxes(
-        tickmode="array",
-        tickvals=tickvals,
-        ticktext=ticktext,
-        row=2, col=1
+        tickmode="array", tickvals=tickvals, ticktext=ticktext, row=2, col=1
     )
 
     return fig
