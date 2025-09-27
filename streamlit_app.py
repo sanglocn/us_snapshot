@@ -498,7 +498,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
 
     # Use session index
     sub = sub.reset_index(drop=True)
-    sub["session"] = sub.index
+    sub["session"] = sub.index.astype(str)
     date_str = sub["date"].dt.strftime("%Y-%m-%d")
 
     # Hover text
@@ -520,8 +520,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
             open=sub["adj_open"], high=sub["adj_high"],
             low=sub["adj_low"], close=sub["adj_close"],
             name="Price",
-            hovertext=candle_hover, hoverinfo="text",
-            width=0.8   # 👈 adjust (0.6 = narrow, 0.8 = wider, 1.0 = very wide)
+            hovertext=candle_hover, hoverinfo="text"
         ),
         row=1, col=1
     )
@@ -556,17 +555,14 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     # Layout
     fig.update_layout(
         autosize=True,
-        height=600,
+        height=650,
         margin=dict(l=20, r=20, t=50, b=90),
         title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(
-            orientation="h",
-            yanchor="top", y=-0.25,
-            xanchor="center", x=0.5
-        ),
+        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
-        template="plotly_white"
+        template="plotly_white",
+        bargap=0.2   # 👈 controls space between candles (0 = no gap, 0.2 = nice spacing)
     )
 
     fig.update_yaxes(title_text="Price", row=1, col=1)
