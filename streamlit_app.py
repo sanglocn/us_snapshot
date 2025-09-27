@@ -484,12 +484,21 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
     if sub.empty:
         raise ValueError(f"No chart data for {ticker}.")
 
+    # Keep only trading days (Mon–Fri) and valid closes
+    sub = sub[(sub["date"].dt.dayofweek < 5) & sub["adj_close"].notna()].copy()
+
+    # Optional: treat zero-volume / NaN-open days as breaks (holidays)
+    holiday_breaks = sub.loc[
+        (sub["adj_volume"].fillna(0) == 0) | (sub["adj_open"].isna()),
+        "date"
+    ].dt.strftime("%Y-%m-%d").unique().tolist()
+
     if len(sub) > max_bars:
         sub = sub.tail(max_bars)
 
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
-        row_heights=[0.72, 0.28], specs=[[{"secondary_y": False}], [{"secondary_y": False}]]
+        row_heights=[0.72, 0.28]
     )
 
     fig.add_trace(
@@ -497,35 +506,46 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
             x=sub["date"],
             open=sub["adj_open"], high=sub["adj_high"], low=sub["adj_low"], close=sub["adj_close"],
             name="Price"
-        ),
-        row=1, col=1
+        ), row=1, col=1
     )
 
-    # Add SMAs if present
     for sma_col, name in [("sma5","SMA 5"), ("sma10","SMA 10"), ("sma20","SMA 20"), ("sma50","SMA 50")]:
-        if sma_col in sub.columns:
+        if sma_col in sub.columns and sub[sma_col].notna().any():
             fig.add_trace(
                 go.Scatter(x=sub["date"], y=sub[sma_col], mode="lines", name=name, line=dict(width=1.2)),
                 row=1, col=1
             )
 
-    # Volume bars
     fig.add_trace(
         go.Bar(x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9),
         row=2, col=1
     )
 
+    # --- KEY LAYOUT TWEAKS ---
     fig.update_layout(
-        margin=dict(l=20, r=20, t=30, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        margin=dict(l=20, r=20, t=70, b=20),   # more top space so title never collides
+        title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom", y=1.02,         # just under the title area
+            xanchor="left",   x=0,
+            bgcolor="rgba(255,255,255,0.6)"
+        ),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         height=650,
-        template="plotly_white",
-        title=f"{ticker} — Candlestick with SMA & Volume"
+        template="plotly_white"
     )
+
     fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
+
+    # Hide weekends + (optionally) holidays from the axis
+    rangebreaks = [dict(bounds=["sat", "mon"])]
+    if len(holiday_breaks) > 0:
+        rangebreaks.append(dict(values=holiday_breaks))
+    fig.update_xaxes(rangebreaks=rangebreaks)
+
     return fig
 
 # --- ADDED ---
