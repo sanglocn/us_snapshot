@@ -165,27 +165,11 @@ def process_data(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> Tuple[pd.DataFram
 def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
     if "count_over_85" not in df_etf.columns or "count_under_50" not in df_etf.columns:
         return pd.DataFrame(columns=["date","count_over_85","count_under_50","date_str"])
-
-    # Ensure date is datetime
-    df_etf = df_etf.copy()
-    df_etf["date"] = pd.to_datetime(df_etf["date"])
-
-    # Clean and sort
-    daily = (
-        df_etf[["date","count_over_85","count_under_50"]]
-        .drop_duplicates()
-        .dropna(subset=["count_over_85","count_under_50"])
-        .sort_values("date", ascending=True)
-    )
-
-    # Keep only last 21 dates
-    last_21_dates = daily["date"].drop_duplicates().sort_values().tail(21)
-    daily_21 = daily[daily["date"].isin(last_21_dates)].copy()
-    daily_21 = daily_21.sort_values("date", ascending=True)
-
-    # Add string version for plotting
+    daily = df_etf[["date","count_over_85","count_under_50"]].drop_duplicates().sort_values("date")
+    daily = daily.dropna(subset=["count_over_85","count_under_50"])
+    last_21_dates = daily["date"].tail(21)
+    daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
-
     return daily_21
 
 # ---------------------------------
