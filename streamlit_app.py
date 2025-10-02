@@ -373,39 +373,32 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str = "steelblue"):
-    """
-    Create an Altair bar chart that uses the datetime 'date' as the x-axis (temporal).
-    df must contain 'date' as pd.Timestamp; returns Altair Chart.
-    """
-    if df.empty:
-        # return an empty chart with correct schema
-        return (
-            alt.Chart(pd.DataFrame({"date": [], value_col: []}))
-            .mark_bar()
-            .encode(
-                x=alt.X("date:T", axis=alt.Axis(title=None)),
-                y=alt.Y(f"{value_col}:Q", axis=alt.Axis(title=None)),
-            )
-        )
-
-    chart = (
+def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
+    df = df.copy()
+    # Ensure date is datetime
+    df["date"] = pd.to_datetime(df["date"])
+    
+    return (
         alt.Chart(df)
-        .mark_bar()
+        .mark_bar(color=bar_color)
         .encode(
-            x=alt.X("date:T",
-                    axis=alt.Axis(title=None, format="%Y-%m-%d", labelAngle=-45)),
-            y=alt.Y(f"{value_col}:Q", axis=alt.Axis(title=None)),
+            # Use temporal axis for chronological order
+            x=alt.X(
+                "date:T",
+                axis=alt.Axis(
+                    title=None,
+                    format="%b %d",  # show label as "Oct 01"
+                    labelAngle=-45
+                )
+            ),
+            y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[
                 alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
-                alt.Tooltip(f"{value_col}:Q", title=value_col),
-            ],
-            color=alt.value(bar_color),
+                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
+            ]
         )
-        .properties(height=240)
+        .properties(height=320)
     )
-
-    return chart
 
 def format_chart_link(ticker: str) -> str:
     """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
