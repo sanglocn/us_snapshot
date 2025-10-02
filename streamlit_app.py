@@ -383,7 +383,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         .encode(
             x=alt.X(
                 "date_label:N",
-                sort=None,  # 👈 keep order as in df (no alphabetical sorting)
+                sort=None,
                 axis=alt.Axis(title=None, labelAngle=-45)
             ),
             y=alt.Y(f"{value_col}:Q", title=None),
