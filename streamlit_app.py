@@ -380,7 +380,7 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            x=alt.X("date_label:N", axis=alt.Axis(title=None, labelAngle=-45)),
+            x=alt.X("date_label:N", axis=alt.Axis(title=None, format="%Y-%m-%d", labelAngle=-45)),
             y=alt.Y(f"{value_col}:Q", title=None),
             tooltip=[alt.Tooltip("date:T", title="Date"),
                      alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_"," ").title())]
@@ -779,9 +779,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
+        
         st.subheader("Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
+        
         c1, c2 = st.columns(2)
         with c1:
             st.altair_chart(breadth_column_chart(counts_21, "count_over_85", bar_color="green"),
