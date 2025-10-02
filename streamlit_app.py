@@ -375,19 +375,25 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     df = df.copy()
-    # Ensure date is datetime
     df["date"] = pd.to_datetime(df["date"])
-    
+
+    # --- Filter out weekends (Sat=5, Sun=6) ---
+    df = df[df["date"].dt.dayofweek < 5]
+
+    # --- Optional: filter out holidays if you have a calendar ---
+    # Example if you have a list of holiday dates:
+    # holidays = pd.to_datetime(["2025-01-01", "2025-07-04", "2025-12-25"])
+    # df = df[~df["date"].isin(holidays)]
+
     return (
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            # Use temporal axis for chronological order
             x=alt.X(
                 "date:T",
                 axis=alt.Axis(
                     title=None,
-                    format="%b %d",  # show label as "Oct 01"
+                    format="%b %d",   # show like "Oct 01"
                     labelAngle=-45
                 )
             ),
