@@ -375,15 +375,25 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     df = df.copy()
-    df["date_label"] = df["date"].dt.strftime("%b %d")
+    df["date"] = pd.to_datetime(df["date"])  # ensure datetime
+    
     return (
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            x=alt.X("date_label:N", axis=alt.Axis(title=None, labelAngle=-45)),
+            x=alt.X(
+                "date:T",   # temporal, so sorting is chronological
+                axis=alt.Axis(
+                    title=None,
+                    format="%b %d",   # show "Oct 01" on axis labels
+                    labelAngle=-45
+                )
+            ),
             y=alt.Y(f"{value_col}:Q", title=None),
-            tooltip=[alt.Tooltip("date:T", title="Date"),
-                     alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_"," ").title())]
+            tooltip=[
+                alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
+                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
+            ]
         )
         .properties(height=320)
     )
