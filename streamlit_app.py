@@ -379,9 +379,16 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str = "ste
     df must contain 'date' as pd.Timestamp; returns Altair Chart.
     """
     if df.empty:
-        return alt.Chart(pd.DataFrame({"date": [], value_col: []}))  # empty chart
+        # return an empty chart with correct schema
+        return (
+            alt.Chart(pd.DataFrame({"date": [], value_col: []}))
+            .mark_bar()
+            .encode(
+                x=alt.X("date:T", axis=alt.Axis(title=None)),
+                y=alt.Y(f"{value_col}:Q", axis=alt.Axis(title=None)),
+            )
+        )
 
-    # Build chart
     chart = (
         alt.Chart(df)
         .mark_bar()
@@ -393,10 +400,12 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str = "ste
                 alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
                 alt.Tooltip(f"{value_col}:Q", title=value_col),
             ],
-            color=alt.value(bar_color)  # fixed color passed in
+            color=alt.value(bar_color),
         )
         .properties(height=240)
     )
+
+    return chart
 
 def format_chart_link(ticker: str) -> str:
     """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
