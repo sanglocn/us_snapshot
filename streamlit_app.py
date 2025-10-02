@@ -167,7 +167,7 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["date","count_over_85","count_under_50","date_str"])
     daily = df_etf[["date","count_over_85","count_under_50"]].drop_duplicates().sort_values("date")
     daily = daily.dropna(subset=["count_over_85","count_under_50"])
-    last_21_dates = daily["date"].tail(21)
+    last_21_dates = daily["date"].tail(21).sort_values("date").copy()
     daily_21 = daily[daily["date"].isin(last_21_dates)].copy().sort_values("date")
     daily_21["date_str"] = daily_21["date"].dt.strftime("%Y-%m-%d")
     return daily_21
