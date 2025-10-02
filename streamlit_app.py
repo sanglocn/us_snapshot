@@ -373,19 +373,29 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
-    df = df.copy()
-    df["date_label"] = df["date"].dt.strftime("%b %d")
-    return (
+def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str = "steelblue"):
+    """
+    Create an Altair bar chart that uses the datetime 'date' as the x-axis (temporal).
+    df must contain 'date' as pd.Timestamp; returns Altair Chart.
+    """
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"date": [], value_col: []}))  # empty chart
+
+    # Build chart
+    chart = (
         alt.Chart(df)
-        .mark_bar(color=bar_color)
+        .mark_bar()
         .encode(
-            x=alt.X("date_label:N", axis=alt.Axis(title=None, format="%Y-%m-%d", labelAngle=-45)),
-            y=alt.Y(f"{value_col}:Q", title=None),
-            tooltip=[alt.Tooltip("date:T", title="Date"),
-                     alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_"," ").title())]
+            x=alt.X("date:T",
+                    axis=alt.Axis(title=None, format="%Y-%m-%d", labelAngle=-45)),
+            y=alt.Y(f"{value_col}:Q", axis=alt.Axis(title=None)),
+            tooltip=[
+                alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
+                alt.Tooltip(f"{value_col}:Q", title=value_col),
+            ],
+            color=alt.value(bar_color)  # fixed color passed in
         )
-        .properties(height=320)
+        .properties(height=240)
     )
 
 def format_chart_link(ticker: str) -> str:
