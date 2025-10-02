@@ -375,33 +375,15 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     df = df.copy()
-    df["date"] = pd.to_datetime(df["date"])
-
-    # --- Filter out weekends (Sat=5, Sun=6) ---
-    df = df[df["date"].dt.dayofweek < 5]
-
-    # --- Optional: filter out holidays if you have a calendar ---
-    # Example if you have a list of holiday dates:
-    # holidays = pd.to_datetime(["2025-01-01", "2025-07-04", "2025-12-25"])
-    # df = df[~df["date"].isin(holidays)]
-
+    df["date_label"] = df["date"].dt.strftime("%b %d")
     return (
         alt.Chart(df)
         .mark_bar(color=bar_color)
         .encode(
-            x=alt.X(
-                "date:T",
-                axis=alt.Axis(
-                    title=None,
-                    format="%b %d",   # show like "Oct 01"
-                    labelAngle=-45
-                )
-            ),
+            x=alt.X("date_label:N", axis=alt.Axis(title=None, labelAngle=-45)),
             y=alt.Y(f"{value_col}:Q", title=None),
-            tooltip=[
-                alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
-                alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_", " ").title())
-            ]
+            tooltip=[alt.Tooltip("date:T", title="Date"),
+                     alt.Tooltip(f"{value_col}:Q", title=value_col.replace("_"," ").title())]
         )
         .properties(height=320)
     )
