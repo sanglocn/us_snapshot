@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -10,6 +11,7 @@ import base64
 import re
 import html
 from typing import List, Dict, Tuple
+from itertools import groupby
 
 # ---------------------------------
 # Configuration
@@ -777,17 +779,53 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     if vol_pivot.empty or price_pivot.empty:
         st.warning("No heatmap data available.")
         return
-    
-    # Customdata for codes
-    vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
-    price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
+
+    # Group tickers by code
+    df_tickers = df_heat[['ticker','code']].drop_duplicates().sort_values(['code','ticker'])
+    grouped = []
+    for code, group in df_tickers.groupby('code'):
+        tickers_group = group['ticker'].tolist()
+        grouped.append((code, tickers_group))
+
+    # Build extended lists for gaps
+    num_cols = len(dates_sorted)
+    extended_y = []
+    extended_customdata_vol = []
+    extended_customdata_price = []
+    z_vol_rows = []
+    z_price_rows = []
+
+    for i, (code, tickers_group) in enumerate(grouped):
+        if i > 0:
+            # Insert gap row
+            extended_y.append("")
+            extended_customdata_vol.append([""] * num_cols)
+            extended_customdata_price.append([""] * num_cols)
+            z_vol_rows.append(np.full(num_cols, np.nan))
+            z_price_rows.append(np.full(num_cols, np.nan))
+
+        for ticker in tickers_group:
+            extended_y.append(ticker)
+            orig_idx = ticker_list.index(ticker)
+            z_vol_rows.append(vol_pivot.values[orig_idx])
+            z_price_rows.append(price_pivot.values[orig_idx])
+            extended_customdata_vol.append([code] * num_cols)
+            extended_customdata_price.append([code] * num_cols)
+
+    # Stack z arrays
+    z_vol = np.vstack(z_vol_rows)
+    z_price = np.vstack(z_price_rows)
     
     # X labels
-    x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
+    x_labels = [d.strftime("%Y-%m-%d") for d in dates_sorted]
     
-    # Dynamic height: base + ~20px per ticker (adjust as needed)
+    # Dynamic height: base + ~20px per ticker + extra for gaps
     num_tickers = len(ticker_list)
-    dynamic_height = max(520, 100 + num_tickers * 20)  # Minimum 520px, scales with tickers
+    num_gaps = len(grouped) - 1
+    dynamic_height = max(520, 100 + (num_tickers + num_gaps) * 20)  # Minimum 520px, scales with tickers and gaps
+    
+    # Caption for colors
+    st.caption("RdYlGn scale: Red (low) to Yellow (neutral) to Green (high)")
     
     # Heatmaps in columns
     col1, col2 = st.columns(2)
@@ -795,18 +833,18 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     with col1:
         fig_vol = go.Figure(
             data=go.Heatmap(
-                z=vol_pivot.values,
+                z=z_vol,
                 x=x_labels,
-                y=vol_pivot.index.tolist(),
+                y=extended_y,
                 colorscale='RdYlGn',
-                colorbar=dict(title='VolumeFactor'),
+                colorbar={"showscale": False},
                 hovertemplate=(
                     "Ticker: %{y}<br>"
                     "Date: %{x}<br>"
                     "Volumefactor: %{z:.4f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
-                customdata=vol_customdata
+                customdata=extended_customdata_vol
             )
         )
         fig_vol.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Volume Factor")
@@ -816,18 +854,18 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     with col2:
         fig_price = go.Figure(
             data=go.Heatmap(
-                z=price_pivot.values,
+                z=z_price,
                 x=x_labels,
-                y=price_pivot.index.tolist(),
+                y=extended_y,
                 colorscale='RdYlGn',
-                colorbar=dict(title='PriceFactor'),
+                colorbar={"showscale": False},
                 hovertemplate=(
                     "Ticker: %{y}<br>"
                     "Date: %{x}<br>"
                     "Pricefactor: %{z:.4f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
-                customdata=price_customdata
+                customdata=extended_customdata_price
             )
         )
         fig_price.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Price Factor")
