@@ -816,6 +816,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         y='PriceFactor',
         color='code',
         custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
+        height=600,
     )
     fig.update_traces(
     marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
