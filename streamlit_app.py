@@ -821,9 +821,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
     hovertemplate=(
         "<b>%{customdata[1]}</b><br>"      # ticker
-        "📅 %{customdata[0]|%Y-%m-%d}<br>"  # date
-        "💰 Price Factor: %{customdata[2]:.2f}<br>"
-        "📦 Volume Factor: %{customdata[3]:.2f}<extra></extra>"
+        "<i>%{customdata[0]|%Y-%m-%d}</i><br>"  # date
+        "Price Factor: %{customdata[2]:.2f}<br>"
+        "Volume Factor: %{customdata[3]:.2f}<extra></extra>"
     ),
     )
     fig.update_layout(
