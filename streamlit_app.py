@@ -835,34 +835,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     df_heat = pd.read_csv(DATA_URLS["heat"])
     df_heat['date'] = pd.to_datetime(df_heat['date'])
     
-    # normalize column names if needed (optional)
-    # If your CSV may have lowercase names, uncomment:
-    # df_heat = df_heat.rename(columns={c.lower(): c for c in df_heat.columns})
-    
     # --- Scatter (most recent point per ticker) ---
-    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1).reset_index(drop=True)
+    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
     df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
     
     st.subheader("🧠 Price & Volume Analysis")
     st.caption(f"Data as of {df_heat_latest_date}")
     
-    # --- Ensure numeric x/y so plot renders ---
-    df_heat_latest['PriceFactor'] = pd.to_numeric(df_heat_latest['PriceFactor'], errors='coerce')
-    df_heat_latest['VolumeFactor'] = pd.to_numeric(df_heat_latest['VolumeFactor'], errors='coerce')
-    
-    # drop rows with missing numeric x/y (can't plot)
-    df_heat_latest = df_heat_latest.dropna(subset=['PriceFactor', 'VolumeFactor'])
-    if df_heat_latest.empty:
-        st.warning("No valid scatter points (PriceFactor/VolumeFactor are missing or non-numeric). Check your CSV.")
-        st.stop()
-    
-    # Build robust customdata for each marker: [date_str, ticker, code, PriceFactor, VolumeFactor]
-    customdata = [
-        [r['date'].strftime("%Y-%m-%d"), r['ticker'], str(r.get('code', '')), float(r['PriceFactor']), float(r['VolumeFactor'])]
-        for _, r in df_heat_latest.iterrows()
-    ]
-    
-    # ----- YOUR SCATTER BLOCK (kept as-is, with customdata attached) -----
     fig = px.scatter(
         df_heat_latest,
         x='VolumeFactor',
@@ -871,117 +850,93 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
         height=550,
     )
-    
     fig.update_traces(
         marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
         hovertemplate=(
             "<b>%{customdata[1]}</b><br>"      # ticker
-            "<i>%{customdata[0]}</i><br>"      # date
+            "<i>%{customdata[0]}</i><br>"      # date (we provided as datetime in custom_data; Plotly will stringify)
             "Price Factor: %{customdata[2]:.2f}<br>"
             "Volume Factor: %{customdata[3]:.2f}<extra></extra>"
         ),
-        # attach robust customdata for click/select parsing
-        customdata=customdata
     )
-    
     fig.update_layout(
         xaxis_title="Volume Factor",
         yaxis_title="Price Factor",
         hovermode='closest',
         template='plotly_white',
     )
-    # Render the scatter so it definitely appears
     st.plotly_chart(fig, use_container_width=True)
     
-    # Capture click / selection events from the scatter
-    events = plotly_events(fig, click_event=True, select_event=True, override_height=560, key="scatter_events")
-    
-    # Parse selected tickers from events
-    selected_tickers = []
-    if events:
-        for ev in events:
-            cd = ev.get("customdata")
-            if cd and isinstance(cd, (list, tuple)) and len(cd) >= 2:
-                selected_tickers.append(cd[1])
-            else:
-                pn = ev.get("pointNumber")
-                if pn is not None and 0 <= pn < len(df_heat_latest):
-                    selected_tickers.append(df_heat_latest.iloc[int(pn)]['ticker'])
-    
-    # Reset selection button and info
-    col_a, col_b = st.columns([1, 4])
-    with col_a:
-        if st.button("Reset Selection"):
-            selected_tickers = []
-    with col_b:
-        if selected_tickers:
-            st.info(f"Filtering heatmaps to: {', '.join(sorted(set(selected_tickers)))}")
-        else:
-            st.write("No selection — showing all tickers")
-    
-    # --- Filter heatmap data according to selection (or show all) ---
-    if selected_tickers:
-        df_filtered = df_heat[df_heat['ticker'].isin(selected_tickers)].copy()
-    else:
-        df_filtered = df_heat.copy()
-    
-    # --- Build ticker ordering grouped by code (so heatmap rows are grouped) ---
-    ticker_order_df = df_filtered.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
+    # --- Heatmaps: build pivot matrices (ticker x date) with consistent ordering ---
+    # Order tickers by code (so rows are grouped)
+    ticker_order_df = df_heat.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
     ticker_list = ticker_order_df['ticker'].tolist()
-    if len(ticker_list) == 0:
-        st.warning("No tickers to display in heatmap for current selection.")
-        st.stop()
     
-    # --- Pivot matrices (ticker rows x date cols) with consistent ordering ---
-    dates_sorted = sorted(df_filtered['date'].unique())
-    vol_pivot = df_filtered.pivot_table(index='ticker', columns='date', values='VolumeFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
-    price_pivot = df_filtered.pivot_table(index='ticker', columns='date', values='PriceFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    # Ensure dates are sorted (oldest -> newest)
+    dates_sorted = sorted(df_heat['date'].unique())
     
-    # Optionally fill missing values to avoid gaps (uncomment if desired)
-    # vol_pivot = vol_pivot.fillna(method='ffill', axis=1).fillna(method='bfill', axis=1)
-    # price_pivot = price_pivot.fillna(method='ffill', axis=1).fillna(method='bfill', axis=1)
+    # Use the same column names that exist in df_heat
+    vol_pivot = df_heat.pivot_table(index='ticker', columns='date', values='VolumeFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    price_pivot = df_heat.pivot_table(index='ticker', columns='date', values='PriceFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
     
-    # Build code customdata for heatmap hover
+    # Build a small map ticker -> code for customdata
     code_map = df_heat.groupby('ticker')['code'].first().to_dict()
-    vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
-    price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
     
-    x_labels = [d.strftime("%Y-%m-%d") for d in dates_sorted]
+    # If there is no data, warn and stop
+    if vol_pivot.empty or price_pivot.empty:
+        st.warning("No heatmap data available.")
+    else:
+        # Precompute customdata arrays: each row is repeated code value for each date column
+        vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
+        price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
     
-    # --- Render two heatmaps side-by-side ---
-    col1, col2 = st.columns(2)
+        # Format x labels as strings
+        x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
     
-    with col1:
-        fig_vol = go.Figure(
-            data=go.Heatmap(
-                z=vol_pivot.values,
-                x=x_labels,
-                y=vol_pivot.index.tolist(),
-                colorscale='Viridis',
-                colorbar=dict(title='VolumeFactor'),
-                hovertemplate="Ticker: %{y}<br>Date: %{x}<br>Volumefactor: %{z:.4f}<br>Code: %{customdata}<extra></extra>",
-                customdata=vol_customdata
+        # Plot heatmaps side-by-side in two columns
+        col1, col2 = st.columns(2)
+    
+        with col1:
+            fig_vol = go.Figure(
+                data=go.Heatmap(
+                    z=vol_pivot.values,
+                    x=x_labels,
+                    y=vol_pivot.index.tolist(),
+                    colorscale='Viridis',
+                    colorbar=dict(title='VolumeFactor'),
+                    hovertemplate=(
+                        "Ticker: %{y}<br>"
+                        "Date: %{x}<br>"
+                        "Volumefactor: %{z:.4f}<br>"
+                        "Code: %{customdata}<extra></extra>"
+                    ),
+                    customdata=vol_customdata
+                )
             )
-        )
-        fig_vol.update_layout(title="Volumefactor (old → new)", height=520, margin=dict(t=40, b=40))
-        fig_vol.update_yaxes(autorange='reversed')
-        st.plotly_chart(fig_vol, use_container_width=True)
+            fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volume Factor")
+            fig_vol.update_yaxes(autorange='reversed')
+            st.plotly_chart(fig_vol, use_container_width=True)
     
-    with col2:
-        fig_price = go.Figure(
-            data=go.Heatmap(
-                z=price_pivot.values,
-                x=x_labels,
-                y=price_pivot.index.tolist(),
-                colorscale='Plasma',
-                colorbar=dict(title='PriceFactor'),
-                hovertemplate="Ticker: %{y}<br>Date: %{x}<br>Pricefactor: %{z:.4f}<br>Code: %{customdata}<extra></extra>",
-                customdata=price_customdata
+        with col2:
+            fig_price = go.Figure(
+                data=go.Heatmap(
+                    z=price_pivot.values,
+                    x=x_labels,
+                    y=price_pivot.index.tolist(),
+                    colorscale='Plasma',
+                    colorbar=dict(title='PriceFactor'),
+                    hovertemplate=(
+                        "Ticker: %{y}<br>"
+                        "Date: %{x}<br>"
+                        "Pricefactor: %{z:.4f}<br>"
+                        "Code: %{customdata}<extra></extra>"
+                    ),
+                    customdata=price_customdata
+                )
             )
-        )
-        fig_price.update_layout(title="Pricefactor (old → new)", height=520, margin=dict(t=40, b=40))
-        fig_price.update_yaxes(autorange='reversed')
-        st.plotly_chart(fig_price, use_container_width=True)
+            fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Price Factor")
+            fig_price.update_yaxes(autorange='reversed')
+            st.plotly_chart(fig_price, use_container_width=True)
        
         # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
         if selected_chart_ticker:
