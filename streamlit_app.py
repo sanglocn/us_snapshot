@@ -810,11 +810,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     fig = px.scatter(
         df_heat_latest,
-        x='volumefactor',
-        y='pricefactor',
+        x='VolumeFactor',
+        y='PriceFactor',
         color='code',
-        hover_data=['date', 'ticker', 'pricefactor', 'volumefactor'],
-        title='Price vs Volume Analysis',
+        hover_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
+        title='Price & Volume Analysis',
     )
     fig.update_layout(
         xaxis_title="Volume Factor",
