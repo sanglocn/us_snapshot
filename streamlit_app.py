@@ -831,58 +831,84 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
-    # --- Prepare scatter (most recent point per ticker) ---
-    df_latest = df_heat.sort_values('date').groupby('ticker', as_index=False).last()
-    latest_date_str = df_heat['date'].max().strftime("%Y-%m-%d")
+    # --- Load data ---
+    df_heat = pd.read_csv(DATA_URLS["heat"])
+    df_heat['date'] = pd.to_datetime(df_heat['date'])
+    
+    # normalize column names if needed (optional)
+    # If your CSV may have lowercase names, uncomment:
+    # df_heat = df_heat.rename(columns={c.lower(): c for c in df_heat.columns})
+    
+    # --- Scatter (most recent point per ticker) ---
+    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1).reset_index(drop=True)
+    df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
     
     st.subheader("🧠 Price & Volume Analysis")
-    st.caption(f"Data as of {latest_date_str}")
-    st.markdown("**Instructions:** Click a point to select a single ticker. Use box/lasso to select multiple. Press **Reset Selection** to clear.")
+    st.caption(f"Data as of {df_heat_latest_date}")
     
-    # Build scatter and attach robust customdata: [date_str, ticker, code, PriceFactor, VolumeFactor]
-    df_latest = df_latest.reset_index(drop=True)
-    customdata = [[r['date'].strftime("%Y-%m-%d"), r['ticker'], r['code'], float(r['PriceFactor']), float(r['VolumeFactor'])]
-                  for _, r in df_latest.iterrows()]
+    # --- Ensure numeric x/y so plot renders ---
+    df_heat_latest['PriceFactor'] = pd.to_numeric(df_heat_latest['PriceFactor'], errors='coerce')
+    df_heat_latest['VolumeFactor'] = pd.to_numeric(df_heat_latest['VolumeFactor'], errors='coerce')
     
-    fig_scatter = px.scatter(
-        df_latest,
+    # drop rows with missing numeric x/y (can't plot)
+    df_heat_latest = df_heat_latest.dropna(subset=['PriceFactor', 'VolumeFactor'])
+    if df_heat_latest.empty:
+        st.warning("No valid scatter points (PriceFactor/VolumeFactor are missing or non-numeric). Check your CSV.")
+        st.stop()
+    
+    # Build robust customdata for each marker: [date_str, ticker, code, PriceFactor, VolumeFactor]
+    customdata = [
+        [r['date'].strftime("%Y-%m-%d"), r['ticker'], str(r.get('code', '')), float(r['PriceFactor']), float(r['VolumeFactor'])]
+        for _, r in df_heat_latest.iterrows()
+    ]
+    
+    # ----- YOUR SCATTER BLOCK (kept as-is, with customdata attached) -----
+    fig = px.scatter(
+        df_heat_latest,
         x='VolumeFactor',
         y='PriceFactor',
         color='code',
-        height=520,
-        hover_data=['date', 'ticker', 'code', 'PriceFactor', 'VolumeFactor'],
+        custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
+        height=550,
     )
-    fig_scatter.update_traces(
-        marker=dict(size=12, opacity=0.85, line=dict(width=1, color='DarkSlateGrey')),
-        customdata=customdata,
+    
+    fig.update_traces(
+        marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
         hovertemplate=(
             "<b>%{customdata[1]}</b><br>"      # ticker
             "<i>%{customdata[0]}</i><br>"      # date
-            "Code: %{customdata[2]}<br>"
-            "Price Factor: %{customdata[3]:.2f}<br>"
-            "Volume Factor: %{customdata[4]:.2f}<extra></extra>"
-        )
+            "Price Factor: %{customdata[2]:.2f}<br>"
+            "Volume Factor: %{customdata[3]:.2f}<extra></extra>"
+        ),
+        # attach robust customdata for click/select parsing
+        customdata=customdata
     )
-    fig_scatter.update_layout(template='plotly_white', margin=dict(t=40, b=20))
     
-    # Render and capture events
-    events = plotly_events(fig_scatter, click_event=True, select_event=True, override_height=540, key="scatter_events")
+    fig.update_layout(
+        xaxis_title="Volume Factor",
+        yaxis_title="Price Factor",
+        hovermode='closest',
+        template='plotly_white',
+    )
+    # Render the scatter so it definitely appears
+    st.plotly_chart(fig, use_container_width=True)
     
-    # --- Parse selected tickers from events ---
+    # Capture click / selection events from the scatter
+    events = plotly_events(fig, click_event=True, select_event=True, override_height=560, key="scatter_events")
+    
+    # Parse selected tickers from events
     selected_tickers = []
     if events:
         for ev in events:
-            # ev is a point dict, customdata should be present
             cd = ev.get("customdata")
             if cd and isinstance(cd, (list, tuple)) and len(cd) >= 2:
                 selected_tickers.append(cd[1])
             else:
-                # fallback to pointNumber -> map to df_latest
                 pn = ev.get("pointNumber")
-                if pn is not None and 0 <= pn < len(df_latest):
-                    selected_tickers.append(df_latest.iloc[int(pn)]['ticker'])
+                if pn is not None and 0 <= pn < len(df_heat_latest):
+                    selected_tickers.append(df_heat_latest.iloc[int(pn)]['ticker'])
     
-    # Reset button (clears selection)
+    # Reset selection button and info
     col_a, col_b = st.columns([1, 4])
     with col_a:
         if st.button("Reset Selection"):
@@ -893,13 +919,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         else:
             st.write("No selection — showing all tickers")
     
-    # --- Filter dataset based on selection (or show all) ---
+    # --- Filter heatmap data according to selection (or show all) ---
     if selected_tickers:
         df_filtered = df_heat[df_heat['ticker'].isin(selected_tickers)].copy()
     else:
         df_filtered = df_heat.copy()
     
-    # --- Determine ticker order grouped by code (use the filtered df so grouping matches selection) ---
+    # --- Build ticker ordering grouped by code (so heatmap rows are grouped) ---
     ticker_order_df = df_filtered.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
     ticker_list = ticker_order_df['ticker'].tolist()
     if len(ticker_list) == 0:
@@ -911,25 +937,24 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     vol_pivot = df_filtered.pivot_table(index='ticker', columns='date', values='VolumeFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
     price_pivot = df_filtered.pivot_table(index='ticker', columns='date', values='PriceFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
     
-    # Optionally fill missing values to avoid gaps (comment/uncomment as desired)
+    # Optionally fill missing values to avoid gaps (uncomment if desired)
     # vol_pivot = vol_pivot.fillna(method='ffill', axis=1).fillna(method='bfill', axis=1)
     # price_pivot = price_pivot.fillna(method='ffill', axis=1).fillna(method='bfill', axis=1)
     
-    # --- Build small code map for customdata on heatmaps ---
+    # Build code customdata for heatmap hover
     code_map = df_heat.groupby('ticker')['code'].first().to_dict()
     vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
     price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
     
-    # Format x labels
     x_labels = [d.strftime("%Y-%m-%d") for d in dates_sorted]
     
-    # --- Build combined heatmaps (two side-by-side) ---
+    # --- Render two heatmaps side-by-side ---
     col1, col2 = st.columns(2)
     
     with col1:
         fig_vol = go.Figure(
             data=go.Heatmap(
-                z=vol_pivot.values if vol_pivot.shape[1] > 0 else np.array([[]]),
+                z=vol_pivot.values,
                 x=x_labels,
                 y=vol_pivot.index.tolist(),
                 colorscale='Viridis',
@@ -945,7 +970,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     with col2:
         fig_price = go.Figure(
             data=go.Heatmap(
-                z=price_pivot.values if price_pivot.shape[1] > 0 else np.array([[]]),
+                z=price_pivot.values,
                 x=x_labels,
                 y=price_pivot.index.tolist(),
                 colorscale='Plasma',
