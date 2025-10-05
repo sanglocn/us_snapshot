@@ -807,8 +807,10 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     df_heat = pd.read_csv(DATA_URLS["heat"])
     df_heat['date'] = pd.to_datetime(df_heat['date'])
     df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
+    df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
     
     st.subheader("🧠 Price & Volume Analysis")
+    st.caption(f"Data as of {df_heat_latest_date}")
     
     fig = px.scatter(
         df_heat_latest,
