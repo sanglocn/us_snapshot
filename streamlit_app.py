@@ -178,11 +178,11 @@ def load_and_normalize(url):
     df['date'] = pd.to_datetime(df['date'])
     return df
 
-df_heat = pd.DataFrame()
 try:
     df_heat = load_and_normalize(DATA_URLS["heat"])
 except Exception as e:
-    st.warning(f"Failed to load heat data: {e}. Proceeding without scatter and heatmaps.")
+    st.error(f"Failed to load/normalize data: {e}")
+    st.stop()
 
 # ---------------------------------
 # Data Processing
@@ -831,141 +831,119 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
-    # --- Scatter and Heatmaps only if data available ---
-    if not df_heat.empty:
-        # --- Scatter (most recent point per ticker) ---
-        df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
-        df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
-        
-        st.subheader("🧠 Price & Volume Analysis")
-        st.caption(f"Data as of {df_heat_latest_date}")
-        
-        if not df_heat_latest.empty:
-            fig = px.scatter(
-                df_heat_latest,
-                x='VolumeFactor',
-                y='PriceFactor',
-                color='code',
-                custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
-                height=550,
-            )
-            fig.update_traces(
-                marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
-                hovertemplate=(
-                    "<b>%{customdata[1]}</b><br>"      # ticker
-                    "<i>%{customdata[0]}</i><br>"      # date (we provided as datetime in custom_data; Plotly will stringify)
-                    "Price Factor: %{customdata[2]:.2f}<br>"
-                    "Volume Factor: %{customdata[3]:.2f}<extra></extra>"
-                ),
-            )
-            fig.update_layout(
-                xaxis_title="Volume Factor",
-                yaxis_title="Price Factor",
-                hovermode='closest',
-                template='plotly_white',
-            )
-            selected_points = plotly_events(fig, key="scatter_select", click_event=True, select_event=False, hover_event=False)
-            
-            selected_ticker = None
-            if selected_points:
-                try:
-                    selected_ticker = selected_points[0]['customdata'][1]
-                except (IndexError, KeyError, TypeError):
-                    selected_ticker = None
-        else:
-            st.warning("No recent data available for scatter plot.")
-            selected_ticker = None
-        
-        # --- Heatmaps: build pivot matrices (ticker x date) with consistent ordering ---
-        # Filter based on selection
-        df_heat_for_heat = df_heat.copy()
-        if selected_ticker:
-            df_heat_for_heat = df_heat_for_heat[df_heat_for_heat['ticker'] == selected_ticker]
-        
-        # Order tickers by code (so rows are grouped)
-        ticker_order_df = df_heat_for_heat.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
-        ticker_list = ticker_order_df['ticker'].tolist()
-        
-        # Ensure dates are sorted (oldest -> newest)
-        dates_sorted = sorted(df_heat_for_heat['date'].unique())
-        
-        # Use the same column names that exist in df_heat
-        vol_pivot = df_heat_for_heat.pivot_table(index='ticker', columns='date', values='VolumeFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
-        price_pivot = df_heat_for_heat.pivot_table(index='ticker', columns='date', values='PriceFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
-        
-        # Build a small map ticker -> code for customdata
-        code_map = df_heat_for_heat.groupby('ticker')['code'].first().to_dict()
-        
-        # If there is no data, warn and stop
-        if vol_pivot.empty or price_pivot.empty:
-            if selected_ticker:
-                st.info(f"No data available for {selected_ticker}")
-            else:
-                st.warning("No heatmap data available.")
-        else:
-            if selected_ticker:
-                st.caption(f"Filtered to: {selected_ticker}")
-            
-            # Precompute customdata arrays: each row is repeated code value for each date column
-            vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
-            price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
-        
-            # Format x labels as strings
-            x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
-        
-            # Plot heatmaps side-by-side in two columns
-            col1, col2 = st.columns(2)
-        
-            with col1:
-                fig_vol = go.Figure(
-                    data=go.Heatmap(
-                        z=vol_pivot.values,
-                        x=x_labels,
-                        y=vol_pivot.index.tolist(),
-                        colorscale='Viridis',
-                        colorbar=dict(title='VolumeFactor'),
-                        hovertemplate=(
-                            "Ticker: %{y}<br>"
-                            "Date: %{x}<br>"
-                            "Volumefactor: %{z:.4f}<br>"
-                            "Code: %{customdata}<extra></extra>"
-                        ),
-                        customdata=vol_customdata
-                    )
-                )
-                fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volume Factor")
-                fig_vol.update_yaxes(autorange='reversed')
-                st.plotly_chart(fig_vol, use_container_width=True)
-        
-            with col2:
-                fig_price = go.Figure(
-                    data=go.Heatmap(
-                        z=price_pivot.values,
-                        x=x_labels,
-                        y=price_pivot.index.tolist(),
-                        colorscale='Plasma',
-                        colorbar=dict(title='PriceFactor'),
-                        hovertemplate=(
-                            "Ticker: %{y}<br>"
-                            "Date: %{x}<br>"
-                            "Pricefactor: %{z:.4f}<br>"
-                            "Code: %{customdata}<extra></extra>"
-                        ),
-                        customdata=price_customdata
-                    )
-                )
-                fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Price Factor")
-                fig_price.update_yaxes(autorange='reversed')
-                st.plotly_chart(fig_price, use_container_width=True)
+    # --- Load data ---
+    df_heat = pd.read_csv(DATA_URLS["heat"])
+    df_heat['date'] = pd.to_datetime(df_heat['date'])
+    
+    # --- Scatter (most recent point per ticker) ---
+    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
+    df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
+    
+    st.subheader("🧠 Price & Volume Analysis")
+    st.caption(f"Data as of {df_heat_latest_date}")
+    
+    fig = px.scatter(
+        df_heat_latest,
+        x='VolumeFactor',
+        y='PriceFactor',
+        color='code',
+        custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
+        height=550,
+    )
+    fig.update_traces(
+        marker=dict(size=14, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')),
+        hovertemplate=(
+            "<b>%{customdata[1]}</b><br>"      # ticker
+            "<i>%{customdata[0]}</i><br>"      # date (we provided as datetime in custom_data; Plotly will stringify)
+            "Price Factor: %{customdata[2]:.2f}<br>"
+            "Volume Factor: %{customdata[3]:.2f}<extra></extra>"
+        ),
+    )
+    fig.update_layout(
+        xaxis_title="Volume Factor",
+        yaxis_title="Price Factor",
+        hovermode='closest',
+        template='plotly_white',
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # --- Heatmaps: build pivot matrices (ticker x date) with consistent ordering ---
+    # Order tickers by code (so rows are grouped)
+    ticker_order_df = df_heat.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
+    ticker_list = ticker_order_df['ticker'].tolist()
+    
+    # Ensure dates are sorted (oldest -> newest)
+    dates_sorted = sorted(df_heat['date'].unique())
+    
+    # Use the same column names that exist in df_heat
+    vol_pivot = df_heat.pivot_table(index='ticker', columns='date', values='VolumeFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    price_pivot = df_heat.pivot_table(index='ticker', columns='date', values='PriceFactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    
+    # Build a small map ticker -> code for customdata
+    code_map = df_heat.groupby('ticker')['code'].first().to_dict()
+    
+    # If there is no data, warn and stop
+    if vol_pivot.empty or price_pivot.empty:
+        st.warning("No heatmap data available.")
     else:
-        st.info("Heat data not available - scatter plot and heatmaps skipped.")
-           
-    # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
-    if selected_chart_ticker:
-        if df_chart.empty:
-            st.warning("Chart data not available.")
-        else:
-            open_chart_ui(selected_chart_ticker, df_chart)
+        # Precompute customdata arrays: each row is repeated code value for each date column
+        vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
+        price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
+    
+        # Format x labels as strings
+        x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
+    
+        # Plot heatmaps side-by-side in two columns
+        col1, col2 = st.columns(2)
+    
+        with col1:
+            fig_vol = go.Figure(
+                data=go.Heatmap(
+                    z=vol_pivot.values,
+                    x=x_labels,
+                    y=vol_pivot.index.tolist(),
+                    colorscale='Viridis',
+                    colorbar=dict(title='VolumeFactor'),
+                    hovertemplate=(
+                        "Ticker: %{y}<br>"
+                        "Date: %{x}<br>"
+                        "Volumefactor: %{z:.4f}<br>"
+                        "Code: %{customdata}<extra></extra>"
+                    ),
+                    customdata=vol_customdata
+                )
+            )
+            fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volume Factor")
+            fig_vol.update_yaxes(autorange='reversed')
+            st.plotly_chart(fig_vol, use_container_width=True)
+    
+        with col2:
+            fig_price = go.Figure(
+                data=go.Heatmap(
+                    z=price_pivot.values,
+                    x=x_labels,
+                    y=price_pivot.index.tolist(),
+                    colorscale='Plasma',
+                    colorbar=dict(title='PriceFactor'),
+                    hovertemplate=(
+                        "Ticker: %{y}<br>"
+                        "Date: %{x}<br>"
+                        "Pricefactor: %{z:.4f}<br>"
+                        "Code: %{customdata}<extra></extra>"
+                    ),
+                    customdata=price_customdata
+                )
+            )
+            fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Price Factor")
+            fig_price.update_yaxes(autorange='reversed')
+            st.plotly_chart(fig_price, use_container_width=True)
+       
+        # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
+        if selected_chart_ticker:
+            if df_chart.empty:
+                st.warning("Chart data not available.")
+            else:
+                open_chart_ui(selected_chart_ticker, df_chart)
 
 # ---------------------------------
 # Main
