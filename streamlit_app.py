@@ -885,7 +885,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                     customdata=vol_customdata
                 )
             )
-            fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volumefactor heatmap (old -> new)")
+            fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volume Factor")
             fig_vol.update_yaxes(autorange='reversed')
             st.plotly_chart(fig_vol, use_container_width=True)
     
@@ -906,7 +906,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                     customdata=price_customdata
                 )
             )
-            fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Pricefactor heatmap (old -> new)")
+            fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Price Factor")
             fig_price.update_yaxes(autorange='reversed')
             st.plotly_chart(fig_price, use_container_width=True)
        
