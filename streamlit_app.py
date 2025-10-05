@@ -785,6 +785,10 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     # X labels
     x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
     
+    # Dynamic height: base + ~20px per ticker (adjust as needed)
+    num_tickers = len(ticker_list)
+    dynamic_height = max(520, 100 + num_tickers * 20)  # Minimum 520px, scales with tickers
+    
     # Heatmaps in columns
     col1, col2 = st.columns(2)
     
@@ -805,7 +809,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 customdata=vol_customdata
             )
         )
-        fig_vol.update_layout(height=520, margin=dict(t=40, b=40), title="Volume Factor")
+        fig_vol.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Volume Factor")
         fig_vol.update_yaxes(autorange='reversed')
         st.plotly_chart(fig_vol, use_container_width=True)
     
@@ -826,7 +830,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 customdata=price_customdata
             )
         )
-        fig_price.update_layout(height=520, margin=dict(t=40, b=40), title="Price Factor")
+        fig_price.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Price Factor")
         fig_price.update_yaxes(autorange='reversed')
         st.plotly_chart(fig_price, use_container_width=True)
 
