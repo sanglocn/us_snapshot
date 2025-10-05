@@ -803,7 +803,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
-    # Scatterplot 
+    # Scatter (most recent point per ticker)
     df_heat = pd.read_csv(DATA_URLS["heat"])
     df_heat['date'] = pd.to_datetime(df_heat['date'])
     df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
@@ -836,6 +836,69 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         template='plotly_white',
     )
     st.plotly_chart(fig, use_container_width=True)
+
+    # Heatmaps: build pivot matrices (ticker x date) with consistent ordering ---
+    # Order tickers by code (so rows are grouped)
+    ticker_order_df = df_heat.groupby(['ticker','code'])['date'].min().reset_index().sort_values(['code','ticker'])
+    ticker_list = ticker_order_df['ticker'].tolist()
+    dates_sorted = sorted(df_heat['date'].unique())
+    vol_pivot = df_heat.pivot_table(index='ticker', columns='date', values='volumefactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    price_pivot = df_heat.pivot_table(index='ticker', columns='date', values='pricefactor', aggfunc='last').reindex(index=ticker_list, columns=dates_sorted)
+    
+    # Build a narrow code-color column (categorical) to show grouping
+    unique_codes = list(ticker_order_df['code'].unique())
+    code_to_idx = {c: i for i,c in enumerate(unique_codes)}
+    code_idx = [code_to_idx[ticker_order_df.set_index('ticker').loc[t]['code']] for t in ticker_list]
+    
+    # Create subplot layout: 1 column wide for scatter (full width), below a 2-column row for heatmaps
+    # Streamlit layout: we'll place scatter at top, then use columns for heatmaps below.
+    st.plotly_chart(fig_scatter, use_container_width=True)
+    
+    st.markdown("---")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        fig_vol = go.Figure(
+            data=go.Heatmap(
+                z=vol_pivot.values,
+                x=[d.strftime("%Y-%m-%d") for d in vol_pivot.columns],
+                y=vol_pivot.index.tolist(),
+                colorscale='Viridis',
+                colorbar=dict(title='Volumefactor'),
+                hovertemplate=(
+                    "Ticker: %{y}<br>"
+                    "Date: %{x}<br>"
+                    "Volumefactor: %{z:.4f}<br>"
+                    "Code: %{customdata}<extra></extra>"
+                ),
+                customdata=[[df.loc[(df['ticker']==t),'code'].iloc[0]]*vol_pivot.shape[1] for t in vol_pivot.index]
+            )
+        )
+        fig_vol.update_layout(height=520, margin=dict(t=40,b=40), title="Volumefactor heatmap (old -> new)")
+        fig_vol.update_yaxes(autorange='reversed')
+        st.plotly_chart(fig_vol, use_container_width=True)
+    
+    with col2:
+        fig_price = go.Figure(
+            data=go.Heatmap(
+                z=price_pivot.values,
+                x=[d.strftime("%Y-%m-%d") for d in price_pivot.columns],
+                y=price_pivot.index.tolist(),
+                colorscale='Plasma',
+                colorbar=dict(title='Pricefactor'),
+                hovertemplate=(
+                    "Ticker: %{y}<br>"
+                    "Date: %{x}<br>"
+                    "Pricefactor: %{z:.4f}<br>"
+                    "Code: %{customdata}<extra></extra>"
+                ),
+                customdata=[[df.loc[(df['ticker']==t),'code'].iloc[0]]*price_pivot.shape[1] for t in price_pivot.index]
+            )
+        )
+        fig_price.update_layout(height=520, margin=dict(t=40,b=40), title="Pricefactor heatmap (old -> new)")
+        fig_price.update_yaxes(autorange='reversed')
+        st.plotly_chart(fig_price, use_container_width=True)
    
     # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
     if selected_chart_ticker:
