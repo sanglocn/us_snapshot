@@ -789,7 +789,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
-        st.subheader("📖 Breadth Gauge")
+        st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
@@ -807,7 +807,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     df_heat = pd.read_csv(DATA_URLS["heat"])
     df_heat['date'] = pd.to_datetime(df_heat['date'])
     df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
-    st.subheader("📖 Price & Volume Analysis")
+    st.subheader("🧠 Price & Volume Analysis")
     fig = px.scatter(
         df_heat_latest,
         x='VolumeFactor',
