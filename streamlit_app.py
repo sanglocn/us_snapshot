@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -779,44 +778,16 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
         st.warning("No heatmap data available.")
         return
     
-    # Build expanded y labels with spacers between codes
-    expanded_y = []
-    original_row_map = []
-    prev_code = None
-    for i, ticker in enumerate(ticker_list):
-        code = code_map[ticker]
-        if prev_code is not None and code != prev_code:
-            expanded_y.append(" ")
-            original_row_map.append(None)
-        expanded_y.append(ticker)
-        original_row_map.append(i)
-        prev_code = code
-    
-    # Create expanded customdata
-    dates_num = len(dates_sorted)
-    expanded_customdata = []
-    for y in expanded_y:
-        if y == " ":
-            expanded_customdata.append([""] * dates_num)
-        else:
-            expanded_customdata.append([code_map[y]] * dates_num)
-    
-    # Create expanded z matrices with NaN for spacers
-    new_vol_z = np.full((len(expanded_y), dates_num), np.nan)
-    for new_row, orig_row in enumerate(original_row_map):
-        if orig_row is not None:
-            new_vol_z[new_row, :] = vol_pivot.iloc[orig_row].values
-    
-    new_price_z = np.full((len(expanded_y), dates_num), np.nan)
-    for new_row, orig_row in enumerate(original_row_map):
-        if orig_row is not None:
-            new_price_z[new_row, :] = price_pivot.iloc[orig_row].values
+    # Customdata for codes
+    vol_customdata = [[code_map.get(t, "")] * vol_pivot.shape[1] for t in vol_pivot.index]
+    price_customdata = [[code_map.get(t, "")] * price_pivot.shape[1] for t in price_pivot.index]
     
     # X labels
-    x_labels = [d.strftime("%Y-%m-%d") for d in dates_sorted]
+    x_labels = [d.strftime("%Y-%m-%d") for d in vol_pivot.columns]
     
-    # Dynamic height: base + ~20px per expanded row
-    dynamic_height = max(520, 100 + len(expanded_y) * 20)
+    # Dynamic height: base + ~20px per ticker (adjust as needed)
+    num_tickers = len(ticker_list)
+    dynamic_height = max(520, 100 + num_tickers * 20)  # Minimum 520px, scales with tickers
     
     # Heatmaps in columns
     col1, col2 = st.columns(2)
@@ -824,9 +795,9 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     with col1:
         fig_vol = go.Figure(
             data=go.Heatmap(
-                z=new_vol_z,
+                z=vol_pivot.values,
                 x=x_labels,
-                y=expanded_y,
+                y=vol_pivot.index.tolist(),
                 colorscale='RdYlGn',
                 showscale=False,
                 colorbar=dict(title='VolumeFactor'),
@@ -836,7 +807,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                     "Volumefactor: %{z:.4f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
-                customdata=expanded_customdata
+                customdata=vol_customdata
             )
         )
         fig_vol.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Volume Factor")
@@ -846,9 +817,9 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     with col2:
         fig_price = go.Figure(
             data=go.Heatmap(
-                z=new_price_z,
+                z=price_pivot.values,
                 x=x_labels,
-                y=expanded_y,
+                y=price_pivot.index.tolist(),
                 colorscale='RdYlGn',
                 showscale=False,
                 colorbar=dict(title='PriceFactor'),
@@ -858,7 +829,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                     "Pricefactor: %{z:.4f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
-                customdata=expanded_customdata
+                customdata=price_customdata
             )
         )
         fig_price.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Price Factor")
