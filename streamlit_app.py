@@ -798,7 +798,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 z=vol_pivot.values,
                 x=x_labels,
                 y=vol_pivot.index.tolist(),
-                colorscale='Viridis',
+                colorscale='RdYlGn',
                 colorbar=dict(title='VolumeFactor'),
                 hovertemplate=(
                     "Ticker: %{y}<br>"
@@ -819,7 +819,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 z=price_pivot.values,
                 x=x_labels,
                 y=price_pivot.index.tolist(),
-                colorscale='Plasma',
+                colorscale='RdYlGn',
                 colorbar=dict(title='PriceFactor'),
                 hovertemplate=(
                     "Ticker: %{y}<br>"
