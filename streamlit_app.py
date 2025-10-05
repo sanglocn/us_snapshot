@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.express as px
 import altair as alt
 import io
 import base64
@@ -20,6 +21,7 @@ DATA_URLS = {
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
     "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
+    "heat": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_heat.csv",
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market","Sector","Commodity","Crypto","Country","Theme","Leader"]
@@ -801,7 +803,27 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     else:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
-    # --- ADDED ---
+    # Scatterplot 
+    df_heat = pd.read_csv(DATA_URLS["heat"])
+    df_heat['date'] = pd.to_datetime(df_heat['date'])
+    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
+
+    fig = px.scatter(
+        df_heat_latest,
+        x='volumefactor',
+        y='pricefactor',
+        color='code',
+        hover_data=['date', 'ticker', 'pricefactor', 'volumefactor'],
+        title='Price vs Volume Analysis',
+    )
+    fig.update_layout(
+        xaxis_title="Volume Factor",
+        yaxis_title="Price Factor",
+        hovermode='closest',
+        template='plotly_white',
+    )
+    st.plotly_chart(fig, use_container_width=True)
+   
     # Open chart UI (modal or sidebar) if the user clicked a 📈 cell
     if selected_chart_ticker:
         if df_chart.empty:
