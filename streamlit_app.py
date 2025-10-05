@@ -807,14 +807,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     df_heat = pd.read_csv(DATA_URLS["heat"])
     df_heat['date'] = pd.to_datetime(df_heat['date'])
     df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
-
+    st.subheader("📖 Price & Volume Analysis")
     fig = px.scatter(
         df_heat_latest,
         x='VolumeFactor',
         y='PriceFactor',
         color='code',
         hover_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
-        title='Price & Volume Analysis',
     )
     fig.update_layout(
         xaxis_title="Volume Factor",
