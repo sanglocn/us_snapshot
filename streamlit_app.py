@@ -885,11 +885,12 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        st.header(f"📌 {group_name}")
         
-        _, toggle_col = st.columns([10, 1])
+        toggle_col, header_col = st.columns([1, 10])
         with toggle_col:
-            hide_low_rs = st.toggle("Hide <80% RS (1M)", key=f"toggle_{slugify(group_name)}")
+            hide_low_rs = st.toggle("Hide weak RS", key=f"toggle_{slugify(group_name)}")
+        with header_col:
+            st.header(f"📌 {group_name}")
         
         tickers_in_group = group_tickers[group_name].tolist()
         
