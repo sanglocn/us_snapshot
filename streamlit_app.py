@@ -624,7 +624,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         bargap=0.3
     )
 
-    fig.update_yaxes(title_text="Price", row=1, cols=1)
+    fig.update_yaxes(title_text="Price", row=1, col=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
     # X-axis: monthly ticks, hide weekends/holidays
@@ -850,8 +850,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # RS Hide Toggle
-    _, center_col, _ = st.columns([1, 3, 1])
+    # RS Hide Toggle under Latest Update, centered
+    _, center_col, _ = st.columns([1, 2, 1])
     with center_col:
         hide_rs = st.toggle('Hide RS', value=False)
 
