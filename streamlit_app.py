@@ -14,7 +14,7 @@ from typing import List, Dict, Tuple
 # ---------------------------------
 # Configuration
 # ---------------------------------
-st.set_page_config(page_title="US Market Snapshot", layout="wide")
+st.set_page_config(page_title="US Market Daily Snapshot", layout="wide")
 
 # Constants
 DATA_URLS = {
@@ -850,10 +850,10 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # RS Hide Toggle under Latest Update, centered
-    _, center_col, _ = st.columns([1, 2, 1])
-    with center_col:
-        hide_rs = st.toggle('Hide RS', value=False)
+    # Sidebar for global filters
+    with st.sidebar:
+        st.header("Filters")
+        hide_rs = st.toggle('Hide RS (below 85%)', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
 
     # Load optional data with fallbacks
     try:
