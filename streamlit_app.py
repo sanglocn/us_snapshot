@@ -885,25 +885,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        
-        toggle_col, header_col = st.columns([1, 10])
-        with toggle_col:
-            hide_low_rs = st.toggle("Hide weak RS", key=f"toggle_{slugify(group_name)}")
-        with header_col:
-            st.header(f"📌 {group_name}")
-        
-        tickers_in_group = group_tickers[group_name].tolist()
-        
-        if hide_low_rs and "rs_rank_21d" in latest.columns:
-            tickers_in_group = [
-                t for t in tickers_in_group 
-                if pd.notna(latest.loc[t, "rs_rank_21d"]) and latest.loc[t, "rs_rank_21d"] >= 0.80
-            ]
-        
-        if not tickers_in_group:
-            st.info("No tickers meet the criteria.")
-            continue
-        
+        st.header(f"📌 {group_name}")
+        tickers_in_group = group_tickers[group_name]
+
         # Sort by RS rank if available
         if "rs_rank_21d" in latest.columns:
             tickers_in_group = sorted(
