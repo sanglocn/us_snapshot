@@ -438,9 +438,8 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
 def format_chart_link(ticker: str) -> str:
     """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
     t = _escape(ticker)
-    row_id = f"row-{t}"
     return (
-        f'<a href="?chart={t}#{row_id}" target="_self" '
+        f'<a href="?chart={t}" target="_self" '
         f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
         f'title="Open chart for {t}">📈</a>'
     )
@@ -653,24 +652,6 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
             @st.dialog(f"Chart — {ticker}")
             def _dlg():
                 st.error(str(e))
-                st.markdown("""
-                <script>
-                const dialog = document.querySelector('dialog');
-                if (dialog) {
-                    dialog.addEventListener('close', () => {
-                        const hash = window.location.hash;
-                        if (hash) {
-                            setTimeout(() => {
-                                const element = document.querySelector(hash);
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                            }, 100);
-                        }
-                    });
-                }
-                </script>
-                """, unsafe_allow_html=True)
             _dlg()
         else:
             with st.sidebar:
@@ -685,24 +666,6 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
             if sma_missing:
                 st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
             st.plotly_chart(fig, use_container_width=True)
-            st.markdown("""
-            <script>
-            const dialog = document.querySelector('dialog');
-            if (dialog) {
-                dialog.addEventListener('close', () => {
-                    const hash = window.location.hash;
-                    if (hash) {
-                        setTimeout(() => {
-                            const element = document.querySelector(hash);
-                            if (element) {
-                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }
-                        }, 100);
-                    }
-                });
-            }
-            </script>
-            """, unsafe_allow_html=True)
         _dlg()
     else:
         with st.sidebar:
@@ -714,22 +677,10 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
 # ---------------------------------
 # Table Rendering
 # ---------------------------------
-def render_group_table(group_name: str, ticker_rows: List[Tuple[str, Dict]]) -> None:
-    """Render a group table as styled HTML with row IDs."""
-    if not ticker_rows:
-        return
+def render_group_table(group_name: str, rows: List[Dict]) -> None:
+    """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    headers = list(ticker_rows[0][1].keys())
-    thead_html = "<thead><tr>" + "".join(f"<th>{h}</th>" for h in headers) + "</tr></thead>"
-    tbody_html = ""
-    for ticker, row_dict in ticker_rows:
-        row_id = f"row-{slugify(ticker)}"
-        tr_html = f'<tr id="{row_id}">'
-        for h in headers:
-            tr_html += f"<td>{row_dict[h]}</td>"
-        tr_html += "</tr>"
-        tbody_html += tr_html
-    html = f"<table>{thead_html}<tbody>{tbody_html}</tbody></table>"
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
         #{table_id} table {{
@@ -907,7 +858,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Sidebar for global filters
     with st.sidebar:
         st.header("Filters")
-        hide_rs = st.toggle('Hide RS (below 85%)', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
+        hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where either Price Factor or Volume Factor is below 0.5 (based on latest values)")
 
     # Load optional data with fallbacks
@@ -963,7 +914,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 reverse=True,
             )
 
-        ticker_rows = []
+        rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
@@ -974,7 +925,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 if card_html:
                     chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
-            row_dict = {
+            rows.append({
                 "Ticker": chip,
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
@@ -992,10 +943,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA20": format_indicator(row.get("above_sma20")),
                 "  ": "",
                 "Chart": format_chart_link(ticker),
-            }
-            ticker_rows.append((ticker, row_dict))
+            })
 
-        render_group_table(group_name, ticker_rows)
+        render_group_table(group_name, rows)
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
