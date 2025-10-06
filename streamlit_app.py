@@ -725,16 +725,17 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 # Heatmap Rendering Helpers
 # ---------------------------------
-def render_heat_scatter(df_heat: pd.DataFrame) -> None:
+def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
-    df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
-    
     st.subheader("🧠 Price & Volume Analysis")
-    st.caption(f"Data as of {df_heat_latest_date}")
+    st.caption(f"Data as of {latest_date}")
+    
+    if df_latest.empty:
+        st.warning("No data available after filtering.")
+        return
     
     fig = px.scatter(
-        df_heat_latest,
+        df_latest,
         x='VolumeFactor',
         y='PriceFactor',
         color='code',
@@ -760,6 +761,10 @@ def render_heat_scatter(df_heat: pd.DataFrame) -> None:
 
 def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
     """Render side-by-side heatmaps for VolumeFactor and PriceFactor over time."""
+    if df_heat.empty:
+        st.warning("No heatmap data available.")
+        return
+    
     # Order tickers by code
     ticker_order_df = df_heat.groupby(['ticker', 'code'])['date'].min().reset_index().sort_values(['code', 'ticker'])
     ticker_list = ticker_order_df['ticker'].tolist()
@@ -853,7 +858,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Sidebar for global filters
     with st.sidebar:
         st.header("Filters")
-        hide_rs = st.toggle('Hide RS (below 85%)', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
+        hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
+        hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where either Price Factor or Volume Factor is below 0.5 (based on latest values)")
 
     # Load optional data with fallbacks
     try:
@@ -963,8 +969,20 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Heat data visualizations
     if not df_heat.empty:
-        render_heat_scatter(df_heat)
-        render_heat_heatmaps(df_heat)
+        df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
+        df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
+        
+        if hide_pv:
+            mask = (df_heat_latest['PriceFactor'] >= 0.5) & (df_heat_latest['VolumeFactor'] >= 0.5)
+            if mask.sum() == 0:
+                st.warning("No tickers meet the Price & Volume threshold (both >= 0.5).")
+            else:
+                df_heat_filtered = df_heat[df_heat['ticker'].isin(df_heat_latest[mask]['ticker'])]
+                render_heat_scatter(df_heat_latest[mask], df_heat_latest_date)
+                render_heat_heatmaps(df_heat_filtered)
+        else:
+            render_heat_scatter(df_heat_latest, df_heat_latest_date)
+            render_heat_heatmaps(df_heat)
     else:
         st.warning("Heat data not available — skipping price/volume analysis.")
 
