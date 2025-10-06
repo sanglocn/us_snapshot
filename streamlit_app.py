@@ -624,7 +624,7 @@ def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180)
         bargap=0.3
     )
 
-    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Price", row=1, cols=1)
     fig.update_yaxes(title_text="Volume", row=2, col=1)
 
     # X-axis: monthly ticks, hide weekends/holidays
@@ -850,6 +850,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
+    # RS Hide Toggle
+    _, center_col, _ = st.columns([1, 3, 1])
+    with center_col:
+        hide_rs = st.toggle('Hide RS', value=False)
+
     # Load optional data with fallbacks
     try:
         df_holdings = load_holdings_csv()
@@ -887,6 +892,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             continue
         st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
+
+        # Filter by RS rank if toggle is on
+        if hide_rs and "rs_rank_21d" in latest.columns:
+            tickers_in_group = [t for t in tickers_in_group if latest.loc[t, "rs_rank_21d"] >= 0.85]
+            if not tickers_in_group:
+                st.info(f"No tickers meet the RS threshold for {group_name}.")
+                continue
 
         # Sort by RS rank if available
         if "rs_rank_21d" in latest.columns:
