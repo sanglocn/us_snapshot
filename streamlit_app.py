@@ -841,7 +841,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 customdata=price_customdata
             )
         )
-        fig_price.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Price Factor")
+        fig_price.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Price Factor", hoverlabel=dict(align='left'))
         fig_price.update_yaxes(autorange='reversed')
         st.plotly_chart(fig_price, use_container_width=True)
 
