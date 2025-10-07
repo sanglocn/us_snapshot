@@ -811,7 +811,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 showscale=False,
                 colorbar=dict(title='VolumeFactor'),
                 hovertemplate=(
-                    "Ticker: %{y}<br>"
+                    "<b>%{y}</b><br>"
                     "Date: %{x}<br>"
                     "Volume Factor: %{z:.2f}<br>"
                     "Code: %{customdata}<extra></extra>"
@@ -833,7 +833,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 showscale=False,
                 colorbar=dict(title='PriceFactor'),
                 hovertemplate=(
-                    "Ticker: %{y}<br>"
+                    "<b>%{y}</b><br>"
                     "Date: %{x}<br>"
                     "Price Factor: %{z:.2f}<br>"
                     "Code: %{customdata}<extra></extra>"
