@@ -819,7 +819,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 customdata=vol_customdata
             )
         )
-        fig_vol.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Volume Factor")
+        fig_vol.update_layout(height=dynamic_height, margin=dict(t=40, b=40), title="Volume Factor", hoverlabel=dict(align='left'))
         fig_vol.update_yaxes(autorange='reversed')
         st.plotly_chart(fig_vol, use_container_width=True)
     
