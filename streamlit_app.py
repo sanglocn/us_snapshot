@@ -813,7 +813,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 hovertemplate=(
                     "Ticker: %{y}<br>"
                     "Date: %{x}<br>"
-                    "Volumefactor: %{z:.4f}<br>"
+                    "Volume Factor: %{z:.2f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
                 customdata=vol_customdata
@@ -835,7 +835,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
                 hovertemplate=(
                     "Ticker: %{y}<br>"
                     "Date: %{x}<br>"
-                    "Pricefactor: %{z:.4f}<br>"
+                    "Price Factor: %{z:.2f}<br>"
                     "Code: %{customdata}<extra></extra>"
                 ),
                 customdata=price_customdata
