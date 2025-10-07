@@ -733,13 +733,17 @@ def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     if df_latest.empty:
         st.warning("No data available after filtering.")
         return
+
+    # Add formatted date string (without time) for tooltip
+    df_latest = df_latest.copy()
+    df_latest['date_str'] = df_latest['date'].dt.strftime('%Y-%m-%d')
     
     fig = px.scatter(
         df_latest,
         x='VolumeFactor',
         y='PriceFactor',
         color='code',
-        custom_data=['date', 'ticker', 'PriceFactor', 'VolumeFactor'],
+        custom_data=['date_str', 'ticker', 'PriceFactor', 'VolumeFactor'],
         height=550,
     )
     fig.update_traces(
