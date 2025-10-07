@@ -736,7 +736,7 @@ def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
 
     # Add formatted date string (without time) for tooltip
     df_latest = df_latest.copy()
-    df_latest['date_str'] = df_latest['date'].dt.strftime('%Y-%m-%d')
+    df_latest['date_str'] = df_latest['date'].dt.strftime('%b %d, %Y')
     
     fig = px.scatter(
         df_latest,
