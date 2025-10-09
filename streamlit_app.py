@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -846,32 +847,11 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
         st.plotly_chart(fig_price, use_container_width=True)
 
 # ---------------------------------
-# Navigation Helpers
-# ---------------------------------
-def render_navigation_sidebar():
-    """Render navigation links in the sidebar."""
-    st.markdown("---")
-    st.header("📍 Navigation")
-    
-    # Main title link (top of page)
-    st.markdown('[🏠 Dashboard Overview](#dashboard-overview)')
-    
-    # Group links
-    for group in GROUP_ORDER:
-        group_slug = slugify(group)
-        st.markdown(f'[📌 {group}](#group-{group_slug})')
-    
-    # Fixed sections
-    st.markdown('[✏️ Breadth Gauge](#breadth-gauge)')
-    st.markdown('[🧠 Price & Volume](#price-volume)')
-
-# ---------------------------------
 # Dashboard Rendering
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
-    # Main title with anchor
-    st.markdown('<h1 id="dashboard-overview">US Market Daily Snapshot</h1>', unsafe_allow_html=True)
+    st.title("US Market Daily Snapshot")
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
@@ -880,14 +860,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # Sidebar for global filters and navigation
+    # Sidebar for global filters
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
-        
-        # Add navigation
-        render_navigation_sidebar()
 
     # Load optional data with fallbacks
     try:
@@ -924,11 +901,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        
-        # Header with anchor
-        group_slug = slugify(group_name)
-        st.markdown(f'<h2 id="group-{group_slug}">📌 {group_name}</h2>', unsafe_allow_html=True)
-        
+        st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
 
         # Filter by RS rank if toggle is on
@@ -985,8 +958,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
-        # Header with anchor
-        st.markdown('<h2 id="breadth-gauge">✏️ Breadth Gauge</h2>', unsafe_allow_html=True)
+        st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
@@ -1004,9 +976,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
-        
-        # Header with anchor (moved up to subheader level for consistency)
-        st.markdown('<h2 id="price-volume">🧠 Price & Volume Analysis</h2>', unsafe_allow_html=True)
         
         if hide_pv:
             mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
