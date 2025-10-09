@@ -727,6 +727,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
+    st.markdown('<div id="price-volume-analysis"></div>', unsafe_allow_html=True)
     st.subheader("🧠 Price & Volume Analysis")
     st.caption(f"Data as of {latest_date}")
     
@@ -850,6 +851,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
+    st.markdown('<div id="top"></div>', unsafe_allow_html=True)
     st.title("US Market Daily Snapshot")
 
     # Inject CSS
@@ -895,6 +897,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if val:
         selected_chart_ticker = str(val[0] if isinstance(val, list) else val).upper().strip()
 
+    toc_items = ['<li><a href="#top">🏠 US Market Daily Snapshot</a></li>']
+
     # Render group tables
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
@@ -918,6 +922,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 reverse=True,
             )
 
+        slug = slugify(group_name)
+        st.markdown(f'<div id="{slug}"></div>', unsafe_allow_html=True)
+        st.header(f"📌 {group_name}")
         rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
@@ -950,6 +957,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             })
 
         render_group_table(group_name, rows)
+        toc_items.append(f'<li><a href="#{slug}">📌 {group_name}</a></li>')
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
@@ -957,6 +965,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
+        toc_items.append('<li><a href="#breadth-gauge">✏️ Breadth Gauge</a></li>')
+        st.markdown('<div id="breadth-gauge"></div>', unsafe_allow_html=True)
         st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
@@ -976,15 +986,19 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
         
+        toc_item_added = False
         if hide_pv:
             mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
             if mask.sum() == 0:
                 st.warning("No tickers meet the Price & Volume threshold.")
             else:
                 df_heat_filtered = df_heat[df_heat['ticker'].isin(df_heat_latest[mask]['ticker'])]
+                toc_items.append('<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>')
+                toc_item_added = True
                 render_heat_scatter(df_heat_latest[mask], df_heat_latest_date)
                 render_heat_heatmaps(df_heat_filtered)
-        else:
+        if not hide_pv or (hide_pv and not toc_item_added):
+            toc_items.append('<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>')
             render_heat_scatter(df_heat_latest, df_heat_latest_date)
             render_heat_heatmaps(df_heat)
     else:
@@ -996,6 +1010,14 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             st.warning("Chart data not available.")
         else:
             open_chart_ui(selected_chart_ticker, df_chart)
+
+    # Table of Contents in sidebar
+    with st.sidebar:
+        st.markdown("### Table of Contents")
+        if toc_items:
+            st.markdown(f'<ul>{"".join(toc_items)}</ul>', unsafe_allow_html=True)
+        else:
+            st.info("No sections available.")
 
 # ---------------------------------
 # Main
