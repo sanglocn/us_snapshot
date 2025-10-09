@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -393,63 +394,6 @@ def build_chip_css() -> str:
     return "<style>" + base_css + "\n".join(group_css_parts) + "</style>"
 
 # ---------------------------------
-# Navigation Helpers
-# ---------------------------------
-def build_top_nav(toc_items: List[str]) -> str:
-    """Generate HTML for top navigation bar."""
-    nav_links = " ".join(toc_items)
-    nav_html = f"""
-    <nav class="top-nav">
-        <ul>{nav_links}</ul>
-    </nav>
-    <style>
-    .top-nav {{
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-        border-bottom: 1px solid #e2e8f0;
-        padding: 8px 0;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }}
-    .top-nav ul {{
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }}
-    .top-nav li {{
-        margin: 0;
-    }}
-    .top-nav a {{
-        text-decoration: none;
-        color: #475569;
-        font-weight: 500;
-        padding: 6px 12px;
-        border-radius: 6px;
-        transition: background 0.2s;
-        font-size: 14px;
-    }}
-    .top-nav a:hover {{
-        background: rgba(59, 130, 246, 0.1);
-        color: #2563eb;
-    }}
-    @media (max-width: 768px) {{
-        .top-nav ul {{
-            gap: 10px;
-        }}
-        .top-nav a {{
-            padding: 4px 8px;
-            font-size: 12px;
-        }}
-    }}
-    </style>
-    """
-    return nav_html
-
-# ---------------------------------
 # Visualization Helpers
 # ---------------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
@@ -784,7 +728,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    st.markdown('<div id="price-volume-analysis"></div>', unsafe_allow_html=True)
     st.subheader("🧠 Price & Volume Analysis")
     st.caption(f"Data as of {latest_date}")
     
@@ -908,7 +851,6 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
-    st.markdown('<div id="top"></div>', unsafe_allow_html=True)
     st.title("US Market Daily Snapshot")
 
     # Inject CSS
@@ -954,8 +896,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if val:
         selected_chart_ticker = str(val[0] if isinstance(val, list) else val).upper().strip()
 
-    toc_items = ['<li><a href="#top">🏠 US Market Daily Snapshot</a></li>']
-
     # Render group tables
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
@@ -979,9 +919,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 reverse=True,
             )
 
-        slug = slugify(group_name)
-        st.markdown(f'<div id="{slug}"></div>', unsafe_allow_html=True)
-        st.header(f"📌 {group_name}")
         rows = []
         for ticker in tickers_in_group:
             row = latest.loc[ticker]
@@ -1014,17 +951,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             })
 
         render_group_table(group_name, rows)
-        toc_items.append(f'<li><a href="#{slug}">📌 {group_name}</a></li>')
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
-    breadth_item = '<li><a href="#breadth-gauge">✏️ Breadth Gauge</a></li>'
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
-        toc_items.append(breadth_item)
-        st.markdown('<div id="breadth-gauge"></div>', unsafe_allow_html=True)
         st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
@@ -1040,12 +973,10 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
-    pv_item = '<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>'
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
         
-        toc_items.append(pv_item)
         if hide_pv:
             mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
             if mask.sum() == 0:
@@ -1059,18 +990,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             render_heat_heatmaps(df_heat)
     else:
         st.warning("Heat data not available — skipping price/volume analysis.")
-
-    # Render top navigation bar
-    nav_links = [item.split('>')[1].split('<')[0] for item in toc_items]  # Extract text for nav
-    st.markdown(build_top_nav(toc_items), unsafe_allow_html=True)
-
-    # Table of Contents in sidebar
-    with st.sidebar:
-        st.markdown("### Table of Contents")
-        if toc_items:
-            st.markdown(f'<ul>{"".join(toc_items)}</ul>', unsafe_allow_html=True)
-        else:
-            st.info("No sections available.")
 
     # Open selected chart
     if selected_chart_ticker:
