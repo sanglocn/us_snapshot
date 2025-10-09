@@ -393,6 +393,63 @@ def build_chip_css() -> str:
     return "<style>" + base_css + "\n".join(group_css_parts) + "</style>"
 
 # ---------------------------------
+# Navigation Helpers
+# ---------------------------------
+def build_top_nav(toc_items: List[str]) -> str:
+    """Generate HTML for top navigation bar."""
+    nav_links = " ".join(toc_items)
+    nav_html = f"""
+    <nav class="top-nav">
+        <ul>{nav_links}</ul>
+    </nav>
+    <style>
+    .top-nav {{
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 8px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }}
+    .top-nav ul {{
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }}
+    .top-nav li {{
+        margin: 0;
+    }}
+    .top-nav a {{
+        text-decoration: none;
+        color: #475569;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: background 0.2s;
+        font-size: 14px;
+    }}
+    .top-nav a:hover {{
+        background: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+    }}
+    @media (max-width: 768px) {{
+        .top-nav ul {{
+            gap: 10px;
+        }}
+        .top-nav a {{
+            padding: 4px 8px;
+            font-size: 12px;
+        }}
+    }}
+    </style>
+    """
+    return nav_html
+
+# ---------------------------------
 # Visualization Helpers
 # ---------------------------------
 def create_sparkline(values: List[float], width: int = 155, height: int = 36) -> str:
@@ -961,11 +1018,12 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
+    breadth_item = '<li><a href="#breadth-gauge">✏️ Breadth Gauge</a></li>'
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
-        toc_items.append('<li><a href="#breadth-gauge">✏️ Breadth Gauge</a></li>')
+        toc_items.append(breadth_item)
         st.markdown('<div id="breadth-gauge"></div>', unsafe_allow_html=True)
         st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
@@ -982,34 +1040,29 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
+    pv_item = '<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>'
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
         
-        toc_item_added = False
+        toc_items.append(pv_item)
         if hide_pv:
             mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
             if mask.sum() == 0:
                 st.warning("No tickers meet the Price & Volume threshold.")
             else:
                 df_heat_filtered = df_heat[df_heat['ticker'].isin(df_heat_latest[mask]['ticker'])]
-                toc_items.append('<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>')
-                toc_item_added = True
                 render_heat_scatter(df_heat_latest[mask], df_heat_latest_date)
                 render_heat_heatmaps(df_heat_filtered)
-        if not hide_pv or (hide_pv and not toc_item_added):
-            toc_items.append('<li><a href="#price-volume-analysis">🧠 Price & Volume Analysis</a></li>')
+        else:
             render_heat_scatter(df_heat_latest, df_heat_latest_date)
             render_heat_heatmaps(df_heat)
     else:
         st.warning("Heat data not available — skipping price/volume analysis.")
 
-    # Open selected chart
-    if selected_chart_ticker:
-        if df_chart.empty:
-            st.warning("Chart data not available.")
-        else:
-            open_chart_ui(selected_chart_ticker, df_chart)
+    # Render top navigation bar
+    nav_links = [item.split('>')[1].split('<')[0] for item in toc_items]  # Extract text for nav
+    st.markdown(build_top_nav(toc_items), unsafe_allow_html=True)
 
     # Table of Contents in sidebar
     with st.sidebar:
@@ -1018,6 +1071,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             st.markdown(f'<ul>{"".join(toc_items)}</ul>', unsafe_allow_html=True)
         else:
             st.info("No sections available.")
+
+    # Open selected chart
+    if selected_chart_ticker:
+        if df_chart.empty:
+            st.warning("Chart data not available.")
+        else:
+            open_chart_ui(selected_chart_ticker, df_chart)
 
 # ---------------------------------
 # Main
