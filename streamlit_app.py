@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components  # --- NAV ADDITIONS ---
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -326,7 +327,7 @@ def build_chip_css() -> str:
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: auto;       /* let browser auto-size columns based on content */
+  table-layout: auto       /* let browser auto-size columns based on content */
 }
 .tt-table thead th {
   text-align: left;
@@ -727,7 +728,9 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    st.markdown('<h2 id="price-volume-analysis">🧠 Price & Volume Analysis</h2>', unsafe_allow_html=True)
+    # --- NAV ADDITIONS: anchor before subheader ---
+    st.markdown(f'<div id="{slugify("price-volume-analysis")}"></div>', unsafe_allow_html=True)
+    st.subheader("🧠 Price & Volume Analysis")
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
@@ -850,7 +853,12 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
+    # --- NAV ADDITIONS: create a list of navigation items that we'll populate and show in sidebar ---
+    nav_items = []
+    # Top anchor
+    st.markdown(f'<div id="{slugify("top")}"></div>', unsafe_allow_html=True)
     st.title("US Market Daily Snapshot")
+    nav_items.append(("Top", slugify("top")))
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
@@ -859,27 +867,44 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # Sidebar for global filters and navigation
+    # Sidebar for global filters
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
-        st.markdown("---")
-        st.header("Navigation")
-        nav_html = """
-        <ul style="list-style-type: none; padding: 0; margin: 0;">
-            <li><a href="#market" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Market</a></li>
-            <li><a href="#sector" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Sector</a></li>
-            <li><a href="#commodity" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Commodity</a></li>
-            <li><a href="#crypto" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Crypto</a></li>
-            <li><a href="#country" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Country</a></li>
-            <li><a href="#theme" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Theme</a></li>
-            <li><a href="#leader" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Leader</a></li>
-            <li style="margin-top: 10px;"><a href="#breadth-gauge" style="text-decoration: none; color: #2563eb; font-weight: 500;">✏️ Breadth Gauge</a></li>
-            <li><a href="#price-volume-analysis" style="text-decoration: none; color: #2563eb; font-weight: 500;">🧠 Price & Volume Analysis</a></li>
-        </ul>
-        """
-        st.markdown(nav_html, unsafe_allow_html=True)
+
+    # --- NAV ADDITIONS: Sidebar navigation UI (selectbox) ---
+    # We'll build nav_items as we create sections below. To avoid "undefined" nav before groups are processed,
+    # we create a sidebar placeholder area now that will be updated (selectbox triggers rerun).
+    # Build basic navigation options that will be present even before group headers are rendered.
+    pre_nav = [("Top", slugify("top")), ("Filters", slugify("filters"))]
+    # render a selectbox that won't crash if nav_items later extend
+    with st.sidebar:
+        selected_nav_label = st.selectbox(
+            "Jump to section",
+            [label for label, _id in pre_nav],
+            index=0
+        )
+        # If user picks a pre-nav item, perform scroll
+        if selected_nav_label:
+            # Map label -> id
+            label_to_id = {label: _id for label, _id in pre_nav}
+            target_id = label_to_id.get(selected_nav_label)
+            if target_id:
+                # Run a small JS snippet to scroll to the element
+                components.html(
+                    f"""
+                    <script>
+                    (function() {{
+                        const el = document.getElementById("{target_id}");
+                        if (el) {{
+                            el.scrollIntoView({{behavior:'smooth'}});
+                        }}
+                    }})();
+                    </script>
+                    """,
+                    height=0,
+                )
 
     # Load optional data with fallbacks
     try:
@@ -913,11 +938,17 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Render group tables
     group_tickers = latest.groupby("group").groups
+    # We'll collect group nav items to present in the sidebar navigation control.
+    group_nav = []
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        slug = slugify(group_name)
-        st.markdown(f'<h2 id="{slug}">📌 {group_name}</h2>', unsafe_allow_html=True)
+        # --- NAV ADDITIONS: insert anchor before each group header ---
+        anchor_id = slugify(f"group-{group_name}")
+        st.markdown(f'<div id="{anchor_id}"></div>', unsafe_allow_html=True)
+        st.header(f"📌 {group_name}")
+        group_nav.append((f"📌 {group_name}", anchor_id))
+
         tickers_in_group = group_tickers[group_name]
 
         # Filter by RS rank if toggle is on
@@ -968,13 +999,26 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
         render_group_table(group_name, rows)
 
+    # --- NAV ADDITIONS: after building group nav, update the sidebar navigation selectbox with all items ---
+    # Build final nav list: Top, Filters, Groups..., Breadth, Price & Volume Analysis, Heatmaps, Charts
+    final_nav = [("Top", slugify("top")), ("Filters", slugify("filters"))] + group_nav + [
+        ("✏️ Breadth Gauge", slugify("breadth-gauge")),
+        ("🧠 Price & Volume Analysis", slugify("price-volume-analysis")),
+        ("Heatmaps", slugify("heatmaps")),
+        ("Charts", slugify("charts"))
+    ]
+
+    # Place anchors for breadth, heatmaps and charts sections (if they will appear)
+    st.markdown(f'<div id="{slugify("breadth-gauge")}"></div>', unsafe_allow_html=True)
+
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
     if not counts_21.empty:
-        st.markdown('<h2 id="breadth-gauge">✏️ Breadth Gauge</h2>', unsafe_allow_html=True)
-        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
+        
+        st.subheader("✏️ Breadth Gauge")
+        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
         c1, c2 = st.columns(2)
@@ -988,6 +1032,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
+    # Add anchor for heatmaps (already added price-volume anchor inside render_heat_scatter)
+    st.markdown(f'<div id="{slugify("heatmaps")}"></div>', unsafe_allow_html=True)
+
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
@@ -1007,11 +1054,42 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.warning("Heat data not available — skipping price/volume analysis.")
 
     # Open selected chart
+    # Put anchor before chart area so nav can jump here
+    st.markdown(f'<div id="{slugify("charts")}"></div>', unsafe_allow_html=True)
     if selected_chart_ticker:
         if df_chart.empty:
             st.warning("Chart data not available.")
         else:
             open_chart_ui(selected_chart_ticker, df_chart)
+
+    # --- NAV ADDITIONS: final sidebar selectbox with all sections and scroll on selection ---
+    # We place this at the bottom so it overrides the earlier small pre-nav; it will trigger rerun/scroll when user selects.
+    with st.sidebar:
+        all_labels = [label for label, _id in final_nav]
+        sel = st.selectbox("Jump to section (full)", all_labels, index=0, key="full_nav_select")
+        if sel:
+            id_map = {label: _id for label, _id in final_nav}
+            target = id_map.get(sel)
+            if target:
+                components.html(
+                    f"""
+                    <script>
+                    (function() {{
+                        const el = document.getElementById("{target}");
+                        if (el) {{
+                            el.scrollIntoView({{behavior:'smooth'}});
+                        }} else {{
+                            // retry once after a short delay in case element is rendered slightly later
+                            setTimeout(()=>{{
+                                const el2 = document.getElementById("{target}");
+                                if (el2) el2.scrollIntoView({{behavior:'smooth'}});
+                            }}, 200);
+                        }}
+                    }})();
+                    </script>
+                    """,
+                    height=0,
+                )
 
 # ---------------------------------
 # Main
