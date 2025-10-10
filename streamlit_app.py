@@ -372,6 +372,8 @@ def build_chip_css() -> str:
     transform: translateY(0);
   }
 }
+
+html { scroll-behavior: smooth; }
 """
     group_css_parts = []
     if use_group_colors:
