@@ -727,7 +727,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    st.subheader("🧠 Price & Volume Analysis")
+    st.markdown('<h2 id="price-volume-analysis">🧠 Price & Volume Analysis</h2>', unsafe_allow_html=True)
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
@@ -859,11 +859,27 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # Sidebar for global filters
+    # Sidebar for global filters and navigation
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
+        st.markdown("---")
+        st.header("Navigation")
+        nav_html = """
+        <ul style="list-style-type: none; padding: 0; margin: 0;">
+            <li><a href="#market" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Market</a></li>
+            <li><a href="#sector" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Sector</a></li>
+            <li><a href="#commodity" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Commodity</a></li>
+            <li><a href="#crypto" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Crypto</a></li>
+            <li><a href="#country" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Country</a></li>
+            <li><a href="#theme" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Theme</a></li>
+            <li><a href="#leader" style="text-decoration: none; color: #2563eb; font-weight: 500;">📌 Leader</a></li>
+            <li style="margin-top: 10px;"><a href="#breadth-gauge" style="text-decoration: none; color: #2563eb; font-weight: 500;">✏️ Breadth Gauge</a></li>
+            <li><a href="#price-volume-analysis" style="text-decoration: none; color: #2563eb; font-weight: 500;">🧠 Price & Volume Analysis</a></li>
+        </ul>
+        """
+        st.markdown(nav_html, unsafe_allow_html=True)
 
     # Load optional data with fallbacks
     try:
@@ -900,7 +916,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        st.header(f"📌 {group_name}")
+        slug = slugify(group_name)
+        st.markdown(f'<h2 id="{slug}">📌 {group_name}</h2>', unsafe_allow_html=True)
         tickers_in_group = group_tickers[group_name]
 
         # Filter by RS rank if toggle is on
@@ -954,11 +971,10 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
     if not counts_21.empty:
+        st.markdown('<h2 id="breadth-gauge">✏️ Breadth Gauge</h2>', unsafe_allow_html=True)
+        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
-        
-        st.subheader("✏️ Breadth Gauge")
-        st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
         c1, c2 = st.columns(2)
