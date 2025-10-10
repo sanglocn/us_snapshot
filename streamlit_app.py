@@ -850,6 +850,8 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
+    # Anchor for overview
+    st.markdown('<div id="overview"></div>', unsafe_allow_html=True)
     st.title("US Market Daily Snapshot")
 
     # Inject CSS
@@ -859,11 +861,30 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # Sidebar for global filters
+    # Sidebar for global filters and navigation
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
+
+        st.markdown("---")
+        st.header("Navigation")
+        sections = ["Overview"] + GROUP_ORDER + ["Breadth Gauge", "Price & Volume Analysis"]
+
+        def nav_change():
+            st.session_state.do_scroll = True
+
+        if 'nav_select' not in st.session_state:
+            st.session_state.nav_select = sections[0]
+
+        selected = st.sidebar.selectbox(
+            "Go to Section",
+            options=sections,
+            index=sections.index(st.session_state.nav_select),
+            key='nav_select',
+            on_change=nav_change
+        )
+        st.session_state.nav_select = selected
 
     # Load optional data with fallbacks
     try:
@@ -900,6 +921,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
+        st.markdown(f'<h2 id="{slugify(group_name)}"></h2>', unsafe_allow_html=True)
         st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
 
@@ -954,6 +976,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
     if not counts_21.empty:
+        st.markdown('<h2 id="breadth-gauge"></h2>', unsafe_allow_html=True)
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
@@ -975,6 +998,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
+        st.markdown('<h2 id="price-volume-analysis"></h2>', unsafe_allow_html=True)
         
         if hide_pv:
             mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
@@ -996,6 +1020,23 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             st.warning("Chart data not available.")
         else:
             open_chart_ui(selected_chart_ticker, df_chart)
+
+    # Navigation scroll script
+    if st.session_state.get('do_scroll', False):
+        section = st.session_state.nav_select
+        section_id = "overview" if section == "Overview" else slugify(section)
+        if section_id == "overview":
+            scroll_js = 'window.scrollTo({top: 0, left: 0, behavior: "smooth"});'
+        else:
+            scroll_js = f'const element = document.getElementById("{section_id}"); if (element) {{ element.scrollIntoView({{behavior: "smooth", block: "start"}}); }}'
+        st.markdown(f"""
+        <script>
+        setTimeout(() => {{
+            {scroll_js}
+        }}, 200);
+        </script>
+        """, unsafe_allow_html=True)
+        st.session_state.do_scroll = False
 
 # ---------------------------------
 # Main
