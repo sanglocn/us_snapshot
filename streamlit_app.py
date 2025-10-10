@@ -727,7 +727,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    st.markdown('<h2 id="price-volume-analysis">🧠 Price & Volume Analysis</h2>', unsafe_allow_html=True)
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
@@ -988,6 +987,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
+    st.markdown('<h2 id="price-volume-analysis">🧠 Price & Volume Analysis</h2>', unsafe_allow_html=True)
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
