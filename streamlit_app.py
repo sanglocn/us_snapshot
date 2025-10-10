@@ -727,7 +727,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 # ---------------------------------
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
-    st.subheader("🧠 Price & Volume Analysis")
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
@@ -850,7 +849,7 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 # ---------------------------------
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
-    st.title("US Market Daily Snapshot")
+    st.markdown('<h1 id="overview">US Market Daily Snapshot</h1>', unsafe_allow_html=True)
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
@@ -859,11 +858,19 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     latest_date = latest["date"].max().date() if "date" in latest.columns else "N/A"
     st.caption(f"Latest Update: {latest_date}")
 
-    # Sidebar for global filters
+    # Sidebar for global filters and navigation
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
+
+        st.markdown("---")
+        st.markdown("### Navigation")
+        st.markdown("[Overview](#overview)")
+        for group_name in GROUP_ORDER:
+            st.markdown(f"[📌 {group_name}](#group-{slugify(group_name)})")
+        st.markdown("[✏️ Breadth Gauge](#breadth)")
+        st.markdown("[🧠 Price & Volume](#price-volume)")
 
     # Load optional data with fallbacks
     try:
@@ -900,7 +907,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     for group_name in GROUP_ORDER:
         if group_name not in group_tickers:
             continue
-        st.header(f"📌 {group_name}")
+        st.markdown(f'<h2 id="group-{slugify(group_name)}">📌 {group_name}</h2>', unsafe_allow_html=True)
         tickers_in_group = group_tickers[group_name]
 
         # Filter by RS rank if toggle is on
@@ -953,11 +960,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
+    st.markdown('<h3 id="breadth">✏️ Breadth Gauge</h3>', unsafe_allow_html=True)
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
-        st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
@@ -972,6 +979,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
+    st.markdown('<h3 id="price-volume">🧠 Price & Volume Analysis</h3>', unsafe_allow_html=True)
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
