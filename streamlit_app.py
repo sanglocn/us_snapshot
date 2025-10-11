@@ -1,4 +1,3 @@
-# streamlit_dashboard_with_tooltip_patch.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -264,7 +263,7 @@ def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str |
     return f'<span class="tt-chip{group_class}">{t}{card_html}</span>'
 
 def build_chip_css() -> str:
-    """Generate CSS for ticker chips and tooltips. Minimal patch applied to avoid last-row clipping."""
+    """Generate CSS for ticker chips and tooltips."""
     base_css = """
 /* Chip base */
 .tt-chip {
@@ -292,13 +291,12 @@ def build_chip_css() -> str:
 }
 
 /* Tooltip card to the RIGHT; scroll if tall */
-/* NOTE: Minimal patch applied here: top aligned (avoid bottom clipping), high z-index, pointer-events enabled */
 .tt-chip .tt-card {
   position: absolute;
   left: calc(100% + 8px);
-  top: 0;                                 /* avoid bottom clipping on last row */
-  transform: translateY(0) translateX(6px);
-  z-index: 2147483647;                    /* bring to front */
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  z-index: 999999;
   width: min(520px, 90vw);
   max-height: 60vh;
   overflow: auto;
@@ -310,13 +308,12 @@ def build_chip_css() -> str:
   visibility: hidden;
   opacity: 0;
   transition: opacity .18s ease, transform .18s ease;
-  pointer-events: auto;                    /* allow moving into the card */
+  pointer-events: none;
 }
-.tt-chip:hover .tt-card,
-.tt-chip .tt-card:hover {
+.tt-chip:hover .tt-card {
   visibility: visible;
   opacity: 1;
-  transform: translateY(0) translateX(0);
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Card text */
@@ -688,9 +685,13 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    html_table = pd.DataFrame(rows).to_html(escape=False, index=False)
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
+        #{table_id} {{
+            position: relative;
+            overflow: visible;
+        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
@@ -727,14 +728,8 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
         #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
-
-        /* Ensure tooltip can overflow the table bounds (prevent clipping on last row) */
-        #{table_id} {{ overflow: visible !important; }}
-        #{table_id} table {{ overflow: visible !important; }}
-        #{table_id} table tbody td {{ overflow: visible !important; }}
-        #{table_id} table tbody tr {{ overflow: visible !important; }}
     """
-    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html_table}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
 # ---------------------------------
 # Heatmap Rendering Helpers
