@@ -728,6 +728,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
     st.subheader("🧠 Price & Volume Analysis")
+    st.caption("High Volume Factor = Volume Accumulation · High Price Factor = Price Compression")
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
