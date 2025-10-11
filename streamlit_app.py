@@ -445,7 +445,7 @@ def format_chart_link(ticker: str) -> str:
     t = _escape(ticker)
     return (
         f'<a href="?chart={t}" target="_self" '
-        f'style="text-decoration:none; display:block; text-align:center; font-size:18px;" '
+        f'style="text-decoration:none; display:block; text-align:center; font-size:18px; cursor: pointer;" '
         f'title="Open chart for {t}">📈</a>'
     )
 
@@ -688,6 +688,10 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
+        #{table_id} {{
+            overflow: visible !important;
+            position: relative;
+        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
@@ -708,6 +712,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-right: none !important;
             padding: 6px 8px;
             position: relative;
+            overflow: visible !important;
         }}
         #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
         /* Right align numeric-ish columns */
@@ -857,6 +862,18 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
     st.title("US Market Daily Snapshot")
+
+    # Inject global CSS for overflow to prevent clipping
+    st.markdown("""
+    <style>
+    div.block-container {
+        overflow: visible !important;
+    }
+    div.stMarkdown {
+        overflow: visible !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
