@@ -290,15 +290,15 @@ def build_chip_css() -> str:
   box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card BELOW chip; scroll if tall. Adjusted for better responsiveness on desktop */
+/* Tooltip card to the RIGHT; scroll if tall */
 .tt-chip .tt-card {
   position: absolute;
-  left: 50%;
-  top: calc(100% + 8px);
-  transform: translateX(-50%) translateY(6px);
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
   z-index: 999999;
   width: min(520px, 90vw);
-  max-height: 50vh;
+  max-height: 60vh;
   overflow: auto;
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.06);
@@ -313,7 +313,7 @@ def build_chip_css() -> str:
 .tt-chip:hover .tt-card {
   visibility: visible;
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Card text */
@@ -365,7 +365,7 @@ def build_chip_css() -> str:
     top: auto;
     bottom: calc(100% + 8px);
     transform: translateX(-50%) translateY(6px);
-    max-height: 40vh;
+    max-height: 50vh;
   }
   .tt-chip:hover .tt-card {
     visibility: visible;
