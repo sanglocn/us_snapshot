@@ -265,14 +265,6 @@ def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str |
 def build_chip_css() -> str:
     """Generate CSS for ticker chips and tooltips."""
     base_css = """
-/* Override Streamlit containers to prevent clipping */
-.appview-container .main .block-container {
-  overflow: visible !important;
-}
-.stMarkdown {
-  overflow: visible !important;
-}
-
 /* Chip base */
 .tt-chip {
   position: relative;
@@ -300,11 +292,11 @@ def build_chip_css() -> str:
 
 /* Tooltip card to the RIGHT; scroll if tall */
 .tt-chip .tt-card {
-  position: absolute !important;
+  position: absolute;
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%) translateX(6px);
-  z-index: 999999 !important;
+  z-index: 999999;
   width: min(520px, 90vw);
   max-height: 60vh;
   overflow: auto;
@@ -313,15 +305,15 @@ def build_chip_css() -> str:
   box-shadow: 0 12px 28px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
   border-radius: 12px;
   padding: 12px 12px 8px 12px;
-  visibility: hidden !important;
-  opacity: 0 !important;
+  visibility: hidden;
+  opacity: 0;
   transition: opacity .18s ease, transform .18s ease;
   pointer-events: none;
 }
 .tt-chip:hover .tt-card {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateY(-50%) translateX(0) !important;
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Card text */
@@ -376,14 +368,9 @@ def build_chip_css() -> str:
     max-height: 50vh;
   }
   .tt-chip:hover .tt-card {
-    visibility: visible !important;
-    transform: translateY(0) !important;
+    visibility: visible;
+    transform: translateY(0);
   }
-}
-
-/* Navigation links in sidebar: no underline */
-.stSidebar a {
-    text-decoration: none;
 }
 """
     group_css_parts = []
@@ -696,24 +683,12 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        #{table_id} {{
-            position: relative;
-            overflow: visible !important;
-        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
             border: none;
             border-radius: 8px;
-            margin-bottom: 200px !important;
-            overflow: visible !important;
-        }}
-        #{table_id} table tbody {{
-            overflow: visible !important;
-        }}
-        #{table_id} table tr {{
-            overflow: visible !important;
         }}
         #{table_id} table thead th {{
             text-align: center !important;
@@ -728,7 +703,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-right: none !important;
             padding: 6px 8px;
             position: relative;
-            overflow: visible !important;
         }}
         #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
         /* Right align numeric-ish columns */
@@ -744,7 +718,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(13),
         #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; overflow: visible !important; }}
+        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
@@ -754,7 +728,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
 def render_heat_scatter(df_latest: pd.DataFrame, latest_date: str) -> None:
     """Render scatter plot of latest PriceFactor vs VolumeFactor."""
     st.subheader("🧠 Price & Volume Analysis")
-    st.caption("High Volume Factor = Volume Accumulation · High Price Factor = Price Compression")
     st.caption(f"Data as of {latest_date}")
     
     if df_latest.empty:
@@ -891,12 +864,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
-        st.markdown("---")
-        st.markdown("## Navigation")
-        for group_name in GROUP_ORDER:
-            st.markdown(f'[📌 {group_name}](#{slugify(group_name)})', unsafe_allow_html=True)
-        st.markdown(f'[✏️ Breadth Gauge](#breadth-gauge)', unsafe_allow_html=True)
-        st.markdown(f'[🧠 Price & Volume Analysis](#price-volume)', unsafe_allow_html=True)
 
     # Load optional data with fallbacks
     try:
@@ -931,12 +898,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Render group tables
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
-        anchor_id = slugify(group_name)
-        st.markdown(f'<div id="{anchor_id}" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
-        st.header(f"📌 {group_name}")
         if group_name not in group_tickers:
-            st.info(f"No data available for {group_name}.")
             continue
+        st.header(f"📌 {group_name}")
         tickers_in_group = group_tickers[group_name]
 
         # Filter by RS rank if toggle is on
@@ -989,12 +953,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
-    st.markdown('<div id="breadth-gauge" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
-    st.subheader("✏️ Breadth Gauge")
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
         end_date = counts_21["date"].max().date()
         
+        st.subheader("✏️ Breadth Gauge")
         st.caption("Green = No. of tickers gaining momentum · Red = No. of tickers losing momentum")
         st.caption(f"From {start_date} to {end_date}")
         
@@ -1009,7 +972,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
-    st.markdown('<div id="price-volume" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
