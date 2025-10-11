@@ -290,12 +290,12 @@ def build_chip_css() -> str:
   box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card to the RIGHT; scroll if tall */
+/* Tooltip card centered on screen; scroll if tall */
 .tt-chip .tt-card {
-  position: absolute;
-  left: calc(100% + 8px);
+  position: fixed;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%) translateX(6px);
+  transform: translate(-50%, -50%) translateY(6px);
   z-index: 999999;
   width: min(520px, 90vw);
   max-height: 60vh;
@@ -313,7 +313,7 @@ def build_chip_css() -> str:
 .tt-chip:hover .tt-card {
   visibility: visible;
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translate(-50%, -50%);
 }
 
 /* Card text */
@@ -358,18 +358,34 @@ def build_chip_css() -> str:
   font-variant-numeric: tabular-nums;
 }
 
-/* Mobile fallback: show above chip */
+/* Mobile fallback: adjust for smaller screen */
 @media (max-width: 768px) {
   .tt-chip .tt-card {
+    position: fixed;
     left: 50%;
-    top: auto;
-    bottom: calc(100% + 8px);
-    transform: translateX(-50%) translateY(6px);
-    max-height: 50vh;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    max-height: 70vh;
+    max-width: none;
+    overflow: auto;
+    padding: 12px;
   }
   .tt-chip:hover .tt-card {
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  /* Table adjustments for mobile */
+  .tt-table {
+    font-size: 11px;
+  }
+  .tt-table thead th,
+  .tt-table tbody td {
+    padding: 4px 4px;
+  }
+  .tt-sec {
+    font-size: 10px;
   }
 }
 
