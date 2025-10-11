@@ -690,7 +690,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
     css = f"""
         #{table_id} {{
             position: relative;
-            overflow: visible;
+            overflow: visible !important;
         }}
         #{table_id} table {{
             width: 100%;
@@ -698,6 +698,11 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-spacing: 0;
             border: none;
             border-radius: 8px;
+            margin-bottom: 200px !important;
+            overflow: visible !important;
+        }}
+        #{table_id} table tbody {{
+            overflow: visible !important;
         }}
         #{table_id} table thead th {{
             text-align: center !important;
@@ -712,6 +717,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-right: none !important;
             padding: 6px 8px;
             position: relative;
+            overflow: visible !important;
         }}
         #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
         /* Right align numeric-ish columns */
@@ -727,7 +733,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(13),
         #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
+        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; overflow: visible !important; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
