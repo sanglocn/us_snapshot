@@ -290,15 +290,15 @@ def build_chip_css() -> str:
   box-shadow: 0 2px 8px rgba(37,99,235,.28);
 }
 
-/* Tooltip card to the RIGHT; scroll if tall */
+/* Tooltip card BELOW chip; scroll if tall. Adjusted for better responsiveness on desktop */
 .tt-chip .tt-card {
   position: absolute;
-  left: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%) translateX(6px);
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(6px);
   z-index: 999999;
   width: min(520px, 90vw);
-  max-height: 60vh;
+  max-height: 50vh;
   overflow: auto;
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.06);
@@ -313,7 +313,7 @@ def build_chip_css() -> str:
 .tt-chip:hover .tt-card {
   visibility: visible;
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Card text */
@@ -361,15 +361,15 @@ def build_chip_css() -> str:
 /* Mobile fallback: show above chip */
 @media (max-width: 768px) {
   .tt-chip .tt-card {
-    left: 0;
+    left: 50%;
     top: auto;
     bottom: calc(100% + 8px);
-    transform: translateY(6px);
-    max-height: 50vh;
+    transform: translateX(-50%) translateY(6px);
+    max-height: 40vh;
   }
   .tt-chip:hover .tt-card {
     visibility: visible;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
@@ -445,7 +445,7 @@ def format_chart_link(ticker: str) -> str:
     t = _escape(ticker)
     return (
         f'<a href="?chart={t}" target="_self" '
-        f'style="text-decoration:none; display:block; text-align:center; font-size:18px; cursor: pointer;" '
+        f'style="text-decoration:none; display:block; text-align:center; font-size:18px; line-height:1.2;" '
         f'title="Open chart for {t}">📈</a>'
     )
 
@@ -685,19 +685,16 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    html = pd.DataFrame(rows).to_html(escape=False, index=False)
+    html = f'<div style="padding-bottom: 40px; overflow: visible;">{pd.DataFrame(rows).to_html(escape=False, index=False)}</div>'
 
     css = f"""
-        #{table_id} {{
-            overflow: visible !important;
-            position: relative;
-        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
             border: none;
             border-radius: 8px;
+            overflow: visible;
         }}
         #{table_id} table thead th {{
             text-align: center !important;
@@ -710,11 +707,14 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             border-bottom: none;
             border-left: none !important;
             border-right: none !important;
-            padding: 6px 8px;
+            padding: 8px 8px;
             position: relative;
-            overflow: visible !important;
+            overflow: visible;
         }}
-        #{table_id} table tbody tr:last-child td {{ border-bottom: none; }}
+        #{table_id} table tbody tr:last-child td {{ 
+            border-bottom: none; 
+            padding-bottom: 12px;
+        }}
         /* Right align numeric-ish columns */
         #{table_id} table td:nth-child(3),
         #{table_id} table td:nth-child(4),
@@ -728,7 +728,9 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(13),
         #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
-        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; }}
+        #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; overflow: visible; }}
+        /* Ensure chart links have space */
+        #{table_id} table td:nth-child(14) a {{ display: block; margin: 0 auto; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
@@ -862,18 +864,6 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
     st.title("US Market Daily Snapshot")
-
-    # Inject global CSS for overflow to prevent clipping
-    st.markdown("""
-    <style>
-    div.block-container {
-        overflow: visible !important;
-    }
-    div.stMarkdown {
-        overflow: visible !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
