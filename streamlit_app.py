@@ -265,6 +265,14 @@ def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str |
 def build_chip_css() -> str:
     """Generate CSS for ticker chips and tooltips."""
     base_css = """
+/* Override Streamlit containers to prevent clipping */
+.appview-container .main .block-container {
+  overflow: visible !important;
+}
+.stMarkdown {
+  overflow: visible !important;
+}
+
 /* Chip base */
 .tt-chip {
   position: relative;
@@ -292,11 +300,11 @@ def build_chip_css() -> str:
 
 /* Tooltip card to the RIGHT; scroll if tall */
 .tt-chip .tt-card {
-  position: absolute;
+  position: absolute !important;
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%) translateX(6px);
-  z-index: 999999;
+  z-index: 999999 !important;
   width: min(520px, 90vw);
   max-height: 60vh;
   overflow: auto;
@@ -305,15 +313,15 @@ def build_chip_css() -> str:
   box-shadow: 0 12px 28px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
   border-radius: 12px;
   padding: 12px 12px 8px 12px;
-  visibility: hidden;
-  opacity: 0;
+  visibility: hidden !important;
+  opacity: 0 !important;
   transition: opacity .18s ease, transform .18s ease;
   pointer-events: none;
 }
 .tt-chip:hover .tt-card {
-  visibility: visible;
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(-50%) translateX(0) !important;
 }
 
 /* Card text */
@@ -368,8 +376,8 @@ def build_chip_css() -> str:
     max-height: 50vh;
   }
   .tt-chip:hover .tt-card {
-    visibility: visible;
-    transform: translateY(0);
+    visibility: visible !important;
+    transform: translateY(0) !important;
   }
 }
 
@@ -702,6 +710,9 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
             overflow: visible !important;
         }}
         #{table_id} table tbody {{
+            overflow: visible !important;
+        }}
+        #{table_id} table tr {{
             overflow: visible !important;
         }}
         #{table_id} table thead th {{
