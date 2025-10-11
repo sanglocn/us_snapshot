@@ -253,14 +253,14 @@ def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_row
         f'{table_html}</div>'
     )
 
-def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None, extra_class: str = "") -> str:
+def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
     """Generate HTML chip for ticker with optional tooltip."""
     t = _escape(ticker)
     group_class = ""
     if use_group_colors and group_name:
         group_slug = slugify(group_name)
         group_class = f" chip--{group_slug}"
-    return f'<span class="tt-chip{group_class} {extra_class}">{t}{card_html}</span>'
+    return f'<span class="tt-chip{group_class}">{t}{card_html}</span>'
 
 def build_chip_css() -> str:
     """Generate CSS for ticker chips and tooltips."""
@@ -314,18 +314,6 @@ def build_chip_css() -> str:
   visibility: visible;
   opacity: 1;
   transform: translateY(-50%) translateX(0);
-}
-
-/* Last row tooltip: show ABOVE, centered */
-.tt-chip.last-row .tt-card {
-  left: 50% !important;
-  top: auto !important;
-  bottom: calc(100% + 8px) !important;
-  transform: translateY(6px) translateX(-50%) !important;
-}
-.tt-chip.last-row:hover .tt-card {
-  bottom: 100% !important;
-  transform: translateY(0) translateX(-50%) !important;
 }
 
 /* Card text */
@@ -697,14 +685,9 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    inner_html = pd.DataFrame(rows).to_html(escape=False, index=False)
-    html = f'<div style="overflow: visible !important; position: relative;">{inner_html}</div>'
+    html = pd.DataFrame(rows).to_html(escape=False, index=False)
 
     css = f"""
-        #{table_id} {{
-            overflow: visible !important;
-            position: relative;
-        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
@@ -951,13 +934,15 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             )
 
         rows = []
-        for i, ticker in enumerate(tickers_in_group):
+        for ticker in tickers_in_group:
             row = latest.loc[ticker]
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
-            card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows) if not df_holdings.empty else ""
-            extra_class = "last-row" if i == len(tickers_in_group) - 1 else ""
-            chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name, extra_class)
+            chip = ticker
+            if not df_holdings.empty:
+                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
+                if card_html:
+                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
             rows.append({
                 "Ticker": chip,
