@@ -697,9 +697,14 @@ def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    html = pd.DataFrame(rows).to_html(escape=False, index=False)
+    inner_html = pd.DataFrame(rows).to_html(escape=False, index=False)
+    html = f'<div style="overflow: visible !important; position: relative;">{inner_html}</div>'
 
     css = f"""
+        #{table_id} {{
+            overflow: visible !important;
+            position: relative;
+        }}
         #{table_id} table {{
             width: 100%;
             border-collapse: collapse;
