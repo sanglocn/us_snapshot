@@ -910,7 +910,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     # Render group tables
     group_tickers = latest.groupby("group").groups
     for group_name in GROUP_ORDER:
-        st.markdown(f'<a id="{slugify(group_name)}"></a>', unsafe_allow_html=True)
+        anchor_id = slugify(group_name)
+        st.markdown(f'<div id="{anchor_id}" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
         st.header(f"📌 {group_name}")
         if group_name not in group_tickers:
             st.info(f"No data available for {group_name}.")
@@ -967,7 +968,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
 
     # Breadth charts
     counts_21 = compute_threshold_counts(df_etf)
-    st.markdown('<a id="breadth-gauge"></a>', unsafe_allow_html=True)
+    st.markdown('<div id="breadth-gauge" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
     st.subheader("✏️ Breadth Gauge")
     if not counts_21.empty:
         start_date = counts_21["date"].min().date()
@@ -987,7 +988,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.info("`count_over_85` and `count_under_50` not found in ETF data — breadth charts skipped.")
 
     # Heat data visualizations
-    st.markdown('<a id="price-volume"></a>', unsafe_allow_html=True)
+    st.markdown('<div id="price-volume" style="padding-top: 80px; margin-top: -80px;"></div>', unsafe_allow_html=True)
     if not df_heat.empty:
         df_heat_latest = df_heat.sort_values('date').groupby('ticker').tail(1)
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
