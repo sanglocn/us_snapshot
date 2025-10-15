@@ -892,7 +892,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
-        hide_extension = st.toggle('Hide Extension Multiple', value=False, help="Hide all tickers with Extension Multiple above 4")
+        hide_extension = st.toggle('Hide Multiple', value=False, help="Hide all tickers with Extension Multiple above 4")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
         st.markdown("---")
         st.markdown("## Navigation")
