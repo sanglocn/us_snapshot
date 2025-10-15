@@ -892,6 +892,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     with st.sidebar:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
+        hide_extension = st.toggle('Hide Extension Multiple', value=False, help="Hide all tickers with Extension Multiple above 4")
         hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
         st.markdown("---")
         st.markdown("## Navigation")
@@ -946,6 +947,13 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             tickers_in_group = [t for t in tickers_in_group if latest.loc[t, "rs_rank_21d"] >= 0.85]
             if not tickers_in_group:
                 st.info(f"No tickers meet the RS threshold for {group_name}.")
+                continue
+
+        # Filter by Extension Multiple if toggle is on
+        if hide_extension and "ratio_pct_dist_to_atr_pct" in latest.columns:
+            tickers_in_group = [t for t in tickers_in_group if latest.loc[t, "ratio_pct_dist_to_atr_pct"] <= 4]
+            if not tickers_in_group:
+                st.info(f"No tickers meet the Extension Multiple threshold for {group_name}.")
                 continue
 
         # Sort by RS rank if available
