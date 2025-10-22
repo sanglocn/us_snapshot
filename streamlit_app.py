@@ -893,7 +893,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.header("Filters")
         hide_rs = st.toggle('Hide RS', value=False, help="Hide all tickers with RS Rank (1M) below 85%")
         hide_extension = st.toggle('Hide Multiple', value=False, help="Hide all tickers with Extension Multiple above 4")
-        hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.55 or Volume Factor is below 0.60 (based on latest values)")
+        hide_pv = st.toggle('Hide Price & Volume', value=False, help="Hide all tickers where Price Factor is below 0.60 or Volume Factor is below 0.65 (based on latest values)")
         st.markdown("---")
         st.markdown("## Navigation")
         for group_name in GROUP_ORDER:
@@ -1025,7 +1025,7 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         df_heat_latest_date = df_heat['date'].max().strftime("%Y-%m-%d")
         
         if hide_pv:
-            mask = (df_heat_latest['PriceFactor'] >= 0.55) & (df_heat_latest['VolumeFactor'] >= 0.60)
+            mask = (df_heat_latest['PriceFactor'] >= 0.60) & (df_heat_latest['VolumeFactor'] >= 0.65)
             if mask.sum() == 0:
                 st.warning("No tickers meet the Price & Volume threshold.")
             else:
