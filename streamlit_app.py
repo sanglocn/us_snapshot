@@ -506,25 +506,23 @@ def format_performance_intraday(value: float) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>'
     )
 
-def format_52w(pct_below_high: float, pct_above_low: float) -> str:
-    """Format 52-week proximity with emojis for near-highs and near-lows."""
-    if pd.isna(pct_below_high) or pd.isna(pct_above_low):
+def format_52w_high(value: float) -> str:
+    """Format 52-week pct_below_high with rocket emoji if value > -5."""
+    if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-    
-    # Rocket if close to 52-week high
-    if pct_below_high > -5:
+    if value > -5:
         return '<span style="display:block; text-align:right;">🚀</span>'
-    
-    # Turtle if close to 52-week low
-    if pct_above_low < 5:
+    formatted_value = f'{value:.1f}%'
+    return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
+
+def format_52w_low(value: float) -> str:
+    """Format 52-week pct_above_low with turtle emoji if value < 5."""
+    if pd.isna(value):
+        return '<span style="display:block; text-align:right;">-</span>'
+    if value < 5:
         return '<span style="display:block; text-align:right;">🐢</span>'
-    
-    # Otherwise show both values
-    return (
-        f'<span style="display:block; text-align:right;">'
-        f'High: {pct_below_high:.1f}% | Low: {pct_above_low:.1f}%'
-        f'</span>'
-    )
+    formatted_value = f'{value:.1f}%'
+    return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
 def format_indicator(value: str) -> str:
     """Format yes/no indicator as emoji."""
@@ -1006,8 +1004,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_52w(row.get("pct_below_high")),
-                "52W Low": format_52w(row.get("pct_above_low")),
+                "52W High": format_52w_high(row.get("pct_below_high")),
+                "52W Low": format_52w_low(row.get("pct_above_low")),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
