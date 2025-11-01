@@ -506,6 +506,25 @@ def format_performance_intraday(value: float) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>'
     )
 
+def format_52w(row: pd.Series) -> str:
+    """Format 52-week proximity with emojis based on pct_below_high and pct_above_low."""
+    pct_below_high = row.get("pct_below_high", None)
+    pct_above_low = row.get("pct_above_low", None)
+
+    if pd.isna(pct_below_high) or pd.isna(pct_above_low):
+        return '<span style="display:block; text-align:center;">-</span>'
+
+    if pct_below_high > -5:
+        emoji = "🚀"
+        text = f"{pct_below_high:.1f}% below high"
+    elif pct_above_low < 5:
+        emoji = "🐢"
+        text = f"{pct_above_low:.1f}% above low"
+    else:
+        emoji = ""
+        text = ""
+    return f'<span style="display:block; text-align:center;">{emoji} {text}</span>'
+
 def format_indicator(value: str) -> str:
     """Format yes/no indicator as emoji."""
     value = str(value).strip().lower()
@@ -986,8 +1005,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "1D Return": format_performance(row.get("ret_1d")),
                 "1W Return": format_performance(row.get("ret_1w")),
                 "1M Return": format_performance(row.get("ret_1m")),
-                "52W High": format_performance(row.get("pct_below_high")),
-                "52W Low": format_performance(row.get("pct_above_low")),
+                "52W High": format_52w(row.get("pct_below_high")),
+                "52W Low": format_52w(row.get("pct_above_low")),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
