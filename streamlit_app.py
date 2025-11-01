@@ -10,7 +10,6 @@ import base64
 import re
 import html
 from typing import List, Dict, Tuple
-import itertools
 
 # ---------------------------------
 # Configuration
@@ -42,8 +41,6 @@ GROUP_PALETTE = {
 # Settings
 use_group_colors = True        # color-code ticker chips by group
 max_holdings_rows = 10         # rows shown in tooltip table
-
-_vol_counter = itertools.count()
 
 # ---------------------------------
 # Small Helpers
@@ -437,7 +434,7 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
 def create_volatility_ratio(atr1m, atr3m) -> str:
-    """Create an interactive Plotly chart for Volatility Ratio with flat line and positioned marks."""
+    """Create an inline SVG for Volatility Ratio with horizontal line and positioned marks."""
     if pd.isna(atr1m) or pd.isna(atr3m):
         return '<span style="display:block; text-align:center;">-</span>'
     try:
@@ -445,60 +442,26 @@ def create_volatility_ratio(atr1m, atr3m) -> str:
         v3 = float(atr3m)
     except (ValueError, TypeError):
         return '<span style="display:block; text-align:center;">-</span>'
-
-    plot_id = f"vol_plot_{next(_vol_counter)}"
-    fig = go.Figure()
-
-    minv = min(v1, v3)
-    maxv = max(v1, v3)
-    xrange = [0, max(1.0, maxv * 1.1)]
-
-    # Flat horizontal line between the two points
-    fig.add_trace(go.Scatter(
-        x=[minv, maxv],
-        y=[0, 0],
-        mode='lines',
-        line=dict(color='lightgray', width=1),
-        showlegend=False,
-        hoverinfo='skip'
-    ))
-
-    # 1M marker
-    fig.add_trace(go.Scatter(
-        x=[v1],
-        y=[0],
-        mode='markers',
-        marker=dict(size=8, color='#8b5cf6'),
-        name='1M',
-        showlegend=False,
-        hovertemplate='<b>ATR Ratio 1M</b>: %{x:.2f}<extra></extra>'
-    ))
-
-    # 3M marker
-    fig.add_trace(go.Scatter(
-        x=[v3],
-        y=[0],
-        mode='markers',
-        marker=dict(size=8, color='#eab308'),
-        name='3M',
-        showlegend=False,
-        hovertemplate='<b>ATR Ratio 3M</b>: %{x:.2f}<extra></extra>'
-    ))
-
-    fig.update_layout(
-        width=100,
-        height=40,
-        margin=dict(l=20, r=20, t=5, b=5),
-        xaxis=dict(range=xrange, showgrid=False, showticklabels=False, zeroline=False, fixedrange=True),
-        yaxis=dict(showgrid=False, showticklabels=False, zeroline=False, fixedrange=True, scaleanchor="x", scaleratio=1),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(size=10),
-        hovermode='closest'
-    )
-
-    html = fig.to_html(full_html=False, include_plotlyjs=False, div_id=plot_id)
-    return f'<div style="width:100px; height:40px; display:inline-block;">{html}</div>'
+    
+    width = 80
+    height = 30
+    y = height / 2.0
+    maxv = max(v1, v3, 2.0)
+    scale_factor = 70.0 / maxv
+    x_base = 5.0
+    x1 = x_base + v1 * scale_factor
+    x3 = x_base + v3 * scale_factor
+    
+    svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+        <line x1="{x1}" y1="{y}" x2="{x3}" y2="{y}" stroke="gray" stroke-width="1"/>
+        <circle cx="{x1}" cy="{y}" r="3" fill="#8b5cf6">
+            <title>ATR Ratio 1M: {v1:.2f}</title>
+        </circle>
+        <circle cx="{x3}" cy="{y}" r="3" fill="#eab308">
+            <title>ATR Ratio 3M: {v3:.2f}</title>
+        </circle>
+    </svg>'''
+    return svg
 
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     """Create an Altair bar chart for breadth counts."""
@@ -835,8 +798,6 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; overflow: visible; }}
         /* Ensure chart links have space */
         #{table_id} table td:nth-child(20) a {{ display: block; margin: 0 auto; }}
-        /* Volatility chart cell */
-        #{table_id} table td:nth-child(15) {{ vertical-align: middle; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
@@ -970,7 +931,6 @@ def render_heat_heatmaps(df_heat: pd.DataFrame) -> None:
 def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     """Render the full dashboard."""
     st.title("US Market Daily Snapshot")
-    st.markdown('<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>', unsafe_allow_html=True)
 
     # Inject CSS
     st.markdown(build_chip_css(), unsafe_allow_html=True)
