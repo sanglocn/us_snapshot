@@ -460,6 +460,8 @@ def create_volatility_ratio(atr1m, atr3m) -> str:
         <circle cx="{x3}" cy="{y}" r="3" fill="#eab308">
             <title>ATR Ratio 3M: {v3:.2f}</title>
         </circle>
+        <text x="{x1}" y="{y + 8}" text-anchor="middle" font-size="7" fill="black">{v1:.1f}</text>
+        <text x="{x3}" y="{y + 8}" text-anchor="middle" font-size="7" fill="black">{v3:.1f}</text>
     </svg>'''
     return svg
 
