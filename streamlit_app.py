@@ -511,7 +511,7 @@ def format_52w_high(value: float) -> str:
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     if value > -5:
-        return '<span style="display:block; text-align:right;">🚀</span>'
+        return '<span style="display:block; text-align:center;">🚀</span>'
     formatted_value = f'{value:.1f}%'
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
@@ -520,7 +520,7 @@ def format_52w_low(value: float) -> str:
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     if value < 5:
-        return '<span style="display:block; text-align:right;">🐢</span>'
+        return '<span style="display:block; text-align:center;">🐢</span>'
     formatted_value = f'{value:.1f}%'
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
