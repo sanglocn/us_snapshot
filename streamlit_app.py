@@ -516,11 +516,11 @@ def format_52w_high(value: float) -> str:
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
 def format_52w_low(value: float) -> str:
-    """Format 52-week pct_above_low with turtle emoji if value < 5."""
+    """Format 52-week pct_above_low with snail emoji if value < 5."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
     if value < 5:
-        return '<span style="display:block; text-align:center;">🐢</span>'
+        return '<span style="display:block; text-align:center;">🐌</span>'
     formatted_value = f'{value:.1f}%'
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
