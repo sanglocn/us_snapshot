@@ -507,20 +507,24 @@ def format_performance_intraday(value: float) -> str:
     )
 
 def format_52w(pct_below_high: float, pct_above_low: float) -> str:
-    """Format 52-week proximity with emojis based on pct_below_high and pct_above_low."""
+    """Format 52-week proximity with emojis for near-highs and near-lows."""
     if pd.isna(pct_below_high) or pd.isna(pct_above_low):
-        return '<span style="display:block; text-align:center;">-</span>'
-
+        return '<span style="display:block; text-align:right;">-</span>'
+    
+    # Rocket if close to 52-week high
     if pct_below_high > -5:
-        emoji = "🚀"
-        text = f"{pct_below_high:.1f}% below high"
-    elif pct_above_low < 5:
-        emoji = "🐢"
-        text = f"{pct_above_low:.1f}% above low"
-    else:
-        emoji = ""
-        text = ""
-    return f'<span style="display:block; text-align:center;">{emoji} {text}</span>'
+        return '<span style="display:block; text-align:right;">🚀</span>'
+    
+    # Turtle if close to 52-week low
+    if pct_above_low < 5:
+        return '<span style="display:block; text-align:right;">🐢</span>'
+    
+    # Otherwise show both values
+    return (
+        f'<span style="display:block; text-align:right;">'
+        f'High: {pct_below_high:.1f}% | Low: {pct_above_low:.1f}%'
+        f'</span>'
+    )
 
 def format_indicator(value: str) -> str:
     """Format yes/no indicator as emoji."""
