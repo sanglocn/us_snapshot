@@ -506,11 +506,8 @@ def format_performance_intraday(value: float) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{pct_text}</span>'
     )
 
-def format_52w(row: pd.Series) -> str:
+def format_52w(pct_below_high: float, pct_above_low: float) -> str:
     """Format 52-week proximity with emojis based on pct_below_high and pct_above_low."""
-    pct_below_high = row.get("pct_below_high", None)
-    pct_above_low = row.get("pct_above_low", None)
-
     if pd.isna(pct_below_high) or pd.isna(pct_above_low):
         return '<span style="display:block; text-align:center;">-</span>'
 
