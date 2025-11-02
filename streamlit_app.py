@@ -507,19 +507,19 @@ def format_performance_intraday(value: float) -> str:
     )
 
 def format_52w_high(value: float) -> str:
-    """Format 52-week pct_below_high with rocket emoji if value > -5."""
+    """Format 52-week pct_below_high with rocket emoji if value > -3."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-    if value > -5:
+    if value > -3:
         return '<span style="display:block; text-align:center;">🚀</span>'
     formatted_value = f'{value:.1f}%'
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
 
 def format_52w_low(value: float) -> str:
-    """Format 52-week pct_above_low with snail emoji if value < 5."""
+    """Format 52-week pct_above_low with snail emoji if value < 3."""
     if pd.isna(value):
         return '<span style="display:block; text-align:right;">-</span>'
-    if value < 5:
+    if value < 3:
         return '<span style="display:block; text-align:center;">🐌</span>'
     formatted_value = f'{value:.1f}%'
     return f'<span style="display:block; text-align:right;">{formatted_value}</span>'
@@ -570,6 +570,19 @@ def format_multiple(value) -> str:
         f'<span style="display:block; text-align:right; padding:2px 6px; border-radius:6px; '
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>'
     )
+
+def format_atr(value: str) -> str:
+    """Format ratio indicator as colored arrow emoji based on comparison to 1."""
+    try:
+        num = float(str(value).strip())
+        if num < 1:
+            return '<span style="color:green; display:block; text-align:center;">⬇️</span>'
+        elif num > 1:
+            return '<span style="color:red; display:block; text-align:center;">⬆️</span>'
+        else:
+            return '<span style="display:block; text-align:center;">➖</span>'
+    except ValueError:
+        return '<span style="display:block; text-align:center;">-</span>'
 
 # ---------------------------------
 # Plotly Chart Builder
@@ -1013,8 +1026,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
                 "  ": "",
-                "ATR 1M": format_multiple(row.get("atr_ratio_1m")),
-                "ATR 3M": format_multiple(row.get("atr_ratio_3m")),
+                "ATR 1M": format_atr(row.get("atr_ratio_1m")),
+                "ATR 3M": format_atr(row.get("atr_ratio_3m")),
                 "  ": "",
                 "Chart": format_chart_link(ticker),
             })
