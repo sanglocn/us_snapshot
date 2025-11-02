@@ -571,7 +571,7 @@ def format_multiple(value) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>'
     )
 
-def format_ratio(value: str) -> str:
+def format_atr(value: str) -> str:
     """Format ratio indicator as directional emoji combo: up=warning, down=on-target."""
     try:
         num = float(str(value).strip())
