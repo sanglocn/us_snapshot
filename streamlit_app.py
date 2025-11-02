@@ -571,14 +571,14 @@ def format_multiple(value) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>'
     )
 
-def format_atr(value: str) -> str:
-    """Format ratio indicator as colored arrow emoji based on comparison to 1."""
+def format_ratio(value: str) -> str:
+    """Format ratio indicator as directional emoji combo: up=warning, down=on-target."""
     try:
         num = float(str(value).strip())
         if num < 1:
-            return '<span style="color:green; display:block; text-align:center;">⬇️</span>'
+            return '<span style="color:green; display:block; text-align:center;">🎯</span>'  
         elif num > 1:
-            return '<span style="color:red; display:block; text-align:center;">⬆️</span>'
+            return '<span style="color:red; display:block; text-align:center;">⚠️</span>'
         else:
             return '<span style="display:block; text-align:center;">➖</span>'
     except ValueError:
