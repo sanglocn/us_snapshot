@@ -549,7 +549,7 @@ def format_volume_alert(value: str, rs_rank_252d) -> str:
     elif val == "negative":
         return '<span style="display:block; text-align:center; font-size:16px;">🟥</span>'
     else:
-        return '<span style="color:grey; display:block; text-align:center;">➖</span>'
+        return '<span style="display:block; text-align:center;">-</span>'
 
 def format_multiple(value) -> str:
     """Format extension multiple as a colored badge."""
@@ -580,7 +580,7 @@ def format_volatility(value: str) -> str:
         elif value == "spike":
             return '<span style="color:red; display:block; text-align:center;">⚠️</span>'
         else:
-            return '<span style="display:block; text-align:center;">➖</span>'
+            return '<span style="display:block; text-align:center;">-</span>'
     except ValueError:
         return '<span style="display:block; text-align:center;">-</span>'
 
