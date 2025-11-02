@@ -1026,9 +1026,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
                 "  ": "",
-                "ATR 1M": format_atr(row.get("atr_ratio_1m")),
-                "ATR 3M": format_atr(row.get("atr_ratio_3m")),
-                "  ": "",
                 "Chart": format_chart_link(ticker),
             })
 
