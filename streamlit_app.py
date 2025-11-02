@@ -571,13 +571,13 @@ def format_multiple(value) -> str:
         f'background-color:{bg}; border:1px solid {border}; color:inherit;">{txt}</span>'
     )
 
-def format_atr(value: str) -> str:
+def format_volatility(value: str) -> str:
     """Format ratio indicator as directional emoji combo: up=warning, down=on-target."""
     try:
-        num = float(str(value).strip())
-        if num < 1:
+        value = str(value).strip().lower()
+        if value == "compression":
             return '<span style="color:green; display:block; text-align:center;">🎯</span>'  
-        elif num > 1:
+        elif value == "spike":
             return '<span style="color:red; display:block; text-align:center;">⚠️</span>'
         else:
             return '<span style="display:block; text-align:center;">➖</span>'
@@ -1011,7 +1011,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Relative Strength": create_sparkline(spark_series),
                 "RS Rank (1M)": format_rank(row.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(row.get("rs_rank_252d")),
+                " ": "",
                 "Volume Alert": format_volume_alert(row.get("volume_alert", "-"), row.get("rs_rank_252d")),
+                "Volatility Alert": format_volatility(row.get("volatility_signal")),
                 " ": "",
                 "Intraday": format_performance_intraday(row.get("ret_intraday")),
                 "1D Return": format_performance(row.get("ret_1d")),
