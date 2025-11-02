@@ -433,38 +433,6 @@ def create_sparkline(values: List[float], width: int = 155, height: int = 36) ->
     plt.close(fig)
     return f'<img src="data:image/png;base64,{base64.b64encode(buf.getvalue()).decode("utf-8")}" alt="sparkline" />'
 
-def create_volatility_ratio(atr1m, atr3m) -> str:
-    """Create an inline SVG for Volatility Ratio with horizontal line and positioned marks."""
-    if pd.isna(atr1m) or pd.isna(atr3m):
-        return '<span style="display:block; text-align:center;">-</span>'
-    try:
-        v1 = float(atr1m)
-        v3 = float(atr3m)
-    except (ValueError, TypeError):
-        return '<span style="display:block; text-align:center;">-</span>'
-    
-    width = 80
-    height = 30
-    y = height / 2.0
-    maxv = max(v1, v3, 2.0)
-    scale_factor = 70.0 / maxv
-    x_base = 5.0
-    x1 = x_base + v1 * scale_factor
-    x3 = x_base + v3 * scale_factor
-    
-    svg = f'''<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}">
-        <line x1="{x1}" y1="{y}" x2="{x3}" y2="{y}" stroke="gray" stroke-width="1"/>
-        <circle cx="{x1}" cy="{y}" r="3" fill="#8b5cf6">
-            <title>ATR Ratio 1M: {v1:.2f}</title>
-        </circle>
-        <circle cx="{x3}" cy="{y}" r="3" fill="#eab308">
-            <title>ATR Ratio 3M: {v3:.2f}</title>
-        </circle>
-        <text x="{x1}" y="{y + 8}" text-anchor="middle" font-size="7" fill="black">{v1:.1f}</text>
-        <text x="{x3}" y="{y + 8}" text-anchor="middle" font-size="7" fill="black">{v3:.1f}</text>
-    </svg>'''
-    return svg
-
 def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> alt.Chart:
     """Create an Altair bar chart for breadth counts."""
     df = df.copy()
@@ -787,19 +755,16 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         #{table_id} table td:nth-child(7),
         #{table_id} table td:nth-child(8),
         #{table_id} table td:nth-child(9),
-        #{table_id} table td:nth-child(10),
-        #{table_id} table td:nth-child(14) {{ text-align: right !important; }}
+        #{table_id} table td:nth-child(10) {{ text-align: right !important; }}
         #{table_id} table td:nth-child(5),
         #{table_id} table td:nth-child(11),
         #{table_id} table td:nth-child(12),
-        #{table_id} table td:nth-child(15),
-        #{table_id} table td:nth-child(16),
-        #{table_id} table td:nth-child(17),
-        #{table_id} table td:nth-child(19) {{ text-align: center !important; }}
+        #{table_id} table td:nth-child(13),
+        #{table_id} table td:nth-child(14) {{ text-align: center !important; }}
         /* Keep Ticker column tight and on one line */
         #{table_id} table td:nth-child(1) {{ white-space: nowrap; line-height: 1.25; overflow: visible; }}
         /* Ensure chart links have space */
-        #{table_id} table td:nth-child(20) a {{ display: block; margin: 0 auto; }}
+        #{table_id} table td:nth-child(14) a {{ display: block; margin: 0 auto; }}
     """
     st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
 
@@ -1043,7 +1008,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "52W Low": format_52w_low(row.get("pct_above_low")),
                 "  ": "",
                 "Extension Multiple": format_multiple(row.get("ratio_pct_dist_to_atr_pct")),
-                "Volatility Ratio": create_volatility_ratio(row.get("atr_ratio_1m"), row.get("atr_ratio_3m")),
                 "Above SMA5": format_indicator(row.get("above_sma5")),
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
