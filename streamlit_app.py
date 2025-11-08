@@ -612,6 +612,23 @@ def format_volatility(value: str) -> str:
     except ValueError:
         return '<span style="display:block; text-align:center;">-</span>'
 
+def format_stage_label(value: str) -> str:
+    """Format stage label with colored dot emoji."""
+    try:
+        value = str(value).strip().lower()
+        if value == "stage 1":
+            return '<span style="display:block; text-align:center;">🟡</span>'  # yellow
+        elif value == "stage 2":
+            return '<span style="display:block; text-align:center;">🟢</span>'  # green
+        elif value == "stage 3":
+            return '<span style="display:block; text-align:center;">🟠</span>'  # orange
+        elif value == "stage 4":
+            return '<span style="display:block; text-align:center;">🔴</span>'  # red
+        else:
+            return '<span style="display:block; text-align:center;">⚪</span>'  # grey/other
+    except Exception:
+        return '<span style="display:block; text-align:center;">⚪</span>'
+
 # ---------------------------------
 # Plotly Chart Builder
 # ---------------------------------
@@ -1058,8 +1075,8 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "  ": "",
                 "Chart": format_chart_link(ticker),
                 "  ": "",
-                "Core": format_performance(row.get("stage_label_core")),
-                "Mod": format_performance(row.get("stage_label_adj"))
+                "Core Model": format_stage_label(row.get("stage_label_core")),
+                "Modified Model": format_stage_label(row.get("stage_label_adj"))
             })
 
         render_group_table(group_name, rows)
