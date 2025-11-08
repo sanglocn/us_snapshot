@@ -213,7 +213,7 @@ def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
     })
 
     # Ensure date is datetime type
-    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
 
     # Keep only the most recent record per ticker
     df = df.sort_values(['ticker', 'date']).groupby('ticker', as_index=False).tail(1)
@@ -998,6 +998,12 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     except Exception as e:
         df_heat = pd.DataFrame()
         st.warning(f"Heat data unavailable — {e}")
+
+    try:
+        df_weekly = load_weekly_csv()
+    except Exception as e:
+        df_weekly = pd.DataFrame()
+        st.warning(f"Stage data unavailable — {e}")
 
     if "group" not in latest.columns:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
