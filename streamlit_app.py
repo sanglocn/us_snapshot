@@ -23,6 +23,7 @@ DATA_URLS = {
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
     "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
     "heat": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_heat.csv",
+    "weekly": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price_weekly.csv",
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market", "Sector", "Commodity", "Crypto", "Country", "Theme", "Leader"]
@@ -187,6 +188,33 @@ def load_heat_csv(url: str = DATA_URLS["heat"]) -> pd.DataFrame:
         colmap['volumefactor']: 'VolumeFactor'
     })
     df['date'] = pd.to_datetime(df['date'])
+    return df
+
+@st.cache_data(ttl=900)
+def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
+    """Load and normalize weekly stage data."""
+    df = pd.read_csv(url)
+
+    # Normalize column names to lowercase keys mapping to original names
+    colmap = {c.lower(): c for c in df.columns}
+
+    # Required fields
+    required = ['ticker', 'date', 'market_stage_core', 'stage_label_adj']
+    missing = [r for r in required if r not in colmap]
+    if missing:
+        raise ValueError(f"Missing columns in weekly CSV: {missing}. Available: {list(df.columns)}")
+
+    # Rename to canonical names
+    df = df.rename(columns={
+        colmap['ticker']: 'ticker',
+        colmap['date']: 'date',
+        colmap['stage_label_core']: 'stage_label_core',
+        colmap['stage_label_adj']: 'stage_label_adj'
+    })
+
+    # Ensure date is datetime type
+    df['date'] = pd.to_datetime(df['date'])
+
     return df
 
 # ---------------------------------
@@ -1029,6 +1057,9 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA20": format_indicator(row.get("above_sma20")),
                 "  ": "",
                 "Chart": format_chart_link(ticker),
+                "  ": "",
+                "Core": format_performance(row.get("stage_label_core")),
+                "Mod": format_performance(row.get("stage_label_adj"))
             })
 
         render_group_table(group_name, rows)
