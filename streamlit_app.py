@@ -23,7 +23,7 @@ DATA_URLS = {
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
     "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
     "heat": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_heat.csv",
-    "weekly": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price_weekly.csv",
+    "stage": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price_weekly.csv",
 }
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market", "Sector", "Commodity", "Crypto", "Country", "Theme", "Leader"]
@@ -191,7 +191,7 @@ def load_heat_csv(url: str = DATA_URLS["heat"]) -> pd.DataFrame:
     return df
 
 @st.cache_data(ttl=900)
-def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
+def load_stage_csv(url: str = DATA_URLS["stage"]) -> pd.DataFrame:
     """Load and normalize weekly stage data (latest per ticker only)."""
     df = pd.read_csv(url)
 
@@ -202,7 +202,7 @@ def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
     required = ['ticker', 'date', 'stage_label_core', 'stage_label_adj']
     missing = [r for r in required if r not in colmap]
     if missing:
-        raise ValueError(f"Missing columns in weekly CSV: {missing}. Available: {list(df.columns)}")
+        raise ValueError(f"Missing columns in stage CSV: {missing}. Available: {list(df.columns)}")
 
     # Rename to canonical names
     df = df.rename(columns={
@@ -1000,10 +1000,23 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.warning(f"Heat data unavailable — {e}")
 
     try:
-        df_weekly = load_weekly_csv()
+        df_stage = load_stage_csv()
     except Exception as e:
-        df_weekly = pd.DataFrame()
+        df_stage = pd.DataFrame()
         st.warning(f"Stage data unavailable — {e}")
+
+    # Merge stage labels from weekly data into latest (if available)
+    if not df_stage.empty:
+        latest = (
+            latest
+            .reset_index()
+            .merge(
+                df_stage[['ticker', 'stage_label_core', 'stage_label_adj']],
+                on='ticker',
+                how='left'
+            )
+            .set_index('ticker')
+        )
 
     if "group" not in latest.columns:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
