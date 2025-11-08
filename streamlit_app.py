@@ -199,7 +199,7 @@ def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
     colmap = {c.lower(): c for c in df.columns}
 
     # Required fields
-    required = ['ticker', 'date', 'market_stage_core', 'stage_label_adj']
+    required = ['ticker', 'date', 'stage_label_core', 'stage_label_adj']
     missing = [r for r in required if r not in colmap]
     if missing:
         raise ValueError(f"Missing columns in weekly CSV: {missing}. Available: {list(df.columns)}")
