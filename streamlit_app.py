@@ -192,7 +192,7 @@ def load_heat_csv(url: str = DATA_URLS["heat"]) -> pd.DataFrame:
 
 @st.cache_data(ttl=900)
 def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
-    """Load and normalize weekly stage data."""
+    """Load and normalize weekly stage data (latest per ticker only)."""
     df = pd.read_csv(url)
 
     # Normalize column names to lowercase keys mapping to original names
@@ -214,6 +214,9 @@ def load_weekly_csv(url: str = DATA_URLS["weekly"]) -> pd.DataFrame:
 
     # Ensure date is datetime type
     df['date'] = pd.to_datetime(df['date'])
+
+    # Keep only the most recent record per ticker
+    df = df.sort_values(['ticker', 'date']).groupby('ticker', as_index=False).tail(1)
 
     return df
 
