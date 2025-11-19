@@ -309,7 +309,8 @@ def render_heat_section(df_heat: pd.DataFrame):
     tickers = df_heat.groupby(['ticker','code'])['date'].min().reset_index().sort_values(['code','ticker'])['ticker'].tolist()
 
     vol_pivot = df_heat.pivot(index='ticker', columns='date', values='VolumeFactor').reindex(tickers, dates)
-    price_pivot = df_heat.pivot(index='ticker', columns='date', values='PriceFactor').reindex=tickers, columns=dates)
+    price_pivot = df_heat.pivot(index='ticker', columns='date', values='PriceFactor').reindex(index=tickers, columns=dates)
+
 
     col1, col2 = st.columns(2)
     with col1:
