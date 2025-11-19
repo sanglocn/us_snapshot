@@ -2,14 +2,13 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import plotly.express as px
 import altair as alt
 import io
 import base64
 import re
 import html
-from typing import List, Tuple
+from typing import List
 
 # ---------------------------------
 # Configuration
@@ -22,6 +21,7 @@ DATA_URLS = {
     "heat": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_heat.csv",
     "stage": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price_weekly.csv",
 }
+
 LOOKBACK_DAYS = 21
 GROUP_ORDER = ["Market", "Sector", "Commodity", "Crypto", "Country", "Theme", "Leader"]
 
@@ -40,7 +40,7 @@ use_group_colors = True
 # ---------------------------------
 # Helpers
 # ---------------------------------
-def _clean_text_series(s: pd.Series): 
+def _clean_text_series(s: pd.Series):
     return s.astype(str).str.replace(r"[\r\n\t]+", " ", regex=True).str.replace(r"\s+", " ", regex=True).str.strip()
 
 def _clean_ticker_series(s: pd.Series):
@@ -74,21 +74,24 @@ def create_sparkline_base64(values: List[float], width: int = 180, height: int =
 # ---------------------------------
 def make_advanced_tooltip(row: pd.Series, rs_series: List[float]) -> str:
     spark_img = create_sparkline_base64(rs_series)
-    stage = str(row.get("  ("stage_label_adj", "Unknown")).lower()
-    stage_emoji = {"stage 1": "🟡", "stage 2": "🟢", "stage 3": "🟠", "stage 4": "🔴"}.get(stage, "⚪")
+    stage_raw = row.get("stage_label_adj", "Unknown")
+    stage = str(stage_raw).lower()
+    stage_emoji = {
+        "stage 1": "🟡", "stage 2": "🟢", "stage 3": "🟠", "stage 4": "🔴"
+    }.get(stage, "⚪")
 
     return f"""
     <div class="tt-card">
         <div class="tt-title">{_escape(row.name)}</div>
         {f'<img src="{spark_img}" style="width:100%;border-radius:8px;margin:10px 0;"/>' if spark_img else ''}
         <table class="tt-table">
-            <tr><td>1W Return</td><td>{row.get('ret_1w',0):+.1f}%</td></tr>
-            <tr><td>1M Return</td><td>{row.get('ret_1m',0):+.1f}%</td></tr>
-            <tr><td>Below 52W High</td><td>{row.get('pct_below_high',0):.1f}%</td></tr>
-            <tr><td>Above 52W Low</td><td>{row.get('pct_above_low',0):.1f}%</td></tr>
-            <tr><td>Above SMA5</td><td>{'✅' if row.get('above_sma5')=='yes' else '❌'}</td></tr>
-            <tr><td>Above SMA10</td><td>{'✅' if row.get('above_sma10')=='yes' else '❌'}</td></tr>
-            <tr><td>Modified Stage</td><td>{stage_emoji} {row.get('stage_label_adj','N/A')}</td></tr>
+            <tr><td>1W Return</td><td>{row.get('ret_1w', 0):+.1f}%</td></tr>
+            <tr><td>1M Return</td><td>{row.get('ret_1m', 0):+.1f}%</td></tr>
+            <tr><td>Below 52W High</td><td>{row.get('pct_below_high', 0):.1f}%</td></tr>
+            <tr><td>Above 52W Low</td><td>{row.get('pct_above_low', 0):.1f}%</td></tr>
+            <tr><td>Above SMA5</td><td>{'✅' if row.get('above_sma5') == 'yes' else '❌'}</td></tr>
+            <tr><td>Above SMA10</td><td>{'✅' if row.get('above_sma10') == 'yes' else '❌'}</td></tr>
+            <tr><td>Modified Stage</td><td>{stage_emoji} {stage_raw if pd.notna(stage_raw) else 'N/A'}</td></tr>
         </table>
     </div>
     """
@@ -123,14 +126,14 @@ def build_chip_css() -> str:
     """
     groups = ""
     if use_group_colors:
-        for g,(b,d) in GROUP_PALETTE.items():
-            s=slugify(g)
+        for g, (b, d) in GROUP_PALETTE.items():
+            s = slugify(g)
             groups += f".tt-chip.chip--{s}{{background:linear-gradient(135deg,{b}22,{d}22);border-color:{b}55;color:{d};}}"
             groups += f".tt-chip.chip--{s}:hover{{background:linear-gradient(135deg,{b}33,{d}33);border-color:{b}88;box-shadow:0 4px 16px {b}55;}}"
-    return "<style>"+base+groups+"</style>"
+    return "<style>" + base + groups + "</style>"
 
 # ---------------------------------
-# Data Loading (NO holdings, NO chart)
+# Data Loading
 # ---------------------------------
 @st.cache_data(ttl=900)
 def load_data():
@@ -147,30 +150,32 @@ def load_data():
 @st.cache_data(ttl=900)
 def load_heat_csv():
     df = pd.read_csv(DATA_URLS["heat"])
-    colmap = {c.lower():c for c in df.columns}
-    df = df.rename(columns={colmap.get(k,k):v for k,v in zip(['date','ticker','code','pricefactor','volumefactor'],
-                                                            ['date','ticker','code','PriceFactor','VolumeFactor'])})
+    colmap = {c.lower(): c for c in df.columns}
+    rename = {colmap.get(k, k): v for k, v in zip(['date','ticker','code','pricefactor','volumefactor'],
+                                                 ['date','ticker','code','PriceFactor','VolumeFactor'])}
+    df = df.rename(columns=rename)
     df['date'] = pd.to_datetime(df['date'])
     return df
 
 @st.cache_data(ttl=900)
 def load_stage_csv():
     df = pd.read_csv(DATA_URLS["stage"])
-    colmap = {c.lower():c for c in df.columns}
-    df = df.rename(columns={colmap.get(k,k):v for k,v in zip(['ticker','date','stage_label_core','stage_label_adj'],
-                                                            ['ticker','date','stage_label_core','stage_label_adj'])})
+    colmap = {c.lower(): c for c in df.columns}
+    rename = {colmap.get(k, k): v for k, v in zip(['ticker','date','stage_label_core','stage_label_adj'],
+                                                 ['ticker','date','stage_label_core','stage_label_adj'])}
+    df = df.rename(columns=rename)
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
-    return df.sort_values(['ticker','date']).groupby('ticker').tail(1)
+    return df.sort_values(['ticker', 'date']).groupby('ticker').tail(1)
 
 # ---------------------------------
-# Formatting (unchanged)
+# Formatting Functions (unchanged)
 # ---------------------------------
 def format_rank(v): 
     if pd.isna(v): return '<span style="display:block;text-align:right;">-</span>'
     p = int(round(v*100))
-    if p>=85: bg,bor = "rgba(16,185,129,.22)","rgba(16,185,129,.35)"
-    elif p<50: bg,bor = "rgba(239,68,68,.22)","rgba(239,68,68,.35)"
-    else: bg,bor = "rgba(156,163,175,.25)","rgba(156,163,175,.35)"
+    if p >= 85: bg, bor = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)"
+    elif p < 50: bg, bor = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"
+    else: bg, bor = "rgba(156,163,175,.25)", "rgba(156,163,175,.35)"
     return f'<span style="display:block;text-align:right;padding:2px 6px;border-radius:6px;background:{bg};border:1px solid {bor};">{p}%</span>'
 
 def format_performance(v):
@@ -180,96 +185,103 @@ def format_performance(v):
 def format_performance_intraday(v):
     if pd.isna(v): return '<span style="display:block;text-align:right;">-</span>'
     txt = f"{v:.1f}%"
-    if v>0: bg,bor = "rgba(16,185,129,.22)","rgba(16,185,129,.35)"
-    elif v<0: bg,bor = "rgba(239,68,68,.22)","rgba(239,68,68,.35)"
-    else: bg,bor = "rgba(156,163,175,.25)","rgba(156,163,175,.35)"
+    if v > 0: bg, bor = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)"
+    elif v < 0: bg, bor = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"
+    else: bg, bor = "rgba(156,163,175,.25)", "rgba(156,163,175,.35)"
     return f'<span style="display:block;text-align:right;padding:2px 6px;border-radius:6px;background:{bg};border:1px solid {bor};">{txt}</span>'
 
 def format_52w_high(v):
     if pd.isna(v): return '<span style="display:block;text-align:right;">-</span>'
-    if v>-3: return '<span style="display:block;text-align:center;">🚀</span>'
+    if v > -3: return '<span style="display:block;text-align:center;">🚀</span>'
     return f'<span style="display:block;text-align:right;">{v:.1f}%</span>'
 
 def format_52w_low(v):
     if pd.isna(v): return '<span style="display:block;text-align:right;">-</span>'
-    if v<3: return '<span style="display:block;text-align:center;">🐌</span>'
+    if v < 3: return '<span style="display:block;text-align:center;">🐌</span>'
     return f'<span style="display:block;text-align:right;">{v:.1f}%</span>'
 
 def format_volume_alert(val, rs252):
-    if not isinstance(val,str): return '<span style="display:block;text-align:center;">-</span>'
+    if not isinstance(val, str): return '<span style="display:block;text-align:center;">-</span>'
     val = val.strip().lower()
-    try: rs = float(rs252)>=0.80
-    except: rs = False
-    if val=="positive" and rs: return '<span style="display:block;text-align:center;font-size:16px;">💎</span>'
-    if val=="positive": return '<span style="display:block;text-align:center;font-size:16px;">🟩</span>'
-    if val=="negative": return '<span style="display:block;text-align:center;font-size:16px;">🟥</span>'
+    try: strong_rs = float(rs252) >= 0.80
+    except: strong_rs = False
+    if val == "positive" and strong_rs: return '<span style="display:block;text-align:center;font-size:16px;">💎</span>'
+    if val == "positive": return '<span style="display:block;text-align:center;font-size:16px;">🟩</span>'
+    if val == "negative": return '<span style="display:block;text-align:center;font-size:16px;">🟥</span>'
     return '<span style="display:block;text-align:center;">-</span>'
 
 def format_volatility(v):
-    v=str(v).strip().lower()
-    if v=="compression": return '<span style="color:green;display:block;text-align:center;">🎯</span>'
-    if v=="spike": return '<span style="color:red;display:block;text-align:center;">⚠️</span>'
+    v = str(v).strip().lower()
+    if v == "compression": return '<span style="color:green;display:block;text-align:center;">🎯</span>'
+    if v == "spike": return '<span style="color:red;display:block;text-align:center;">⚠️</span>'
     return '<span style="display:block;text-align:center;">-</span>'
 
 def format_multiple(v):
-    try: v=float(v)
+    try: v = float(v)
     except: return '<span style="display:block;text-align:right;">-</span>'
     txt = f"{v:.2f}"
-    if v>=10: bg,bor = "rgba(239,68,68,.22)","rgba(239,68,68,.35)"
-    elif v>=4: bg,bor = "rgba(234,179,8,.22)","rgba(234,179,8,.35)"
-    elif v>0: bg,bor = "rgba(16,185,129,.22)","rgba(16,185,129,.35)"
-    else: bg,bor = "rgba(156,163,175,.18)","rgba(156,163,175,.30)"
+    if v >= 10: bg, bor = "rgba(239,68,68,.22)", "rgba(239,68,68,.35)"
+    elif v >= 4: bg, bor = "rgba(234,179,8,.22)", "rgba(234,179,8,.35)"
+    elif v > 0: bg, bor = "rgba(16,185,129,.22)", "rgba(16,185,129,.35)"
+    else: bg, bor = "rgba(156,163,175,.18)", "rgba(156,163,175,.30)"
     return f'<span style="display:block;text-align:right;padding:2px 6px;border-radius:6px;background:{bg};border:1px solid {bor};">{txt}</span>'
 
 def format_stage_label(v):
-    v=str(v).lower()
-    if "1" in v: return '<span style="display:block;text-align:center;">🟡</span>'
-    if "2" in v: return '<span style="display:block;text-align:center;">🟢</span>'
-    if "3" in v: return '<span style="display:block;text-align:center;">🟠</span>'
-    if "4" in v: return '<span style="display:block;text-align:center;">🔴</span>'
+    v = str(v).lower()
+    if "stage 1" in v: return '<span style="display:block;text-align:center;">🟡</span>'
+    if "stage 2" in v: return '<span style="display:block;text-align:center;">🟢</span>'
+    if "stage 3" in v: return '<span style="display:block;text-align:center;">🟠</span>'
+    if "stage 4" in v: return '<span style="display:block;text-align:center;">🔴</span>'
     return '<span style="display:block;text-align:center;">⚪</span>'
 
 # ---------------------------------
 # Dashboard
 # ---------------------------------
-def render_dashboard(df_etf, df_rs):
+def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame):
     st.title("US Market Daily Snapshot")
     st.markdown(build_chip_css(), unsafe_allow_html=True)
 
     latest = df_etf.sort_values("date").groupby("ticker").tail(1).set_index("ticker")
-    rs_last = df_rs.sort_values(["ticker","date"]).groupby("ticker").tail(LOOKBACK_DAYS)
+    rs_last = df_rs.sort_values(["ticker", "date"]).groupby("ticker").tail(LOOKBACK_DAYS)
+
     st.caption(f"Latest Update: {latest['date'].max().date()}")
 
-    # Sidebar
+    # Sidebar filters
     with st.sidebar:
         st.header("Filters")
-        hide_rs = st.toggle("Hide RS < 85%", False)
-        hide_ext = st.toggle("Hide Multiple > 4", False)
-        hide_pv = st.toggle("Hide Weak P&V", False)
+        hide_rs = st.toggle("Hide RS Rank (1M) < 85%", False)
+        hide_ext = st.toggle("Hide Extension Multiple > 4", False)
+        hide_pv = st.toggle("Hide Weak Price/Volume", False)
         st.markdown("---")
         for g in GROUP_ORDER:
             st.markdown(f'[📌 {g}](#{slugify(g)})', unsafe_allow_html=True)
-        st.markdown('[✏️ Breadth Gauge](#breadth)')
-        st.markdown('[🧠 Price & Volume](#pv)')
+        st.markdown('[✏️ Breadth Gauge](#breadth-gauge)')
+        st.markdown('[🧠 Price & Volume](#price-volume)')
 
-    # Stage data
+    # Merge stage data
     df_stage = load_stage_csv()
     if not df_stage.empty:
-        latest = latest.reset_index().merge(df_stage[['ticker','stage_label_core','stage_label_adj']], on='ticker', how='left').set_index('ticker')
+        latest = latest.reset_index().merge(df_stage[['ticker', 'stage_label_core', 'stage_label_adj']],
+                                           on='ticker', how='left').set_index('ticker')
 
-    # Tables
+    # Render each group
     for group in GROUP_ORDER:
-        st.markdown(f'<div id="{slugify(group)}" style="padding-top:80px;margin-top:-80px;"></div>', unsafe_allow_html=True)
+        anchor = slugify(group)
+        st.markdown(f'<div id="{anchor}" style="padding-top:80px;margin-top:-80px;"></div>', unsafe_allow_html=True)
         st.header(f"📌 {group}")
-        if "group" not in latest.columns or group not in latest["group"].unique():
+
+        if "group" not in latest.columns or group not in latest["group"].values:
             st.info("No data")
             continue
 
-        tickers = latest[latest["group"]==group].index.tolist()
+        tickers = latest[latest["group"] == group].index.tolist()
+
+        # Apply filters
         if hide_rs and "rs_rank_21d" in latest.columns:
-            tickers = [t for t in tickers if latest.loc[t,"rs_rank_21d"] >= 0.85]
+            tickers = [t for t in tickers if latest.loc[t, "rs_rank_21d"] >= 0.85]
         if hide_ext and "ratio_pct_dist_to_atr_pct" in latest.columns:
-            tickers = [t for t in tickers if latest.loc[t,"ratio_pct_dist_to_atr_pct"] <= 4]
+            tickers = [t for t in tickers if latest.loc[t, "ratio_pct_dist_to_atr_pct"] <= 4.0]
+
         if not tickers:
             st.info("No tickers after filters")
             continue
@@ -277,14 +289,15 @@ def render_dashboard(df_etf, df_rs):
         rows = []
         for t in tickers:
             r = latest.loc[t]
-            rs_series = rs_last[rs_last["ticker"]==t]["rs_to_spy"].tolist()
-            chip = make_ticker_chip(t, make_advanced_tooltip(r, rs_series), group)
+            rs_series = rs_last[rs_last["ticker"] == t]["rs_to_spy"].tolist()
+            tooltip = make_advanced_tooltip(r, rs_series)
+            chip = make_ticker_chip(t, tooltip, group)
 
             rows.append({
                 "Ticker": chip,
                 "RS Rank (1M)": format_rank(r.get("rs_rank_21d")),
                 "RS Rank (1Y)": format_rank(r.get("rs_rank_252d")),
-                "Vol Alert": format_volume_alert(r.get("volume_alert",""), r.get("rs_rank_252d")),
+                "Vol Alert": format_volume_alert(r.get("volume_alert", ""), r.get("rs_rank_252d")),
                 "Volatility": format_volatility(r.get("volatility_signal")),
                 "Intraday": format_performance_intraday(r.get("ret_intraday")),
                 "1D": format_performance(r.get("ret_1d")),
@@ -296,9 +309,10 @@ def render_dashboard(df_etf, df_rs):
                 "Core": format_stage_label(r.get("stage_label_core")),
                 "Mod": format_stage_label(r.get("stage_label_adj"))
             })
+
         st.markdown(pd.DataFrame(rows).to_html(escape=False, index=False), unsafe_allow_html=True)
 
-    # Breadth & Heat sections unchanged (you already have them)
+    # Breadth & Heat sections remain unchanged (you already have them in your original code)
 
 # ---------------------------------
 # Main
