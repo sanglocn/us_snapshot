@@ -39,7 +39,7 @@ GROUP_PALETTE = {
 
 # Settings
 use_group_colors = True        # color-code ticker chips by group
-max_holdings_rows = 10         # rows shown in tooltip table
+max_holdings_rows = 10         # rows shown in tooltip table (ignored now, kept for compatibility)
 
 # ---------------------------------
 # Small Helpers
@@ -215,45 +215,77 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------
 # Chips + Tooltip (HTML/CSS)
 # ---------------------------------
-def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int) -> str:
-    """Generate HTML tooltip card with top holdings for a ticker."""
-    sub = holdings_df[holdings_df["fund_ticker"] == ticker]
-    if sub.empty:
-        return ""
-    last_date = sub["ingest_date"].max()
-    if pd.notna(last_date):
-        sub = sub[sub["ingest_date"] == last_date]
+def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, latest_row=None, max_rows: int = 10) -> str:
+    """Generate HTML tooltip card for a ticker.
 
-    fund_name = _escape(sub["fund_name"].iloc[0])
-    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")
+    Shows two sections only:
+      - Performance: 1W Return and 1M Return
+      - Moving Average: Above SMA5 and Above SMA10
 
-    topn = (
-        sub[["security_name", "security_ticker", "security_weight"]]
-        .dropna(subset=["security_name"])
-        .sort_values("security_weight", ascending=False)
-        .head(max_rows)
+    holdings_df is accepted for compatibility but ignored (we deliberately DO NOT show holdings).
+    latest_row should be the latest row/series/dict for that ticker (contains ret_1w, ret_1m, above_sma5, above_sma10).
+    """
+    # Title (use ticker as primary title — holdings removed)
+    title = _escape(ticker)
+
+    # Last update date: try common date fields from latest_row if present
+    last_update_str = "N/A"
+    if latest_row is not None:
+        # latest_row can be pd.Series or dict
+        try:
+            date_val = latest_row.get("date") if isinstance(latest_row, dict) else latest_row.get("date", None)
+        except Exception:
+            try:
+                date_val = latest_row["date"]
+            except Exception:
+                date_val = None
+        if pd.notna(date_val):
+            try:
+                last_update_str = _escape(pd.to_datetime(date_val).strftime("%Y-%m-%d"))
+            except Exception:
+                last_update_str = _escape(str(date_val))
+
+    # Helper to safely get values from latest_row
+    def _val(key):
+        if latest_row is None:
+            return None
+        try:
+            return latest_row.get(key) if isinstance(latest_row, dict) else latest_row.get(key, None)
+        except Exception:
+            try:
+                return latest_row[key]
+            except Exception:
+                return None
+
+    # Use existing formatters so visual style matches table cells elsewhere
+    ret_1w_html = format_performance(_val("ret_1w"))
+    ret_1m_html = format_performance(_val("ret_1m"))
+    above_sma5_html = format_indicator(_val("above_sma5"))
+    above_sma10_html = format_indicator(_val("above_sma10"))
+
+    # Build compact "Performance" and "Moving Average" tables
+    perf_table = (
+        "<table class='tt-table small'><thead><tr><th colspan='2'>Performance</th></tr></thead>"
+        "<tbody>"
+        f"<tr><td>1W Return</td><td style='text-align:right'>{ret_1w_html}</td></tr>"
+        f"<tr><td>1M Return</td><td style='text-align:right'>{ret_1m_html}</td></tr>"
+        "</tbody></table>"
     )
 
-    rows = []
-    for _, r in topn.iterrows():
-        sec = _escape(r["security_name"])
-        tk = _escape(r.get("security_ticker", ""))
-        wt = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
-        rows.append(
-            f"<tr><td class='tt-sec' title='{sec}'>{sec}</td>"
-            f"<td class='tt-tk' title='{tk}'>{tk}</td>"
-            f"<td class='tt-wt' title='{wt}'>{wt}</td></tr>"
-        )
-
-    table_html = (
-        "<table class='tt-table'>"
-        "<thead><tr><th>Security</th><th>Ticker</th><th>Weight</th></tr></thead>"
-        f"<tbody>{''.join(rows)}</tbody></table>"
+    ma_table = (
+        "<table class='tt-table small'><thead><tr><th colspan='2'>Moving Average</th></tr></thead>"
+        "<tbody>"
+        f"<tr><td>Above SMA5</td><td style='text-align:center'>{above_sma5_html}</td></tr>"
+        f"<tr><td>Above SMA10</td><td style='text-align:center'>{above_sma10_html}</td></tr>"
+        "</tbody></table>"
     )
+
     return (
-        f'<div class="tt-card"><div class="tt-title">{fund_name}</div>'
+        f'<div class="tt-card">'
+        f'<div class="tt-title">{title}</div>'
         f'<div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>'
-        f'{table_html}</div>'
+        f'<div class="tt-sections">{perf_table}{ma_table}</div>'
+        f'</div>'
     )
 
 def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
@@ -396,6 +428,15 @@ def build_chip_css() -> str:
 .stSidebar a {
     text-decoration: none;
 }
+
+/* Tooltip sections layout: side-by-side on wide screens, stacked on mobile */
+.tt-card .tt-sections { display:flex; gap:10px; margin-bottom:8px; align-items:flex-start; flex-wrap:wrap; }
+.tt-card .tt-table.small { width: 48%; font-size:12px; margin:0; border-collapse:collapse; }
+.tt-card .tt-table.small thead th { font-weight:700; font-size:12px; padding-bottom:6px; }
+.tt-card .tt-table.small tbody td { padding:4px 6px; border-bottom:none; vertical-align:middle; }
+@media (max-width:768px) {
+  .tt-card .tt-table.small { width:100%; }
+}
 """
     group_css_parts = []
     if use_group_colors:
@@ -458,7 +499,6 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         )
         .properties(height=320)
     )
-
 
 # ---------------------------------
 # Formatting Helpers
@@ -602,7 +642,7 @@ def format_stage_label(value: str) -> str:
 def render_group_table(group_name: str, rows: List[Dict]) -> None:
     """Render a group table as styled HTML."""
     table_id = f"tbl-{slugify(group_name)}"
-    html = f'<div style="padding-bottom: 40px; overflow: visible;">{pd.DataFrame(rows).to_html(escape=False, index=False)}</div>'
+    html_str = f'<div style="padding-bottom: 40px; overflow: visible;">{pd.DataFrame(rows).to_html(escape=False, index=False)}</div>'
 
     css = f"""
         #{table_id} table {{
@@ -649,7 +689,7 @@ def render_group_table(group_name: str, rows: List[Dict]) -> None:
         /* Ensure chart links have space */
         #{table_id} table td:nth-child(14) a {{ display: block; margin: 0 auto; }}
     """
-    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div id="{table_id}"><style>{css}</style>{html_str}</div>', unsafe_allow_html=True)
 
 # ---------------------------------
 # Heatmap Rendering Helpers
@@ -877,10 +917,11 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
             chip = ticker
-            if not df_holdings.empty:
-                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
-                if card_html:
-                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
+            # Always call tooltip generator (holdings_df accepted but now ignored).
+            # Pass the latest row so tooltip can render ret_1w, ret_1m, above_sma5, above_sma10
+            card_html = make_tooltip_card_for_ticker(df_holdings, ticker, latest_row=row, max_rows=max_holdings_rows)
+            if card_html:
+                chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
             rows.append({
                 "Ticker": chip,
