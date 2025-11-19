@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import plotly.express as px
 import altair as alt
 import io
@@ -21,7 +20,6 @@ DATA_URLS = {
     "etf": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price.csv",
     "rs": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_rs_sparkline.csv",
     "holdings": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_holdings.csv",
-    "chart": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_chart.csv",
     "heat": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_heat.csv",
     "stage": "https://raw.githubusercontent.com/sanglocn/us_snapshot/main/data/us_snapshot_etf_price_weekly.csv",
 }
@@ -140,32 +138,6 @@ def load_holdings_csv(url: str = DATA_URLS["holdings"]) -> pd.DataFrame:
     df["fund_name"] = _fix_acronyms_in_name(_clean_text_series(df["fund_name"], title_case=False))
     df["security_name"] = _fix_acronyms_in_name(_clean_text_series(df["security_name"], title_case=True))
     df["security_ticker"] = _clean_ticker_series(df["security_ticker"])
-    return df
-
-@st.cache_data(ttl=900, show_spinner=False)
-def load_chart_csv(url: str = DATA_URLS["chart"]) -> pd.DataFrame:
-    """Load and clean chart data (candlesticks, SMAs)."""
-    df = pd.read_csv(url)
-    required = {
-        "ticker", "group", "date", "adj_open", "adj_close", "adj_volume", "adj_high", "adj_low"
-    }
-    missing = required - set(df.columns)
-    if missing:
-        raise ValueError(f"Chart CSV missing columns: {sorted(missing)}")
-
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
-    df["ticker"] = _clean_ticker_series(df["ticker"])
-    df["group"] = _clean_text_series(df["group"])
-
-    # Coerce numerics, including optional SMAs
-    numeric_cols = ["adj_open", "adj_close", "adj_high", "adj_low", "adj_volume"]
-    sma_cols = ["sma5", "sma10", "sma20", "sma50"]
-    for col in numeric_cols + [s for s in sma_cols if s in df.columns]:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
-
-    # Track missing SMAs
-    missing_smas = [s for s in sma_cols if s not in df.columns]
-    df.attrs["sma_missing"] = sorted(missing_smas)
     return df
 
 @st.cache_data(ttl=900)
@@ -487,14 +459,6 @@ def breadth_column_chart(df: pd.DataFrame, value_col: str, bar_color: str) -> al
         .properties(height=320)
     )
 
-def format_chart_link(ticker: str) -> str:
-    """Returns an HTML link with a chart emoji that sets ?chart=<ticker> in URL."""
-    t = _escape(ticker)
-    return (
-        f'<a href="?chart={t}" target="_self" '
-        f'style="text-decoration:none; display:block; text-align:center; font-size:18px; line-height:1.2;" '
-        f'title="Open chart for {t}">📈</a>'
-    )
 
 # ---------------------------------
 # Formatting Helpers
@@ -631,148 +595,6 @@ def format_stage_label(value: str) -> str:
             return '<span style="display:block; text-align:center;">⚪</span>'  # grey/other
     except Exception:
         return '<span style="display:block; text-align:center;">⚪</span>'
-
-# ---------------------------------
-# Plotly Chart Builder
-# ---------------------------------
-def make_ticker_figure(df_chart: pd.DataFrame, ticker: str, max_bars: int = 180) -> go.Figure:
-    """Create a candlestick chart with SMAs and volume for a ticker."""
-    sub = df_chart[df_chart["ticker"] == ticker].sort_values("date")
-    if sub.empty:
-        raise ValueError(f"No chart data for {ticker}.")
-
-    # Filter valid sessions
-    sub = sub[
-        sub["adj_open"].notna() &
-        sub["adj_high"].notna() &
-        sub["adj_low"].notna() &
-        sub["adj_close"].notna()
-    ].copy()
-
-    if len(sub) > max_bars:
-        sub = sub.tail(max_bars)
-
-    sub = sub.reset_index(drop=True)
-    date_str = sub["date"].dt.strftime("%Y-%m-%d")
-
-    # Detect market holidays
-    trading_days = pd.to_datetime(sub["date"].dt.normalize().unique())
-    all_weekdays = pd.bdate_range(
-        start=sub["date"].min().normalize(),
-        end=sub["date"].max().normalize(),
-        freq="B"
-    )
-    closed_days = sorted(set(all_weekdays) - set(trading_days))
-    closed_days_str = [d.strftime("%Y-%m-%d") for d in closed_days]
-
-    # Create subplots
-    fig = make_subplots(
-        rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.06,
-        row_heights=[0.72, 0.28]
-    )
-
-    # Candlestick
-    fig.add_trace(
-        go.Candlestick(
-            x=sub["date"],
-            open=sub["adj_open"], high=sub["adj_high"],
-            low=sub["adj_low"], close=sub["adj_close"],
-            name="Price",
-            hovertext=[
-                f"Date: {d}<br>Open: {o:.2f}<br>High: {h:.2f}<br>Low: {l:.2f}<br>Close: {c:.2f}"
-                for d, o, h, l, c in zip(date_str, sub["adj_open"], sub["adj_high"], sub["adj_low"], sub["adj_close"])
-            ],
-            hoverinfo="text"
-        ),
-        row=1, col=1
-    )
-
-    # SMAs
-    sma_pairs = [("sma5", "SMA 5"), ("sma10", "SMA 10"), ("sma20", "SMA 20"), ("sma50", "SMA 50")]
-    for sma_col, name in sma_pairs:
-        if sma_col in sub.columns and sub[sma_col].notna().any():
-            fig.add_trace(
-                go.Scatter(
-                    x=sub["date"], y=sub[sma_col],
-                    mode="lines", name=name, line=dict(width=1.2),
-                    hovertext=[f"Date: {d}<br>{name}: {y:.2f}" for d, y in zip(date_str, sub[sma_col])],
-                    hoverinfo="text"
-                ),
-                row=1, col=1
-            )
-
-    # Volume
-    fig.add_trace(
-        go.Bar(
-            x=sub["date"], y=sub["adj_volume"], name="Volume", opacity=0.9,
-            hovertext=[f"Date: {d}<br>Volume: {int(v):,}" for d, v in zip(date_str, sub["adj_volume"].fillna(0))],
-            hoverinfo="text"
-        ),
-        row=2, col=1
-    )
-
-    # Layout
-    fig.update_layout(
-        autosize=True,
-        height=600,
-        margin=dict(l=20, r=20, t=50, b=90),
-        title=dict(text=f"{ticker} — Candlestick with SMA & Volume", x=0, xanchor="left"),
-        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
-        xaxis_rangeslider_visible=False,
-        hovermode="x unified",
-        template="plotly_white",
-        bargap=0.3
-    )
-
-    fig.update_yaxes(title_text="Price", row=1, col=1)
-    fig.update_yaxes(title_text="Volume", row=2, col=1)
-
-    # X-axis: monthly ticks, hide weekends/holidays
-    xaxis_config = {
-        "dtick": "M1",
-        "tickformat": "%b-%Y",
-        "ticklabelmode": "period",
-        "rangebreaks": [
-            dict(bounds=["sat", "mon"]),
-            dict(values=closed_days_str),
-        ],
-        "showgrid": True,
-    }
-    fig.update_xaxes(**xaxis_config, row=1, col=1)
-    fig.update_xaxes(**xaxis_config, row=2, col=1)
-
-    return fig
-
-def open_chart_ui(ticker: str, df_chart: pd.DataFrame):
-    """Display chart in dialog (if available) or sidebar."""
-    try:
-        fig = make_ticker_figure(df_chart, ticker)
-    except Exception as e:
-        if hasattr(st, "dialog"):
-            @st.dialog(f"Chart — {ticker}")
-            def _dlg():
-                st.error(str(e))
-            _dlg()
-        else:
-            with st.sidebar:
-                st.header(f"Chart — {ticker}")
-                st.error(str(e))
-        return
-
-    sma_missing = df_chart.attrs.get("sma_missing", [])
-    if hasattr(st, "dialog"):
-        @st.dialog(f"Chart — {ticker}")
-        def _dlg():
-            if sma_missing:
-                st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
-            st.plotly_chart(fig, use_container_width=True)
-        _dlg()
-    else:
-        with st.sidebar:
-            st.header(f"Chart — {ticker}")
-            if sma_missing:
-                st.caption(f"Note: Missing SMA columns in source: {', '.join(sma_missing)}")
-            st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------------------
 # Table Rendering
@@ -988,12 +810,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
         st.warning(f"Holdings tooltips disabled — {e}")
 
     try:
-        df_chart = load_chart_csv()
-    except Exception as e:
-        df_chart = pd.DataFrame()
-        st.warning(f"Chart data unavailable — {e}")
-
-    try:
         df_heat = load_heat_csv()
     except Exception as e:
         df_heat = pd.DataFrame()
@@ -1021,13 +837,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
     if "group" not in latest.columns:
         st.error("Column 'group' is missing in ETF dataset — cannot render grouped tables.")
         return
-
-    # Handle URL param for chart
-    qp = st.query_params if hasattr(st, "query_params") else {}
-    selected_chart_ticker = None
-    val = qp.get("chart", None)
-    if val:
-        selected_chart_ticker = str(val[0] if isinstance(val, list) else val).upper().strip()
 
     # Render group tables
     group_tickers = latest.groupby("group").groups
@@ -1095,8 +904,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
                 "Above SMA10": format_indicator(row.get("above_sma10")),
                 "Above SMA20": format_indicator(row.get("above_sma20")),
                 "  ": "",
-                "Chart": format_chart_link(ticker),
-                "  ": "",
                 "Core Model": format_stage_label(row.get("stage_label_core")),
                 "Modified Model": format_stage_label(row.get("stage_label_adj"))
             })
@@ -1143,13 +950,6 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             render_heat_heatmaps(df_heat)
     else:
         st.warning("Heat data not available — skipping price/volume analysis.")
-
-    # Open selected chart
-    if selected_chart_ticker:
-        if df_chart.empty:
-            st.warning("Chart data not available.")
-        else:
-            open_chart_ui(selected_chart_ticker, df_chart)
 
 # ---------------------------------
 # Main
