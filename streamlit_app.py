@@ -215,42 +215,46 @@ def compute_threshold_counts(df_etf: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------
 # Chips + Tooltip (HTML/CSS)
 # ---------------------------------
-def make_tooltip_card_for_ticker(latest_df: pd.DataFrame, ticker: str, max_rows: int = 10) -> str:
-    """
-    Generate a simple tooltip showing 1W and 1M performance instead of holdings.
-    We now pass the 'latest' dataframe (which has the returns) instead of holdings_df.
-    """
-    row = latest_df.loc[ticker]
-    
-    ret_1w = row.get("ret_1w")
-    ret_1m = row.get("ret_1m")
-    
-    ret_1w_str = f"{ret_1w:+.2f}%" if pd.notna(ret_1w) else "N/A"
-    ret_1m_str = f"{ret_1m:+.2f}%" if pd.notna(ret_1m) else "N/A"
-    
-    # Color for 1W return
-    color_1w = "#166534" if (ret_1w or 0) >= 0 else "#a31621"
-    # Color for 1M return
-    color_1m = "#166534" if (ret_1m or 0) >= 0 else "#a31621"
-    
-    fund_name = _escape(row.get("name", ticker))  # optional: show name if you have it
-    
-    tooltip_html = f"""
-    <div class="tt-card" style="width:240px; text-align:center;">
-        <div class="tt-title">{ticker}</div>
-        <div style="margin:12px 0; font-size:15px;">
-            <div style="margin:6px 0;">
-                <span style="color:#888; font-size:13px;">1W Return</span><br>
-                <span style="font-weight:700; font-size:18px; color:{color_1w};">{ret_1w_str}</span>
-            </div>
-            <div style="margin:6px 0;">
-                <span style="color:#888; font-size:13px;">1M Return</span><br>
-                <span style="font-weight:700; font-size:18px; color:{color_1m};">{ret_1m_str}</span>
-            </div>
-        </div>
-    </div>
-    """
-    return tooltip_html
+def make_tooltip_card_for_ticker(holdings_df: pd.DataFrame, ticker: str, max_rows: int) -> str:
+    """Generate HTML tooltip card with top holdings for a ticker."""
+    sub = holdings_df[holdings_df["fund_ticker"] == ticker]
+    if sub.empty:
+        return ""
+    last_date = sub["ingest_date"].max()
+    if pd.notna(last_date):
+        sub = sub[sub["ingest_date"] == last_date]
+
+    fund_name = _escape(sub["fund_name"].iloc[0])
+    last_update_str = _escape(last_date.strftime("%Y-%m-%d") if pd.notna(last_date) else "N/A")
+
+    topn = (
+        sub[["security_name", "security_ticker", "security_weight"]]
+        .dropna(subset=["security_name"])
+        .sort_values("security_weight", ascending=False)
+        .head(max_rows)
+    )
+
+    rows = []
+    for _, r in topn.iterrows():
+        sec = _escape(r["security_name"])
+        tk = _escape(r.get("security_ticker", ""))
+        wt = "" if pd.isna(r["security_weight"]) else f"{float(r['security_weight']):.2f}%"
+        rows.append(
+            f"<tr><td class='tt-sec' title='{sec}'>{sec}</td>"
+            f"<td class='tt-tk' title='{tk}'>{tk}</td>"
+            f"<td class='tt-wt' title='{wt}'>{wt}</td></tr>"
+        )
+
+    table_html = (
+        "<table class='tt-table'>"
+        "<thead><tr><th>Security</th><th>Ticker</th><th>Weight</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+    return (
+        f'<div class="tt-card"><div class="tt-title">{fund_name}</div>'
+        f'<div class="tt-sub">Last update: <span class="tt-date">{last_update_str}</span></div>'
+        f'{table_html}</div>'
+    )
 
 def make_ticker_chip_with_tooltip(ticker: str, card_html: str, group_name: str | None) -> str:
     """Generate HTML chip for ticker with optional tooltip."""
@@ -873,11 +877,10 @@ def render_dashboard(df_etf: pd.DataFrame, df_rs: pd.DataFrame) -> None:
             spark_series = rs_last_n.loc[rs_last_n["ticker"] == ticker, "rs_to_spy"].tolist()
 
             chip = ticker
-            card_html = make_tooltip_card_for_ticker(latest, ticker)  # pass 'latest' instead of holdings
-            if card_html:
-                chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
-            else:
-                chip = ticker
+            if not df_holdings.empty:
+                card_html = make_tooltip_card_for_ticker(df_holdings, ticker, max_rows=max_holdings_rows)
+                if card_html:
+                    chip = make_ticker_chip_with_tooltip(ticker, card_html, group_name)
 
             rows.append({
                 "Ticker": chip,
